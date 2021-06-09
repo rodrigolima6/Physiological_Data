@@ -1,4 +1,10 @@
 import biosignalsnotebooks as bsnb
+
+import novainstrumentation as ni
+from novainstrumentation.panthomkins.butterworth_filters import butter_bandpass_filter
+from novainstrumentation.panthomkins.detect_panthomkins_peaks import detect_panthomkins_peaks
+from novainstrumentation.panthomkins.rr_update import rr_1_update, rr_2_update, sync
+
 try:
     from acquisition import *
 except ModuleNotFoundError:
@@ -26,7 +32,7 @@ class ECG(Sensor):
         return signal_mv,signal_volts
 
 
-    def filterECG(self):
+    def filterECG(self,butterlow=8,butterhigh=30):
 
         """
         :param signal: ECG signal
@@ -34,8 +40,10 @@ class ECG(Sensor):
         :return: filtered_signal - Band Pass filtered ECG signal
         """
 
+        signal = (self.data-np.mean(self.data))/max(self.data)
+
         """Band pass filter between 5 and 15 Hz"""
-        filtered_signal = bsnb.detect._ecg_band_pass_filter(self.data,self.fs)
+        filtered_signal = butter_bandpass_filter(signal, butterlow, butterhigh, self.fs)
 
         return filtered_signal
 
@@ -59,7 +67,7 @@ class ECG(Sensor):
         :return: Squared signal of the ECG derivative
         """
 
-        squared_signal = signal**2
+        squared_signal = 50.0*signal**2
 
         return squared_signal
 
@@ -83,7 +91,8 @@ class ECG(Sensor):
 
         return integrated_signal
 
-    def detectRPeaks(self):
+    @staticmethod
+    def detectRPeaks(data,fs):
 
         """
         :param signal: Non-filtered ECG signal
@@ -92,9 +101,9 @@ class ECG(Sensor):
                  amp_peaks - amplitude of each R-peak detected
         """
 
-        time_peaks,amp_peaks = bsnb.detect_r_peaks(self.data,self.fs,time_units=True,plot_result=False)
+        peaks_index = ni.panthomkins.panthomkins(data,fs,butterlow=8,butterhigh=30)
 
-        return time_peaks,amp_peaks
+        return peaks_index
 
 class HRV(Sensor):
 
