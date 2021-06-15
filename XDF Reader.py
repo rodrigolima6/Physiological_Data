@@ -18,7 +18,7 @@ for stream in data:
     elif(stream['info']['name'][0] == "OpenSignals"):
         for i in range(1,np.array(stream['time_series']).shape[1]):
             plt.plot(stream['time_stamps'],stream['time_series'][:,i],label="OpenSignals_CH"+str(i))
-    elif(stream['info']['name'][0] == "EEG-EEG"):
+    elif(stream['info']['name'][0] == "openvibeSignal"):
         for i in range(1,np.array(stream['time_series']).shape[1]):
             plt.plot(stream['time_stamps'],stream['time_series'][:,i],label="EEG_CH"+str(i))
     else:
