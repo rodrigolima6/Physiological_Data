@@ -1,18 +1,37 @@
+import math
+
 import biosignalsnotebooks as bsnb
 
 import novainstrumentation as ni
 from novainstrumentation.panthomkins.butterworth_filters import butter_bandpass_filter
 from novainstrumentation.panthomkins.detect_panthomkins_peaks import detect_panthomkins_peaks
 from novainstrumentation.panthomkins.rr_update import rr_1_update, rr_2_update, sync
-
+from math import *
 try:
-    from acquisition import *
+    from Physiological_Data.lib.acquisition import *
 except ModuleNotFoundError:
-    from lib.acquisition import *
+    from Physiological_Data.lib.acquisition import *
 import scipy as sc
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import json
+
+class TEMP(Sensor):
+    def convertTEMP(self):
+        VCC=3
+        a0=1.12764514*(10**-3)
+        a1=2.34282709*(10**-4)
+        a2=8.77303013*(10**-8)
+        n=self.resolution
+
+        NTC_volts = self.data*VCC / 2**n
+
+        NTC_Ohms = 10**4 * NTC_volts / (VCC-NTC_volts)
+
+        TEMP_K = 1/(a0+(a1*np.log(NTC_Ohms)) + (a2*(np.log(NTC_Ohms)**3)))
+        TEMP_Celsius = TEMP_K-273.15
+
+        return TEMP_Celsius
 
 class ECG(Sensor):
 

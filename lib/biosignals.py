@@ -2,9 +2,9 @@ import numpy as np
 from biosignalsnotebooks import load
 import os
 try:
-    from lib.tools import *
+    from Physiological_Data.lib.tools import *
 except ModuleNotFoundError:
-    from lib.tools import *
+    from Physiological_Data.lib.tools import *
 from json import loads
 
 END_BASELINE = 'End of Baseline'

@@ -1,7 +1,7 @@
 try:
     from acquisition import *
 except ModuleNotFoundError:
-    from lib.acquisition import *
+    from Physiological_Data.lib.acquisition import *
 from os import listdir
 from os.path import join
 from scipy.io import wavfile

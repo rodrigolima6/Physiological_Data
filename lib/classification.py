@@ -1,7 +1,7 @@
 try:
     from acquisition import *
 except ModuleNotFoundError:
-    from lib.acquisition import *
+    from Physiological_Data.lib.acquisition import *
 
 folders = ['05_11_2020_1',
            '05_11_2020_2',
