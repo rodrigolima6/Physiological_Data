@@ -17,6 +17,7 @@ from matplotlib.patches import Rectangle
 import json
 
 class TEMP(Sensor):
+
     def convertTEMP(self):
         VCC=3
         a0=1.12764514*(10**-3)
