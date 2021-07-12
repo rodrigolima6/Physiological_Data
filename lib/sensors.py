@@ -1,38 +1,17 @@
-import math
-
 import biosignalsnotebooks as bsnb
-
-import novainstrumentation as ni
-from novainstrumentation.panthomkins.butterworth_filters import butter_bandpass_filter
-from novainstrumentation.panthomkins.detect_panthomkins_peaks import detect_panthomkins_peaks
-from novainstrumentation.panthomkins.rr_update import rr_1_update, rr_2_update, sync
-from math import *
 try:
-    from Physiological_Data.lib.acquisition import *
+    from acquisition import *
 except ModuleNotFoundError:
     from Physiological_Data.lib.acquisition import *
 import scipy as sc
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
 import json
+from sklearn.linear_model import LinearRegression
+# from mes2hb.mes2hb import Mes2Hb
+try:
+    from tools import *
+except ImportError:
+    from Physiological_Data.lib.tools import *
 
-class TEMP(Sensor):
-
-    def convertTEMP(self):
-        VCC=3
-        a0=1.12764514*(10**-3)
-        a1=2.34282709*(10**-4)
-        a2=8.77303013*(10**-8)
-        n=self.resolution
-
-        NTC_volts = self.data*VCC / 2**n
-
-        NTC_Ohms = 10**4 * NTC_volts / (VCC-NTC_volts)
-
-        TEMP_K = 1/(a0+(a1*np.log(NTC_Ohms)) + (a2*(np.log(NTC_Ohms)**3)))
-        TEMP_Celsius = TEMP_K-273.15
-
-        return TEMP_Celsius
 
 class ECG(Sensor):
 
@@ -47,12 +26,12 @@ class ECG(Sensor):
         VCC=3000
         gain = 1000
         signal_volts = ((np.array(self.data)/2**self.resolution)-1/2)*VCC/gain
-        signal_mv=signal_volts*1000
+        signal_mv = signal_volts*1000
 
-        return signal_mv,signal_volts
+        return signal_mv
 
 
-    def filterECG(self,butterlow=8,butterhigh=30):
+    def filterECG(self):
 
         """
         :param signal: ECG signal
@@ -60,15 +39,13 @@ class ECG(Sensor):
         :return: filtered_signal - Band Pass filtered ECG signal
         """
 
-        signal = (self.data-np.mean(self.data))/max(self.data)
-
         """Band pass filter between 5 and 15 Hz"""
-        filtered_signal = butter_bandpass_filter(signal, butterlow, butterhigh, self.fs)
+        filtered_signal = bsnb.detect._ecg_band_pass_filter(self.data,self.fs)
 
         return filtered_signal
 
     @staticmethod
-    def differentiateECG(signal):
+    def _differentiateECG(signal):
 
         """
         :param signal: Filtered ECG signal
@@ -80,19 +57,19 @@ class ECG(Sensor):
         return differentiated_signal
 
     @staticmethod
-    def squaredECG(signal):
+    def _squaredECG(signal):
 
         """
         :param signal: Derivative ECG signal
         :return: Squared signal of the ECG derivative
         """
 
-        squared_signal = 50.0*signal**2
+        squared_signal = signal**2
 
         return squared_signal
 
     @staticmethod
-    def integrateECG(signal,fs,window=0.080):
+    def _integrateECG(signal, fs, window=0.080):
 
         """
         :param signal: Squared ECG signal
@@ -111,8 +88,7 @@ class ECG(Sensor):
 
         return integrated_signal
 
-    @staticmethod
-    def detectRPeaks(data,fs):
+    def _detectRPeaks(self):
 
         """
         :param signal: Non-filtered ECG signal
@@ -120,10 +96,25 @@ class ECG(Sensor):
         :return: time_peaks - time instant for each R-peak detected
                  amp_peaks - amplitude of each R-peak detected
         """
+        peaks, valleys = peak_detector(self.data, self.fs)
 
-        peaks_index = ni.panthomkins.panthomkins(data,fs,butterlow=8,butterhigh=30)
+        return peaks[1]
+    
+    def calculateHR(self, peaks):
+        hr = []
+        time = []
+        for i in range(1, len(peaks)):
+            value = (peaks[i] - peaks[i - 1]) * 60 / self.fs
+            hr.append(value)
+            time.append(peaks[i] - peaks[i - 1] / self.fs)
+        return hr, time
+    
+    def processECG(self):
+        peaks = self._detectRPeaks()
+        return peaks
+        # hr, time = self.calculateHR(peaks)
+        # return hr, time
 
-        return peaks_index
 
 class HRV(Sensor):
 
@@ -136,12 +127,12 @@ class HRV(Sensor):
                  rr_interval_time - RR interval series time axis.
         """
 
-        rr_interval,rr_interval_time = bsnb.tachogram(self.data,self.fs,signal=True,out_seconds=True)
+        rr_interval, rr_interval_time = bsnb.tachogram(self.data, self.fs, signal=True, out_seconds=True)
 
-        return rr_interval,rr_interval_time
+        return rr_interval, rr_interval_time
 
     @staticmethod
-    def remove_EctopyBeats(rr_interval,rr_interval_time):
+    def remove_EctopyBeats(rr_interval, rr_interval_time):
 
         """
         :param rr_interval: RR interval series
@@ -150,15 +141,15 @@ class HRV(Sensor):
                  rr_interval_time_NN - RR interval series time axis with no ectopic beats
         """
 
-        rr_interval_NN,rr_interval_time_NN = bsnb.remove_ectopy(rr_interval,rr_interval_time)
+        rr_interval_NN, rr_interval_time_NN = bsnb.remove_ectopy(rr_interval, rr_interval_time)
 
         rr_interval_NN = np.array(rr_interval_NN)
         rr_interval_time_NN = np.array(rr_interval_time_NN)
 
-        return rr_interval_NN,rr_interval_time_NN
+        return rr_interval_NN, rr_interval_time_NN
 
     @staticmethod
-    def HeartRate(rr_interval_NN):
+    def heartRate(rr_interval_NN):
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :return: array of Heart Rate in beats per minute (Bpm) along time.
@@ -168,25 +159,28 @@ class HRV(Sensor):
         return heart_rate
 
     @staticmethod
-    def time_domain_Features(rr_interval_NN):
+    def timeDomainFeatures(rr_interval_NN):
 
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :return: dict with time-domain features of HRV
         """
 
+        rr_interval_diff = np.diff(rr_interval_NN)
+        rr_interval_abs = np.abs(rr_interval_diff)
+
         """Standard deviation of RR interval series with no ectopic beats"""
         SDNN=round(np.std(rr_interval_NN)*1000,4)
 
         """Root Mean Square of the Standard deviation"""
-        RMSSD=round((np.sqrt(np.sum(rr_interval_NN)**2)/(len(rr_interval_NN)-1))*1000,4)
+        RMSSD=round(np.sqrt(np.sum((rr_interval_diff)**2)/(len(rr_interval_NN)-1))*1000,4)
 
         """Number and percentage of RR interval longer than 50 ms"""
-        NN50=sum(1 for i in rr_interval_NN if i > 0.05)
+        NN50=sum(1 for i in rr_interval_abs if i > 0.05)
         pNN50=round((float(NN50)/len(rr_interval_NN)*100),4)
 
         """Number and percentage of RR interval longer than 20 ms"""
-        NN20=sum(1 for i in rr_interval_NN if i > 0.02)
+        NN20=sum(1 for i in rr_interval_abs if i > 0.02)
         pNN20=round((float(NN20)/len(rr_interval_NN)*100),4)
 
         time_domain_features={"SDNN":SDNN,"RMSSD":RMSSD,"NN50":NN50,"pNN50":pNN50,"NN20":NN20,"pNN20":pNN20}
@@ -194,7 +188,7 @@ class HRV(Sensor):
         return time_domain_features
 
     @staticmethod
-    def poincare_features(rr_interval_NN):
+    def poincareFeatures(rr_interval_NN):
 
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
@@ -248,7 +242,7 @@ class HRV(Sensor):
         return interpolatedRR
 
     @staticmethod
-    def frequency_analysis(rr_interval_time_NN,rr_interval_NN,window='hanning',interpolation_rate = 4):
+    def frequencyAnalysis(rr_interval_time_NN, rr_interval_NN, window='hanning', interpolation_rate=4):
 
 
         init_time = int(rr_interval_time_NN[0])
@@ -268,6 +262,14 @@ class HRV(Sensor):
         power = [round(val, 4) for val, freq in zip(power_axis, freq_axis) if freq < 0.5]
 
         return freqs, power
+
+    def processHR(self):
+        rr_interval, rr_interval_time = self.RR_interval()
+        rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(rr_interval, rr_interval_time)
+        time_features = self.timeDomainFeatures(rr_interval_NN)
+        poincare_features = self.poincareFeatures(rr_interval_NN)
+
+        return time_features, poincare_features
 
 class PPG(Sensor):
 
@@ -362,5 +364,59 @@ class PPG(Sensor):
             return peaksAmplitude,peaksIndexes
 
 
+class fNIRS(Sensor):
+    def __init__(self, data, fs, resolution):
+        super().__init__(data, fs, resolution)
+        self.red = self.convertPhys(data[:, 0], resolution)
+        self.infrared = self.convertPhys(data[:, 1], resolution)
+
+        self.red = self.filterData(self.red, fs)
+        self.infrared = self.filterData(self.infrared, fs)
+
+        print(self.red, self.infrared)
+    
+    @staticmethod
+    def convertPhys(data, resolution):
+        return (0.15 * data) / (2**resolution)
+
+    # def convertConcentration(self):
+    #     converter = Mes2Hb()
+    #     self.hbo, self.hb, self.hbt = converter.convert([self.red.copy(), self.infrared.copy()], wavelength=[660, 860])
+    
+    def detectPeaks(self):
+        pass
+
+    def extractFeatures(self):
+        pass
+
+    @staticmethod
+    def filterData(data, fs):
+        return bsnb.bandpass(data, 0.05, 1, fs=fs, use_filtfilt=True)
+
+    @staticmethod
+    def root_mean_square(signal):
+        """Signal should be a segment"""
+        return np.sqrt(np.mean(signal**2))
+
+    @staticmethod
+    def slope_regression(signal):
+        """Signal should be a segment"""
+        time = np.arange(0, len(signal)).reshape(-1, 1)
+        model = LinearRegression()
+        model = model.fit(time, signal.reshape(-1,1))
+        return model.coef_[0]
+
+    @staticmethod
+    def slope_naive(signal):
+        """Signal should be a segment"""
+        return signal[-1] - signal[0]
+
+    def processfNIRS(self):
+        self.convertConcentration()
+
 if __name__ == '__main__':
-    ecg = ECG(np.sin(2*np.pi/1000), 1000, 16)
+    # ecg = ECG(np.sin(2*np.pi/1000), 1000, 16)
+    device = Devices(r'..\..\acquisitions\Acquisitions\03_11_2020')
+    data = device.getSensorsData([FNIRS])
+    fnirs = fNIRS(data['data'][:, 1:3], device.fs, device.resolution)
+    fnirs.processfNIRS()

@@ -3,8 +3,13 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.model_selection import KFold, LeavePGroupsOut
 from sklearn.ensemble import RandomForestClassifier
-from biosignalsnotebooks import features_extraction
+# from biosignalsnotebooks import features_extraction
 from sklearn.metrics import accuracy_score, f1_score
+from sklearn.tree import DecisionTreeClassifier
+try:
+    from lib.peak_detector import peak_detector
+except ImportError:
+    from peak_detector import peak_detector
 
 
 def closestIndex(data, value):
@@ -80,9 +85,12 @@ def classify(features, labels, groups=None, n_estimators=100):
 
         samples_train, mean, std = normalizeFeatures(samples_train)
         samples_test, _, _ = normalizeFeatures(samples_test, mean, std)
+        saveToTSV(np.vstack([samples_train, samples_test]), np.vstack([labels_train, labels_test]))
 
         # Build the random forest clasdsifier.
         random_forest = RandomForestClassifier(n_estimators=n_estimators, criterion='entropy', n_jobs=-1, random_state=42)
+
+        # random_forest = DecisionTreeClassifier(random_state=42)
 
         # Train the classifier on the training set.
         random_forest = random_forest.fit(samples_train, np.ravel(labels_train))
@@ -95,7 +103,7 @@ def classify(features, labels, groups=None, n_estimators=100):
         acc.append(accuracy_score(np.ravel(labels_test), results)*100)
         f1.append(f1_score([0 if x =='task' else 1 for x in labels_test], [0 if x =='task' else 1 for x in results])*100)
         print(f"{i} - Accuracy: {accuracy_score(labels_test, results)*100:.2f}; F1-Score: {f1_score([0 if x =='task' else 1 for x in labels_test], [0 if x =='task' else 1 for x in results])*100:.2f}%")
-    return acc, f1
+    return acc, f1, random_forest
 
 
 if __name__ == '__main__':

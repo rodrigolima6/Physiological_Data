@@ -3,9 +3,9 @@ try:
     from psychopy import *
     from acquisition import *
 except ModuleNotFoundError:
-    from Physiological_Data.lib.biosignals import *
-    from Physiological_Data.lib.psychopy import *
-    from Physiological_Data.lib.acquisition import *
+    from lib.biosignals import *
+    from lib.psychopy import *
+    from lib.acquisition import *
 
 import matplotlib.pylab as plt
 

@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from json import load
 try:
     from Physiological_Data.lib.biosignals import *
     from Physiological_Data.lib.psychopy import *
@@ -20,6 +21,12 @@ class Acquisition():
         self.labels = []
         self.sensors = []
         self.signal = []
+        self.description = None
+        try:
+            with open(os.path.join(dir_path, 'description.json'), 'r') as file:
+                self.description = load(file)
+        except FileNotFoundError as e:
+            print(e, "The description file does not exist and will not be loaded.")
 
     @staticmethod
     def getPsychoFile(path):
@@ -33,10 +40,19 @@ class Acquisition():
     def getPsychoActivity(self):
         return self.psycho.getActivity()
 
-    def getBiosignalsSensors(self, sensors=[FNIRS, ACC, EDA]):
-        data = self.biosignals.getSensorsData(sensors)
+    def getBiosignalsSensors(self, sensors=(FNIRS, ACC, EDA), rightPos=None):
+        rightMAC = None
+        if rightPos:
+            for key in self.description['Position'].keys():
+                if key != 'left':
+                    rightMAC = self.description['Position'][key]
+
+        data = self.biosignals.getSensorsData(sensors, rightMAC)
         self.signal = data['data']
         self.sensors = data['sensors']
+    
+    def convertSensors(self):
+        self.signal = self.biosignals.convertSensors()
 
     def segmentWindowingBiosignals(self, signal, timestamps, labels, timeWindow=0.1, overlap=0, binary=True):
         self.segmentedBiosignals, self.labels = self.biosignals.segmentSignalsWindowing(signal, timestamps, labels, timeWindow, overlap, binary)
@@ -56,6 +72,12 @@ class Acquisition():
 
     def getDataset(self):
         return self.features, np.reshape(self.labels, (-1, 1)), np.reshape(self.getParticipantIDClassification(), (-1, 1))
+
+    def deleteArtifacts(self):
+        if self.description != None:
+            self.signal = self.biosignals.deleteArtifacts(self.description['Push Button']['singles'], self.description['Push Button']['doubles'])
+        else:
+            print(f"description.json file is not available for the acquisition.")
 
 
 if __name__ == '__main__':
