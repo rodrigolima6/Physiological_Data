@@ -1,9 +1,10 @@
 import os
+from abc import abstractmethod
 
 import numpy as np
 
 try:
-    from Physiological_Data.lib.tools import *
+    from lib.tools import *
 except ModuleNotFoundError:
     from tools import *
 from json import loads
@@ -401,6 +402,10 @@ class Sensor:
         statistical_features = {"AVG": average, "Maximum": maximum, "Minimum": minimum}
 
         return statistical_features
+    
+    # @abstractmethod()
+    def getFeatures(self):
+        pass
 
 
 if __name__ == '__main__':

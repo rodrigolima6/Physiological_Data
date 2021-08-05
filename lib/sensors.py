@@ -2,15 +2,17 @@ import biosignalsnotebooks as bsnb
 try:
     from acquisition import *
 except ModuleNotFoundError:
-    from Physiological_Data.lib.acquisition import *
+    from lib.acquisition import *
 import scipy as sc
 import json
 from sklearn.linear_model import LinearRegression
+from scipy.signal import welch
+from scipy import integrate
 # from mes2hb.mes2hb import Mes2Hb
 try:
     from tools import *
 except ImportError:
-    from Physiological_Data.lib.tools import *
+    from lib.tools import *
 
 
 class ECG(Sensor):
@@ -263,7 +265,7 @@ class HRV(Sensor):
 
         return freqs, power
 
-    def processHR(self):
+    def getFeatures(self):
         rr_interval, rr_interval_time = self.RR_interval()
         rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(rr_interval, rr_interval_time)
         time_features = self.timeDomainFeatures(rr_interval_NN)
@@ -413,6 +415,85 @@ class fNIRS(Sensor):
 
     def processfNIRS(self):
         self.convertConcentration()
+
+
+class EEG(Sensor):
+    def __init__(self, data, fs, resolution):
+        super().__init__(data, fs, resolution)
+
+        self.data = data # converted and filtered EEG data
+        self.fs = fs
+        self.resolution = resolution
+        self.bands = {'alpha': [8, 12], 'betha': [12, 35], 'gamma': [35, 49], 'theta': [4, 8], 'delta': [.5, 4]}
+    
+    @staticmethod
+    def extractBand(data: np.array, band: list, fs: int):
+        f1, f2 = band
+        win = 4 * fs
+        freq, power = welch(data, fs, nperseg=win)
+        idx_band = np.logical_and(freq >= f1, freq <= f2)  # Get the band of frequencies
+        power_freq = np.trapz(power[idx_band],dx=np.mean(np.diff(freq)))  # Calculate the power of the band of frequencies
+        return power_freq
+
+    def extractAllBands(self, bands):
+        band_powers = {}
+        for key, item in bands.items():
+            band_powers[key] = self.extractBand(self.data, item, self.fs)
+        return band_powers
+    
+    def getDominantFreq(self, data, fs):
+        win = 4 * fs
+        freq, power = welch(data, fs, nperseg=win)
+        dominant_freq = freq[np.argmax(power)]
+        return dominant_freq
+    
+    def getCombinationFreq(self, power_freqs: dict):
+        combinations = {}
+        for key, item in power_freqs.items():
+            for other_key, other_item in power_freqs.items():
+                if key != other_key:
+                    combinations[f"{key}/{other_key}"] = item/other_item
+        return combinations
+    
+    def getFeatures(self):
+        power_freqs = self.extractAllBands(self.bands)
+        dominant_freq = self.getDominantFreq(self.data, self.fs)
+        combinations = self.getCombinationFreq(power_freqs)
+        features = np.concatenate([dominant_freq, list(power_freqs.values()), list(combinations.values())])
+        return features
+
+
+class ACC(Sensor):
+    def __init__(self, data, fs, resolution):
+        super().__init__(data, fs, resolution)
+
+        self.data = data * 9.8  # Convert to m/s
+        self.fs = fs
+        self.resolution = resolution
+    
+    def getIntegration(self, data, fs):
+        t = bsnb.generate_time(data, fs)
+        return integrate.simpson(data, t)
+
+    def getVel(self, acc, fs):
+        return self.vel
+    
+    def getDesl(self, vel, fs):
+        return self.desl
+    
+    
+    def getFeatures(self):
+        self.acc = self.data
+        self.vel = self.getIntegration(acc, self.fs)
+        self.desl = self.getIntegration(vel, self.fs)
+
+        features = []
+        for i in [self.acc, self.vel, self.desl]:
+            for func in [np.mean, np.min, np.max, np.std]:
+                features.append(func(i))
+
+        return np.array(features)
+
 
 if __name__ == '__main__':
     # ecg = ECG(np.sin(2*np.pi/1000), 1000, 16)

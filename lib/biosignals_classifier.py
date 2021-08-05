@@ -7,6 +7,10 @@ import torchvision
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
+try:
+    from dataLoader import SensorsDataset
+except ImportError:
+    from lib.dataLoader import SensorsDataset
 
 
 class AE(nn.Module):
@@ -44,7 +48,7 @@ def train_classifier(epochs, train_loader):
 
     # create a model from `AE` autoencoder class
     # load it to the specified device, either gpu or cpu
-    model = AE(input_shape=784).to(device)
+    model = AE(input_shape=1024).to(device)
 
     # create an optimizer object
     # Adam optimizer with learning rate 1e-3
@@ -57,10 +61,12 @@ def train_classifier(epochs, train_loader):
 
     for epoch in range(epochs):
         loss = 0
-        for batch_features, batch_labels in train_loader:
+        for batch_features, batch_labels, _ in train_loader:
             # reshape mini-batch data to [N, 784] matrix
             # load it to the active device
-            batch_features = batch_features.view(-1, 784).to(device)
+            batch_features = torch.tensor(batch_features).view(1, -1)
+            print(batch_features.size)
+            batch_features = batch_features.to(device)
 
             # reset the gradients back to zero
             # PyTorch accumulates gradients on subsequent backward passes
@@ -99,27 +105,10 @@ def train_classifier(epochs, train_loader):
 
 
 if __name__ == '__main__':
-    transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
+    data = SensorsDataset(sensors=[1])
 
-    train_dataset = torchvision.datasets.MNIST(
-        root="~/torch_datasets", train=True, transform=transform, download=True
-    )
-
-    test_dataset = torchvision.datasets.MNIST(
-        root="~/torch_datasets", train=False, transform=transform, download=True
-    )
-
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=128, shuffle=True, num_workers=4, pin_memory=True
-    )
-
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=32, shuffle=False, num_workers=4, pin_memory=True
-    )
-
-    model, features, labels = train_classifier(20, train_loader)
+    model, features, labels = train_classifier(20, data)
     random_forest = RandomForestClassifier(n_estimators=1000, n_jobs=-1)
-    # random_forest = DecisionTreeClassifier()
     random_forest = random_forest.fit(features, labels)
 
     print(features.shape)

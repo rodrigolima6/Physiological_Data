@@ -2,8 +2,8 @@ import numpy as np
 import os
 from json import load
 try:
-    from Physiological_Data.lib.biosignals import *
-    from Physiological_Data.lib.psychopy import *
+    from lib.biosignals import *
+    from lib.psychopy import *
 except ModuleNotFoundError:
     from biosignals import *
     from psychopy import *

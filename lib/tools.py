@@ -38,15 +38,29 @@ def windowing(signal, sampling_rate=1000, time_window=.25, overlap=0):
     return signal_windows
 
 
-def normalizeFeatures(features, mean=None, std=None):
+def standardizeFeatures(features, mean=None, std=None):
     if mean is None and std is None:
         mean = np.mean(features, axis=0)
         std = np.std(features, axis=0)
-    # print(f"Features Shape: {features.shape}")
     features = features - mean
     features = features / std
-    # print(f"Features Shape: {features.shape}")
     return features, mean, std
+
+
+def normalizeFeatures(features, mean=None, max_value=None):
+    if mean is None and max_value is None:
+        mean_value = np.mean(features) # Calculate the mean of the signal
+        abs_features = np.abs(features) # Calculate the absolute of the signal
+        max_value = np.max(features) # Get the maximum value of the absolute signal
+        
+    normalised_features = (features - mean_value) / max_value
+    return normalised_features, mean, max_value
+
+def quantize(data, d=1000):
+    scaled_data = data*d
+    rounded_data = np.around(scaled_data)
+    quantised_data = np.array(rounded_data, dtype=np.int)
+    return quantised_data   
 
 
 def plotDataset(features, labels):

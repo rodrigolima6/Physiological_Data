@@ -14,12 +14,13 @@ def Load_Opensignals(data):
             CH1 = stream['time_series'][:, 1]  # ECG
             CH2 = stream['time_series'][:, 2]  # EDA
             CH3 = stream['time_series'][:, 3]  # RESP
-            CH4 = stream['time_series'][:, 4]  # fNIRS
-            # CH5 = stream['time_series'][:,5] #TEMP
+            CH4 = stream['time_series'][:, 4]  # TEMP
+            CH5 = stream['time_series'][:,5] #fnirs RED
+            CH6 = stream['time_series'][:, 6]  # fnirs IRED
             time_Opensignals = stream['time_stamps']
             fs = int(stream['info']['nominal_srate'][0])
 
-    return CH1,CH2,CH3,CH4,time_Opensignals,fs
+    return CH1,CH2,CH3,CH4,CH5,CH6,time_Opensignals,fs
 
 def Load_EEG(data):
 
