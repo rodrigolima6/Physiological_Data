@@ -2,7 +2,7 @@ try:
     from biosignals import *
     from psychopy import *
     from acquisition import *
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError):
     from lib.biosignals import *
     from lib.psychopy import *
     from lib.acquisition import *

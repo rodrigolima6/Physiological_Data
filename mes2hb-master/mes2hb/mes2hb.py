@@ -5,6 +5,27 @@ import numpy as np
 import math
 from .absorption_coefficients import AbsorptionCoefficients
 
+from time import time
+from numba import njit
+
+
+@njit
+def _compute_log(pos_red, pos_infrared, red, infrared, mean_baseline_red, mean_baseline_infrared):
+    new_red = np.zeros(len(red))
+    new_ir = np.zeros(len(infrared))
+    len_red = len(pos_red)
+    len_infrared = len(pos_infrared)
+    pos = max(len_red, len_infrared)
+    for i in range(pos):
+        if i < len_red:
+            value = pos_red[i]
+            new_red[i] = math.log(mean_baseline_red/red[value][0])
+        if i < len_infrared:
+            value = pos_infrared[i]
+            new_ir[i] = math.log(mean_baseline_infrared/infrared[value][0])
+    return new_red, new_ir
+
+
 class Mes2Hb:
     def __init__(self):
         self.coefficients = AbsorptionCoefficients()
@@ -31,6 +52,9 @@ class Mes2Hb:
                 hbo, hb, hbt(np.ndarray): 3 (N-baseline[1]-baseline[0], 1) arrays
                 containing oxy, de-oxy and total haemoglobin concentrations.
         """
+        
+        t = time()
+        
         red_mes_data = np.reshape(
             mes_data[0], (mes_data[0].shape[0], 1)
             )
@@ -39,9 +63,13 @@ class Mes2Hb:
             )
 
         mes_data_shape = ir_mes_data.shape
+        
+        print("Time to reshape: ", time() - t, "; Shape: ", mes_data_shape)
 
         wlen_red = wavelength[0]
         wlen_ir = wavelength[1]
+        
+        t = time()
 
         oxy_red = self.coefficients.get_coefficient(
             wlen_red, "oxy"
@@ -55,26 +83,36 @@ class Mes2Hb:
         dxy_ir = self.coefficients.get_coefficient(
             wlen_ir, "dxy"
             )
+        
+        print("Time to get coefficients: ", time() - t, "Coefficients: ", oxy_red, oxy_ir, dxy_red, dxy_ir)
+        t = time()
 
         mean_baseline_red = np.mean(red_mes_data[baseline[0]:baseline[1]])
         mean_baseline_ir = np.mean(ir_mes_data[baseline[0]:baseline[1]])
-
-        pos = np.where(
+        
+        print("Time to compute mean: ", time() - t)
+        t = time()
+        
+        
+        ####################################################### REDUCE TIME #############################################################
+        pos_red = np.where(
             red_mes_data*mean_baseline_red > 0
             )
-        a_red = np.array([
-                math.log(mean_baseline_red/i[0]) if idx in pos[0] else 0 \
-                for idx, i in enumerate(red_mes_data)
-            ])
 
-        pos = np.where(
+        pos_ired = np.where(
             ir_mes_data*mean_baseline_ir > 0
             )
-        a_ir = np.array([
-                math.log(mean_baseline_ir/i[0]) if idx in pos[0] else 0 \
-                for idx, i in enumerate(ir_mes_data)
-            ])
+        print("Time to compute baseline: ", time()-t)
+        t = time()
 
+        a_red, a_ir = _compute_log(pos_red[0], pos_ired[0], red_mes_data, ir_mes_data, mean_baseline_red, mean_baseline_ir)
+
+        print("Time to compute log: ", time()-t)
+        t = time()
+        #################################################################################################################################
+        #################################################################################################################################
+        #################################################################################################################################
+        
         hb = np.zeros(mes_data_shape)
         hbo = np.zeros(mes_data_shape)
         hbt = np.zeros(mes_data_shape)
@@ -82,10 +120,13 @@ class Mes2Hb:
         ####### Oxy Hb #######
         if ((oxy_red*dxy_ir - oxy_ir*dxy_red)!=0):
             hbo = (a_red*dxy_ir - a_ir*dxy_red)/(oxy_red*dxy_ir - oxy_ir*dxy_red)
+        print("Time to compute Oxy Hb: ", time()-t)
+        t = time()
 
         ####### DeOxy Hb #######
         if ((dxy_red*oxy_ir - dxy_ir*oxy_red)!=0):
         	hb = (a_red*oxy_ir - a_ir*oxy_red)/(dxy_red*oxy_ir - dxy_ir*oxy_red)
+        print("Time to compute Deoxy Hb: ", time()-t)
 
         hbt = hbo + hb
         return hbo[baseline[1]:], hb[baseline[1]:], hbt[baseline[1]:]

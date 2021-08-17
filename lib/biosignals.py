@@ -1,14 +1,15 @@
 import os
-from abc import abstractmethod
 
 import numpy as np
 
 try:
-    from lib.tools import *
-except ModuleNotFoundError:
+    from Physiological_Data.lib.tools import *
+except (ImportError, ModuleNotFoundError):
     from tools import *
 from json import loads
 import biosignalsnotebooks as bsnb
+import abc
+
 
 END_BASELINE = 'End of Baseline'
 BEGIN_BASELINE = 'Begin of Baseline'
@@ -403,7 +404,7 @@ class Sensor:
 
         return statistical_features
     
-    # @abstractmethod()
+    @abc.abstractmethod
     def getFeatures(self):
         pass
 

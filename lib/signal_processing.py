@@ -11,14 +11,13 @@ def almostEqual(v1, v2, delta):
     else:
         return all(abs(v1 - v2) < delta)
 
-def pan_tompkins_filter(data):
+def pan_tompkins_filter(data, fs):
     # Pan & Tompkins signal conditioning: https://www.robots.ox.ac.uk/~gari/teaching/cdt/A3/readings/ECG/Pan+Tompkins.pdf
     # (used the normal differentiation, as the 4-point differentiation gave equal results)
     red_diff = differentation(data) # differentiate data
     red_sqr = square(red_diff) # square it
-    red_sqr_int_DO = integration_DO(red_sqr, 300) # and integrate it
-    red_sqr_int = integrate(red_sqr, 300) # and integrate it
-    return red_sqr_int, red_sqr_int_DO
+    red_sqr_int_DO = integration_DO(red_sqr, fs) # and integrate it
+    return red_sqr_int_DO
 
 def getValuesArray(array, index_s, index_e):
     index_s, index_e = int(index_s), int(index_e)

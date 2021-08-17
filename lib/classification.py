@@ -1,6 +1,6 @@
 try:
     from acquisition import *
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError):
     from lib.acquisition import *
 
 folders = ['05_11_2020_1',

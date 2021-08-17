@@ -1,6 +1,6 @@
 try:
     from acquisition import *
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError):
     from lib.acquisition import *
 from os import listdir
 from os.path import join

@@ -4,7 +4,7 @@ from json import load
 try:
     from lib.biosignals import *
     from lib.psychopy import *
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError):
     from biosignals import *
     from psychopy import *
 

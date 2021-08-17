@@ -9,7 +9,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 try:
     from dataLoader import SensorsDataset
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     from lib.dataLoader import SensorsDataset
 
 
@@ -105,7 +105,15 @@ def train_classifier(epochs, train_loader):
 
 
 if __name__ == '__main__':
-    data = SensorsDataset(sensors=[1])
+    groups = ['05_11_2020_1',
+           '05_11_2020_2',
+           '10_11_2020_2',
+           '27_11_2020',
+           '11_12_2020_1',
+           '11_12_2020_2'
+           ]
+
+    data = SensorsDataset(sensors=[1], groups=groups[:-1])
 
     model, features, labels = train_classifier(20, data)
     random_forest = RandomForestClassifier(n_estimators=1000, n_jobs=-1)
@@ -113,13 +121,15 @@ if __name__ == '__main__':
 
     print(features.shape)
 
+    del data
+    test_loader = SensorsDataset(sensors=[1], groups=groups[-1])
     result = 0
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     criterion = nn.MSELoss()
 
     features, labels = [], []
     for test_batch, test_labels in test_loader:
-        test_batch = test_batch.view(-1, 784).to(device)
+        test_batch = test_batch.view(-1, 1024).to(device)
         output, feat = model(test_batch)
         train_loss = criterion(output, test_batch)
         loss = train_loss.item()

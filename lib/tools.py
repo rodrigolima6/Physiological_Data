@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.tree import DecisionTreeClassifier
 try:
     from lib.peak_detector import peak_detector
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     from peak_detector import peak_detector
 
 

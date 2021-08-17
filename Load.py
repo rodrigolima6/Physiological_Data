@@ -29,8 +29,12 @@ def Load_EEG(data):
     for stream in data:
         if (stream['info']['name'][0] == "openvibeSignal"):
             for i in range(0, 32):
+                # print(i)
                 EEG_data["EEG_" + str(i + 1)] = stream['time_series'][:, i]
             time_EEG = stream['time_stamps']
             EEG_fs = int(stream['info']['nominal_srate'][0])
 
     return EEG_data,time_EEG,EEG_fs
+
+# data, header = pyxdf.load_xdf('G:\\O meu disco\\PhD\\1st Study\\data\\P8_S1_GroupA_eeg.xdf')
+# EEG,time_EEG,EEG_fs = Load_EEG(data)

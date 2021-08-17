@@ -1,18 +1,23 @@
 import biosignalsnotebooks as bsnb
 try:
     from acquisition import *
-except ModuleNotFoundError:
-    from lib.acquisition import *
+except (ImportError, ModuleNotFoundError):
+    from Physiological_Data.lib.acquisition import *
 import scipy as sc
 import json
 from sklearn.linear_model import LinearRegression
 from scipy.signal import welch
 from scipy import integrate
-# from mes2hb.mes2hb import Mes2Hb
+import novainstrumentation as ni
+from mes2hb.mes2hb import Mes2Hb
 try:
     from tools import *
-except ImportError:
-    from lib.tools import *
+    from respRT import peak_detector_Resp
+    from signal_processing import integration_DO
+except (ImportError, ModuleNotFoundError):
+    from Physiological_Data.lib.tools import *
+    from Physiological_Data.lib.respRT import peak_detector_Resp
+    from Physiological_Data.lib.signal_processing import integration_DO
 
 
 class ECG(Sensor):
@@ -98,9 +103,11 @@ class ECG(Sensor):
         :return: time_peaks - time instant for each R-peak detected
                  amp_peaks - amplitude of each R-peak detected
         """
-        peaks, valleys = peak_detector(self.data, self.fs)
+        # peaks, valleys = peak_detector(self.data, self.fs)
+        peaks = ni.panthomkins.panthomkins(self.data,self.fs)
 
-        return peaks[1]
+        # return peaks[1]
+        return peaks
     
     def calculateHR(self, peaks):
         hr = []
@@ -265,13 +272,47 @@ class HRV(Sensor):
 
         return freqs, power
 
+    @staticmethod
+    def frequencyFeatures(freq,power):
+        """
+            Indexes of Frequencies of each component
+            """
+        vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
+        lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
+        hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
+        total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
+        """
+        Power of each frequency component in the desired range of frequencies
+        """
+
+        vlf = round(sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]), 4)
+        lf = round(sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]), 4)
+        hf = round(sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]), 4)
+        total_power = round(sc.integrate.trapz(power[total_power_indexes], freq[total_power_indexes]), 4)
+
+        """
+        Frequency components in normalized units (n.u)
+        Balance - LF(n.u)/HF(n.u)
+        """
+
+        lf_norm = round(lf / (total_power - vlf) * 100, 2)
+        hf_norm = round(hf / (total_power - vlf) * 100, 2)
+        ratio = round(lf_norm / hf_norm, 2)
+
+        frequency_features={"VLF Power":vlf,"LF Power":lf,"HF Power":hf,"Total Power":total_power,"LF (nu)":lf_norm,"HF (nu)":hf_norm,"LF/HF":ratio}
+
+        return frequency_features
+
+
     def getFeatures(self):
         rr_interval, rr_interval_time = self.RR_interval()
         rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(rr_interval, rr_interval_time)
+        freq, power = self.frequencyAnalysis(rr_interval_time_NN, rr_interval_NN)
         time_features = self.timeDomainFeatures(rr_interval_NN)
         poincare_features = self.poincareFeatures(rr_interval_NN)
+        frequency_features = self.frequencyFeatures(freq,power)
 
-        return time_features, poincare_features
+        return time_features, poincare_features, frequency_features
 
 class PPG(Sensor):
 
@@ -381,9 +422,9 @@ class fNIRS(Sensor):
     def convertPhys(data, resolution):
         return (0.15 * data) / (2**resolution)
 
-    # def convertConcentration(self):
-    #     converter = Mes2Hb()
-    #     self.hbo, self.hb, self.hbt = converter.convert([self.red.copy(), self.infrared.copy()], wavelength=[660, 860])
+    def convertConcentration(self):
+        converter = Mes2Hb()
+        self.hbo, self.hb, self.hbt = converter.convert([self.red.copy(), self.infrared.copy()], wavelength=[660, 860])
     
     def detectPeaks(self):
         pass
@@ -459,7 +500,7 @@ class EEG(Sensor):
         power_freqs = self.extractAllBands(self.bands)
         dominant_freq = self.getDominantFreq(self.data, self.fs)
         combinations = self.getCombinationFreq(power_freqs)
-        features = np.concatenate([dominant_freq, list(power_freqs.values()), list(combinations.values())])
+        features = np.concatenate([[dominant_freq], list(power_freqs.values()), list(combinations.values())])
         return features
 
 
@@ -472,8 +513,8 @@ class ACC(Sensor):
         self.resolution = resolution
     
     def getIntegration(self, data, fs):
-        t = bsnb.generate_time(data, fs)
-        return integrate.simpson(data, t)
+        # t = bsnb.generate_time(data, fs)
+        return integration_DO(data, fs)
 
     def getVel(self, acc, fs):
         return self.vel
@@ -484,8 +525,8 @@ class ACC(Sensor):
     
     def getFeatures(self):
         self.acc = self.data
-        self.vel = self.getIntegration(acc, self.fs)
-        self.desl = self.getIntegration(vel, self.fs)
+        self.vel = self.getIntegration(self.acc, self.fs)
+        self.desl = self.getIntegration(self.vel, self.fs)
 
         features = []
         for i in [self.acc, self.vel, self.desl]:
@@ -493,6 +534,86 @@ class ACC(Sensor):
                 features.append(func(i))
 
         return np.array(features)
+
+
+class RESP(Sensor):
+    def __init__(self, data, fs, resolution):
+        super().__init__(data, fs, resolution)
+        
+        self.data = data
+        self.fs = fs
+        self.resolution = resolution
+    
+    def maxPeaks(self, peaks):
+        return max(peaks)
+    
+    def meanAmpPeaks(self, peaks):
+        return np.mean(peaks)
+
+    def stdAmpPeaks(self, peaks):
+        return np.std(peaks)
+    
+    def rmsAmpPeaks(self, peaks):
+        return np.sqrt(np.mean(np.power(peaks, 2))) / len(peaks)
+    
+    def energyValue(self, data):
+        return np.mean(np.power(data, 2)) / len(data)
+
+    def meanValue(self, data):
+        return np.mean(data)
+    
+    def minValue(self, data):
+        return min(data)
+    
+    def maxValue(self, data):
+        return max(data)
+    
+    def stdValue(self, data):
+        return np.std(data)
+    
+    def rmsValue(self, data):
+        return self.rmsAmpPeaks(data)
+    
+    def areaValue(self, data):
+        return integrate.cumtrapz(data)
+
+    def respFreq(self, peaks, fs):
+        return 1/self.respInterval(peaks, fs)
+
+    def respInterval(self, peaks, fs):
+        return np.mean(np.diff(peaks))*fs
+    
+    def statisticsLastPeaks(self, peaks, fs):
+        if len(peaks) > 10:
+            peaks = peaks[-10:]
+        diff_peaks = np.diff(peaks) * fs
+        return np.mean(diff_peaks), np.std(diff_peaks), min(diff_peaks), max(diff_peaks), self.rmsValue(diff_peaks)
+    
+    def zeroCrossing(self, data, fs):
+        return bsnb.zero_crossing_rate(data) * len(data)/fs
+    
+    def getFeatures(self):
+        peaks, peaksAmp = peak_detector_Resp(self.data, self.fs)
+        peaks = peaks[1]
+        features = []
+        funcs = {'peaks': [self.maxPeaks, self.meanAmpPeaks, self.stdAmpPeaks, self.rmsAmpPeaks, self.respFreq, self.respInterval, self.statisticsLastPeaks],
+                'data': [self.energyValue, self.meanValue,  self.minValue, self.maxValue, self.stdValue, self.rmsValue, self.areaValue, self.zeroCrossing]}
+        # Extract features from peaks
+        for key in funcs:
+            aux = self.data
+            if key == 'peaks':
+                aux = peaks
+            for func in funcs[key]:
+                try:
+                    value = func(aux)
+                except TypeError as e:
+                    value = func(aux, self.fs)
+
+                if type(value) == np.float64 or type(value) == int:
+                    value = [value]
+                features.append(value)
+        
+        return np.concatenate(features)
 
 
 if __name__ == '__main__':

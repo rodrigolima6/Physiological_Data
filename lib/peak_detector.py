@@ -1,12 +1,16 @@
 import numpy as np
+from scipy.signal import decimate
 import biosignalsnotebooks as bsnb
 try:
-    from signal_processing import peakDetection
-except ImportError:
+    from signal_processing import peakDetection, pan_tompkins_filter
+except (ImportError, ModuleNotFoundError):
     from lib.signal_processing import peakDetection
 
 
 def peak_detector_RT(signal, fs, step=1, win_size=1.5, x_thr=0.3):
+    if fs > 50:
+        signal = decimate(signal, int(fs/50))
+        fs /= int(fs/50)
     win_size *= fs
     x_thr *= fs
     win = []
@@ -35,10 +39,10 @@ def peak_detector_RT(signal, fs, step=1, win_size=1.5, x_thr=0.3):
             win.append(signal[i])
 
         if len(win) >= win_size:
-            win_aux = win
+            win_aux = pan_tompkins_filter(win, fs)
 
-            pro = 0.8 * np.ptp(win_aux)
-            sup_thr = min(win_aux) + .1 * np.ptp(win_aux)
+            pro = 0.3 * np.ptp(win_aux)
+            sup_thr = min(win_aux) + .5 * np.ptp(win_aux)
             inf_thr = min(win_aux) + .1  * np.ptp(win_aux)
 
             value = win_aux[len(win)//2]
@@ -85,8 +89,7 @@ def peak_detector_RT(signal, fs, step=1, win_size=1.5, x_thr=0.3):
     return peaks, valleys
 
 
-def peak_detector(signal, fs, window=3, overlap=.3):
-    # Get Peaks - Avoid using STD...
+def peak_detector(signal, fs, window=3, overlap=.3, x_thr=.3, pro=0.5):
     peaks, peaksPos, valleys, valleysPos = [], [], [], []
     window *= fs
     overlap = int(fs*overlap)
@@ -94,7 +97,7 @@ def peak_detector(signal, fs, window=3, overlap=.3):
     for i in range(overlap, len(signal), window):
         segment = signal[i - overlap:i+window]
         
-        peaks, peakPos_det, _, valleyPos_det = peakDetection(segment, x_threshold=int(.3 * fs), proeminence=0.5*np.ptp(segment))
+        peaks, peakPos_det, _, valleyPos_det = peakDetection(segment, x_threshold=int(overlap * fs), proeminence=pro*np.ptp(segment))
 
         if len(peakPos_det) > 1:
             peakPos_det, valleyPos_det = peakPos_det[:-1], valleyPos_det[:-1]
@@ -114,12 +117,26 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     device = Devices(r'..\..\acquisitions\Acquisitions\03_11_2020')
-    data = device.getSensorsData(['ECG'])
-    ecg_signal = device.convertAndfilterSignal(data['data'][:, 1], 'ECG', device.fs, device.resolution)
+    data_ecg = device.getSensorsData(['ECG'])
+    ecg_signal = device.convertAndfilterSignal(data_ecg['data'][:, 1], 'ECG', device.fs, device.resolution)
 
-    peaks, valleys = peak_detector(ecg_signal, device.fs)
+    peaks, valleys = peak_detector_RT(ecg_signal, device.fs, x_thr=.1)
 
     plt.figure()
-    plt.plot(ecg_signal)
-    plt.scatter(peaks[1], peaks[0], c='r')
+    plt.plot(decimate(ecg_signal, int(device.fs/50)))
+    # plt.plot(ecg_signal)
+    # plt.scatter(peaks[1], peaks[0], c='r')
+    plt.vlines(peaks[1], -.5, .75, 'r')
+    plt.show()
+
+    data_resp = device.getSensorsData(['RESPIRATION'])
+    resp_signal = device.convertAndfilterSignal(data_resp['data'][:, 1], 'RESPIRATION', device.fs, device.resolution)
+
+    peaks, valleys = peak_detector_RT(resp_signal, device.fs, win_size=20)
+
+    plt.figure()
+    plt.plot(decimate(resp_signal, int(device.fs/50)))
+    # plt.plot(ecg_signal)
+    # plt.scatter(peaks[1], peaks[0], c='r')
+    plt.vlines(peaks[1], -.5, .75, 'r')
     plt.show()
