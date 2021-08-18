@@ -1,6 +1,6 @@
 import biosignalsnotebooks as bsnb
 try:
-    from acquisition import *
+    from Physiological_Data.lib.acquisition import *
 except (ImportError, ModuleNotFoundError):
     from Physiological_Data.lib.acquisition import *
 import scipy as sc
@@ -11,9 +11,9 @@ from scipy import integrate
 import novainstrumentation as ni
 from mes2hb.mes2hb import Mes2Hb
 try:
-    from tools import *
-    from respRT import peak_detector_Resp
-    from signal_processing import integration_DO
+    from Physiological_Data.lib.tools import *
+    from Physiological_Data.lib.respRT import peak_detector_Resp
+    from Physiological_Data.lib.signal_processing import integration_DO
 except (ImportError, ModuleNotFoundError):
     from Physiological_Data.lib.tools import *
     from Physiological_Data.lib.respRT import peak_detector_Resp
@@ -157,18 +157,24 @@ class HRV(Sensor):
 
         return rr_interval_NN, rr_interval_time_NN
 
-    @staticmethod
-    def heartRate(rr_interval_NN):
+
+    def heartRate(self,rr_interval_NN):
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :return: array of Heart Rate in beats per minute (Bpm) along time.
         """
         heart_rate=(60.0/rr_interval_NN)
 
-        return heart_rate
+        statistical_features = self.statistical_Features(heart_rate)
 
-    @staticmethod
-    def timeDomainFeatures(rr_interval_NN):
+        hr = {"Avg HR":[statistical_features["AVG"]],"Min HR":[statistical_features["Minimum"]],"Max HR":[statistical_features["Maximum"]],"SD":[statistical_features["STD"]]}
+
+        return hr
+
+
+    def timeDomainFeatures(self,rr_interval_NN):
+
+        statistical_features = self.statistical_Features(rr_interval_NN)
 
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
@@ -192,7 +198,7 @@ class HRV(Sensor):
         NN20=sum(1 for i in rr_interval_abs if i > 0.02)
         pNN20=round((float(NN20)/len(rr_interval_NN)*100),4)
 
-        time_domain_features={"SDNN":SDNN,"RMSSD":RMSSD,"NN50":NN50,"pNN50":pNN50,"NN20":NN20,"pNN20":pNN20}
+        time_domain_features={"AVG RR":[statistical_features["AVG"]],"Minimum RR":[statistical_features["Minimum"]],"Maximum RR": [statistical_features["Maximum"]],"SDNN":[SDNN],"RMSSD":[RMSSD],"NN50":[NN50],"pNN50":[pNN50],"NN20":[NN20],"pNN20":[pNN20]}
 
         return time_domain_features
 
@@ -219,7 +225,7 @@ class HRV(Sensor):
         "SD2/SD1"
         SD_ratio = round(SD2 / SD1, 4)
 
-        poincaré_features={"SD1":SD1,"SD2":SD2,"SD2/SD1":SD_ratio}
+        poincaré_features={"SD1":[SD1*1000],"SD2":[SD2*1000],"SD2/SD1":[SD_ratio]}
 
         return poincaré_features
 
@@ -267,8 +273,9 @@ class HRV(Sensor):
                                                                                 1000)),
                                                 nperseg=min(len(nn_tachogram_even), 1000))
 
-        freqs = [round(val, 3) for val in freq_axis if val < 0.5]
-        power = [round(val, 4) for val, freq in zip(power_axis, freq_axis) if freq < 0.5]
+        freqs = np.array([round(val, 3) for val in freq_axis if val < 0.5])
+        power = np.array([round(val, 4) for val, freq in zip(power_axis, freq_axis) if freq < 0.5])
+
 
         return freqs, power
 
@@ -285,10 +292,10 @@ class HRV(Sensor):
         Power of each frequency component in the desired range of frequencies
         """
 
-        vlf = round(sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]), 4)
-        lf = round(sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]), 4)
-        hf = round(sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]), 4)
-        total_power = round(sc.integrate.trapz(power[total_power_indexes], freq[total_power_indexes]), 4)
+        vlf = round(sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes])*1000000, 4)
+        lf = round(sc.integrate.trapz(power[lf_indexes], freq[lf_indexes])*1000000, 4)
+        hf = round(sc.integrate.trapz(power[hf_indexes], freq[hf_indexes])*1000000, 4)
+        total_power = round(sc.integrate.trapz(power[total_power_indexes], freq[total_power_indexes])*1000000, 4)
 
         """
         Frequency components in normalized units (n.u)
@@ -299,7 +306,7 @@ class HRV(Sensor):
         hf_norm = round(hf / (total_power - vlf) * 100, 2)
         ratio = round(lf_norm / hf_norm, 2)
 
-        frequency_features={"VLF Power":vlf,"LF Power":lf,"HF Power":hf,"Total Power":total_power,"LF (nu)":lf_norm,"HF (nu)":hf_norm,"LF/HF":ratio}
+        frequency_features={"VLF Power":[vlf],"LF Power":[lf],"HF Power":[hf],"Total Power":[total_power],"LF (nu)":[lf_norm],"HF (nu)":[hf_norm],"LF/HF":[ratio]}
 
         return frequency_features
 
@@ -307,12 +314,13 @@ class HRV(Sensor):
     def getFeatures(self):
         rr_interval, rr_interval_time = self.RR_interval()
         rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(rr_interval, rr_interval_time)
+        heart_rate = self.heartRate(rr_interval_NN)
         freq, power = self.frequencyAnalysis(rr_interval_time_NN, rr_interval_NN)
         time_features = self.timeDomainFeatures(rr_interval_NN)
         poincare_features = self.poincareFeatures(rr_interval_NN)
         frequency_features = self.frequencyFeatures(freq,power)
 
-        return time_features, poincare_features, frequency_features
+        return heart_rate,time_features, poincare_features,frequency_features
 
 class PPG(Sensor):
 
@@ -425,7 +433,7 @@ class fNIRS(Sensor):
     def convertConcentration(self):
         converter = Mes2Hb()
         self.hbo, self.hb, self.hbt = converter.convert([self.red.copy(), self.infrared.copy()], wavelength=[660, 860])
-    
+
     def detectPeaks(self):
         pass
 

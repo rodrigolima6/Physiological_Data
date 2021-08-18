@@ -5,7 +5,7 @@ import numpy as np
 try:
     from Physiological_Data.lib.tools import *
 except (ImportError, ModuleNotFoundError):
-    from tools import *
+    from Physiological_Data.lib.tools import *
 from json import loads
 import biosignalsnotebooks as bsnb
 import abc
@@ -399,8 +399,9 @@ class Sensor:
         maximum = max(signal)
         minimum = min(signal)
         average = np.mean(signal)
+        std = np.std(signal)
 
-        statistical_features = {"AVG": average, "Maximum": maximum, "Minimum": minimum}
+        statistical_features = {"AVG": average, "Maximum": maximum, "Minimum": minimum, "STD":std}
 
         return statistical_features
     

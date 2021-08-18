@@ -2,11 +2,11 @@ import numpy as np
 import os
 from json import load
 try:
-    from lib.biosignals import *
-    from lib.psychopy import *
+    from Physiological_Data.lib.biosignals import *
+    from Physiological_Data.lib.psychopy import *
 except (ImportError, ModuleNotFoundError):
-    from biosignals import *
-    from psychopy import *
+    from Physiological_Data.lib.biosignals import *
+    from Physiological_Data.lib.psychopy import *
 
 
 class Acquisition():

@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pylab as plt
 from biosignalsnotebooks import bsnb
 import statistics
 from scipy.signal import find_peaks

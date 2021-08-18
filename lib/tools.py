@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.model_selection import KFold, LeavePGroupsOut
 from sklearn.ensemble import RandomForestClassifier
@@ -7,9 +7,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.tree import DecisionTreeClassifier
 try:
-    from lib.peak_detector import peak_detector
+    from Physiological_Data.lib.peak_detector import peak_detector
 except (ImportError, ModuleNotFoundError):
-    from peak_detector import peak_detector
+    from Physiological_Data.lib.peak_detector import peak_detector
 
 
 def closestIndex(data, value):
@@ -63,19 +63,19 @@ def quantize(data, d=1000):
     return quantised_data   
 
 
-def plotDataset(features, labels):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    task, baseline = [], []
-    for i in range(len(labels)):
-        if labels[i] == 'task':
-            task.append(features[i])
-        else:
-            baseline.append(features[i])
-    task, baseline = np.array(task), np.array(baseline)
-    ax.scatter(task[:,0], task[:,1], task[:,2], zdir='z', s=20, color='blue', depthshade=True)
-    ax.scatter(baseline[:,0], baseline[:,1], baseline[:,2], zdir='z', s=20, color='red', depthshade=True)
-    plt.show()
+# def plotDataset(features, labels):
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111, projection='3d')
+#     task, baseline = [], []
+#     for i in range(len(labels)):
+#         if labels[i] == 'task':
+#             task.append(features[i])
+#         else:
+#             baseline.append(features[i])
+#     task, baseline = np.array(task), np.array(baseline)
+#     ax.scatter(task[:,0], task[:,1], task[:,2], zdir='z', s=20, color='blue', depthshade=True)
+#     ax.scatter(baseline[:,0], baseline[:,1], baseline[:,2], zdir='z', s=20, color='red', depthshade=True)
+#     plt.show()
 
 
 def saveToTSV(features, labels):
