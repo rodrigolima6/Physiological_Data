@@ -29,3 +29,27 @@ def Process_HRV(data,fs,resolution):
     HRV_Dataframe= ((heart_rate_df.join(time_features_df)).join(poincare_features_df)).join(frequency_features_df)
 
     return HRV_Dataframe
+
+def Process_fNIRS(data,fs,resolution):
+
+    sensor = fNIRS(data,fs,resolution)
+
+    sensor.processfNIRS()
+
+    fnirs_features = sensor.getFeatures()
+
+    fNIRS_Dataframe = pd.DataFrame.from_dict(fnirs_features,orient="columns")
+
+    return fNIRS_Dataframe
+
+def Process_RESP(data,fs,resolution):
+
+    sensor = RESP(data,fs,resolution)
+
+    signals,info = sensor.process_RESP()
+
+    df = sensor.RESP_RRV(signals)
+
+    resp_Dataframe = sensor.getFeatures(signals,df)
+
+    return resp_Dataframe

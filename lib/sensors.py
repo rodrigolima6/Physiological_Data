@@ -5,6 +5,7 @@ except (ImportError, ModuleNotFoundError):
     from Physiological_Data.lib.acquisition import *
 import scipy as sc
 import json
+import neurokit2 as nk
 from sklearn.linear_model import LinearRegression
 from scipy.signal import welch
 from scipy import integrate
@@ -157,13 +158,16 @@ class HRV(Sensor):
 
         return rr_interval_NN, rr_interval_time_NN
 
-
-    def heartRate(self,rr_interval_NN):
+    def heart_rate(self,rr_interval_NN):
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :return: array of Heart Rate in beats per minute (Bpm) along time.
         """
         heart_rate=(60.0/rr_interval_NN)
+
+        return heart_rate
+
+    def heartRate_features(self,heart_rate):
 
         statistical_features = self.statistical_Features(heart_rate)
 
@@ -314,13 +318,14 @@ class HRV(Sensor):
     def getFeatures(self):
         rr_interval, rr_interval_time = self.RR_interval()
         rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(rr_interval, rr_interval_time)
-        heart_rate = self.heartRate(rr_interval_NN)
+        heart_rate = self.heart_rate(rr_interval_NN)
+        heart_rate_features = self.heartRate_features(heart_rate)
         freq, power = self.frequencyAnalysis(rr_interval_time_NN, rr_interval_NN)
         time_features = self.timeDomainFeatures(rr_interval_NN)
         poincare_features = self.poincareFeatures(rr_interval_NN)
         frequency_features = self.frequencyFeatures(freq,power)
 
-        return heart_rate,time_features, poincare_features,frequency_features
+        return heart_rate_features,time_features, poincare_features,frequency_features
 
 class PPG(Sensor):
 
@@ -437,9 +442,6 @@ class fNIRS(Sensor):
     def detectPeaks(self):
         pass
 
-    def extractFeatures(self):
-        pass
-
     @staticmethod
     def filterData(data, fs):
         return bsnb.bandpass(data, 0.05, 1, fs=fs, use_filtfilt=True)
@@ -464,6 +466,18 @@ class fNIRS(Sensor):
 
     def processfNIRS(self):
         self.convertConcentration()
+
+    def getFeatures(self):
+
+        hb_dict = self.statistical_Features(self.hb)
+        hbo_dict = self.statistical_Features(self.hbo)
+        hbt_dict = self.statistical_Features(self.hbt)
+
+        fNIRS_dict={"AVG Hb":[hb_dict["AVG"]],"Minimum Hb":[hb_dict["Minimum"]],"Maximum Hb":[hb_dict["Maximum"]],"STD Hb":[hb_dict["STD"]],
+                    "AVG Hbo":[hbo_dict["AVG"]],"Minimum Hbo":[hbo_dict["Minimum"]],"Maximum Hbo":[hbo_dict["Maximum"]],"STD Hbo":[hbo_dict["STD"]],
+                    "AVG Hbt":[hbt_dict["AVG"]],"Minimum Hbt":[hbt_dict["Minimum"]],"Maximum Hbt":[hbt_dict["Maximum"]],"STD Hbt":[hbt_dict["STD"]]}
+
+        return fNIRS_dict
 
 
 class EEG(Sensor):
@@ -548,40 +562,69 @@ class RESP(Sensor):
     def __init__(self, data, fs, resolution):
         super().__init__(data, fs, resolution)
         
-        self.data = data
+        self.data = np.array(data).astype(float)
         self.fs = fs
         self.resolution = resolution
-    
+
+    def process_RESP(self):
+        signals,info = nk.rsp_process(self.data,self.fs,method="biosppy")
+
+        return signals,info
+
+    @staticmethod
+    def RESP_RRV(signals):
+        info,peak_signals=nk.rsp_peaks(signals["RSP_Clean"])
+
+        rrv_dataframe=nk.rsp_rrv(signals["RSP_Rate"],peaks=peak_signals["RSP_Troughs"])
+
+        return rrv_dataframe
+
+    def getFeatures(self,signals,rrv_dataframe):
+        rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
+        rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
+
+        rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
+        rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True)
+        rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True)
+        rrv_dataframe.insert(0,"Mean_RSP_Amplitude",rsp_amp_dict["AVG"],True)
+
+        rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"], True)
+        rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
+        rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True)
+        rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"], True)
+        
+        return rrv_dataframe
+
     def maxPeaks(self, peaks):
         return max(peaks)
-    
+
     def meanAmpPeaks(self, peaks):
         return np.mean(peaks)
 
     def stdAmpPeaks(self, peaks):
         return np.std(peaks)
-    
+
     def rmsAmpPeaks(self, peaks):
         return np.sqrt(np.mean(np.power(peaks, 2))) / len(peaks)
-    
+
     def energyValue(self, data):
         return np.mean(np.power(data, 2)) / len(data)
 
     def meanValue(self, data):
         return np.mean(data)
-    
+
     def minValue(self, data):
         return min(data)
-    
+
     def maxValue(self, data):
         return max(data)
-    
+
     def stdValue(self, data):
         return np.std(data)
-    
+
     def rmsValue(self, data):
         return self.rmsAmpPeaks(data)
-    
+
     def areaValue(self, data):
         return integrate.cumtrapz(data)
 
@@ -590,38 +633,38 @@ class RESP(Sensor):
 
     def respInterval(self, peaks, fs):
         return np.mean(np.diff(peaks))*fs
-    
+
     def statisticsLastPeaks(self, peaks, fs):
         if len(peaks) > 10:
             peaks = peaks[-10:]
         diff_peaks = np.diff(peaks) * fs
         return np.mean(diff_peaks), np.std(diff_peaks), min(diff_peaks), max(diff_peaks), self.rmsValue(diff_peaks)
-    
+
     def zeroCrossing(self, data, fs):
         return bsnb.zero_crossing_rate(data) * len(data)/fs
-    
-    def getFeatures(self):
-        peaks, peaksAmp = peak_detector_Resp(self.data, self.fs)
-        peaks = peaks[1]
-        features = []
-        funcs = {'peaks': [self.maxPeaks, self.meanAmpPeaks, self.stdAmpPeaks, self.rmsAmpPeaks, self.respFreq, self.respInterval, self.statisticsLastPeaks],
-                'data': [self.energyValue, self.meanValue,  self.minValue, self.maxValue, self.stdValue, self.rmsValue, self.areaValue, self.zeroCrossing]}
-        # Extract features from peaks
-        for key in funcs:
-            aux = self.data
-            if key == 'peaks':
-                aux = peaks
-            for func in funcs[key]:
-                try:
-                    value = func(aux)
-                except TypeError as e:
-                    value = func(aux, self.fs)
-
-                if type(value) == np.float64 or type(value) == int:
-                    value = [value]
-                features.append(value)
-        
-        return np.concatenate(features)
+    #
+    # def getFeatures(self):
+    #     peaks, peaksAmp = peak_detector_Resp(self.data, self.fs)
+    #     peaks = peaks[1]
+    #     features = []
+    #     funcs = {'peaks': [self.maxPeaks, self.meanAmpPeaks, self.stdAmpPeaks, self.rmsAmpPeaks, self.respFreq, self.respInterval, self.statisticsLastPeaks],
+    #             'data': [self.energyValue, self.meanValue,  self.minValue, self.maxValue, self.stdValue, self.rmsValue, self.areaValue, self.zeroCrossing]}
+    #     # Extract features from peaks
+    #     for key in funcs:
+    #         aux = self.data
+    #         if key == 'peaks':
+    #             aux = peaks
+    #         for func in funcs[key]:
+    #             try:
+    #                 value = func(aux)
+    #             except TypeError as e:
+    #                 value = func(aux, self.fs)
+    #
+    #             if type(value) == np.float64 or type(value) == int:
+    #                 value = [value]
+    #             features.append(value)
+    #
+    #     return np.concatenate(features)
 
 
 if __name__ == '__main__':
