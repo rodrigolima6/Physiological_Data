@@ -113,8 +113,9 @@ class EDA(Sensor):
         eda_tonic_dict = self.statistical_Features(eda_tonic)
         SCR_Amplitude_dict = self.statistical_Features(SCR_Amplitude)
         SCR_RiseTime_dict = self.statistical_Features(SCR_RiseTime)
+        SCR_RecoveryTime_dict = self.statistical_Features(SCR_RecoveryTime)
 
-        return eda_phasic_dict,eda_tonic_dict,SCR_Amplitude_dict,SCR_RiseTime_dict,frequency_features
+        return eda_phasic_dict,eda_tonic_dict,SCR_Amplitude_dict,SCR_RiseTime_dict,SCR_RecoveryTime_dict,frequency_features
 
 
 class ECG(Sensor):
