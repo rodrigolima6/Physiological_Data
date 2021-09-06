@@ -9,6 +9,7 @@ import neurokit2 as nk
 from sklearn.linear_model import LinearRegression
 from scipy.signal import welch
 from scipy import integrate
+from biosppy.signals.eda import *
 import novainstrumentation as ni
 from mes2hb.mes2hb import Mes2Hb
 try:
@@ -19,6 +20,101 @@ except (ImportError, ModuleNotFoundError):
     from Physiological_Data.lib.tools import *
     from Physiological_Data.lib.respRT import peak_detector_Resp
     from Physiological_Data.lib.signal_processing import integration_DO
+
+class EDA(Sensor):
+    def __init__(self, data, fs, resolution):
+        super().__init__(data, fs, resolution)
+
+        self.data = data
+        self.fs = fs
+        self.resolution = resolution
+
+    def filterEDA(self):
+
+        lowfrequency=1
+        order=2
+
+        data_filtered = bsnb.lowpass(self.data,lowfrequency,order,self.fs,use_filtfilt=True)
+
+        return data_filtered
+
+    @staticmethod
+    def componentsEDA(data_filtered):
+
+        eda_components = nk.eda_phasic(data_filtered)
+        eda_phasic = eda_components["EDA_Phasic"].values
+        eda_tonic = eda_components["EDA_Tonic"].values
+
+        return eda_phasic,eda_tonic
+
+
+    def featuresSCR(self,eda_phasic):
+        info,signals = nk.eda_peaks(eda_phasic,self.fs,method="gamboa2008")
+
+        SCR_Amplitude = signals["SCR_Amplitude"]
+        SCR_RiseTime = signals["SCR_RiseTime"]
+        SCR_RecoveryTime = signals["SCR_RecoveryTime"]
+
+        return SCR_Amplitude,SCR_RiseTime,SCR_RecoveryTime
+
+    @staticmethod
+    def frequencyAnalysis(data_filtered):
+
+        downsampled1 = sc.signal.decimate(data_filtered, q=10,n=8)
+        downsampled2 = sc.signal.decimate(downsampled1, q=10,n=8)
+        downsampled3 = sc.signal.decimate(downsampled2, q=10, n=8)
+
+        signal_filtered = bsnb.highpass(downsampled3, 0.01, order=8)
+
+        freqs,power = sc.signal.welch(signal_filtered, nperseg=128, window='blackman')
+
+        return freqs,power
+
+    @staticmethod
+    def frequencyFeatures(freq,power):
+        """
+                    Indexes of Frequencies of each component
+                    """
+        vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
+        lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
+        hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
+        total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
+        """
+        Power of each frequency component in the desired range of frequencies
+        """
+
+        vlf = round(sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000, 4)
+        lf = round(sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4)
+        hf = round(sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4)
+        total_power = round(sc.integrate.trapz(power[total_power_indexes], freq[total_power_indexes]) * 1000000, 4)
+
+        """
+        Frequency components in normalized units (n.u)
+        Balance - LF(n.u)/HF(n.u)
+        """
+
+        lf_norm = round(lf / (total_power - vlf) * 100, 2)
+        hf_norm = round(hf / (total_power - vlf) * 100, 2)
+        ratio = round(lf_norm / hf_norm, 2)
+
+        frequency_features = {"VLF Power": [vlf], "LF Power": [lf], "HF Power": [hf], "Total Power": [total_power],
+                              "LF (nu)": [lf_norm], "HF (nu)": [hf_norm], "LF/HF": [ratio]}
+
+        return frequency_features
+
+    def getFeatures(self):
+        eda_filtered = self.filterEDA()
+        eda_phasic, eda_tonic = self.componentsEDA(eda_filtered)
+        SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime = self.featuresSCR(eda_phasic)
+        freqs, power = self.frequencyAnalysis(eda_filtered)
+        frequency_features = self.frequencyFeatures(freqs,power)
+
+        eda_phasic_dict = self.statistical_Features(eda_phasic)
+        eda_tonic_dict = self.statistical_Features(eda_tonic)
+        SCR_Amplitude_dict = self.statistical_Features(SCR_Amplitude)
+        SCR_RiseTime_dict = self.statistical_Features(SCR_RiseTime)
+
+        return eda_phasic_dict,eda_tonic_dict,SCR_Amplitude_dict,SCR_RiseTime_dict,frequency_features
 
 
 class ECG(Sensor):
@@ -592,7 +688,7 @@ class RESP(Sensor):
         rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
         rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True)
         rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"], True)
-        
+
         return rrv_dataframe
 
     def maxPeaks(self, peaks):

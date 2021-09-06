@@ -396,10 +396,10 @@ class Sensor:
     @staticmethod
     def statistical_Features(signal):
 
-        maximum = max(signal)
-        minimum = min(signal)
-        average = np.mean(signal)
-        std = np.std(signal)
+        maximum = np.nanmax(signal)
+        minimum = np.nanmin(signal)
+        average = np.nanmean(signal)
+        std = np.nanstd(signal)
 
         statistical_features = {"AVG": average, "Maximum": maximum, "Minimum": minimum, "STD":std}
 
