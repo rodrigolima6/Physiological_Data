@@ -21,6 +21,14 @@ except (ImportError, ModuleNotFoundError):
     from Physiological_Data.lib.respRT import peak_detector_Resp
     from Physiological_Data.lib.signal_processing import integration_DO
 
+class TEMP(Sensor):
+    def __init__(self, data, fs, resolution):
+        super().__init__(data, fs, resolution)
+
+        self.data = data
+        self.fs = fs
+        self.resolution = resolution
+
 class EDA(Sensor):
     def __init__(self, data, fs, resolution):
         super().__init__(data, fs, resolution)

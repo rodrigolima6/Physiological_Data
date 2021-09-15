@@ -111,6 +111,40 @@ def Social_negative(data):
 
     return social_negative
 
+def Category_Dataframe(category,dimension):
+
+    df1 = pd.DataFrame(columns=[category["P10_S1"]["videos"]])
+    df2 = pd.DataFrame(columns=[category["P10_S2"]["videos"]])
+    users_list = list()
+
+    for users in category.keys():
+        if ("EMDB/A" in str(category[users]["videos"])):
+            users_list.append(users.split("_")[0])
+            df1.loc[len(df1)] = category[users][dimension].values
+        if ("EMDB/B" in str(category[users]["videos"])):
+            df2.loc[len(df2)] = category[users][dimension].values
+    df1.insert(0, "Users", users_list)
+    df = (df1.join(df2)).set_index("Users")
+
+    return df
+
+def Full_Dataframe(data,dimension):
+    horror = Horror(data)
+    erotic = Erotic(data)
+    scenery = Scenery(data)
+    social_positive = Social_positive(data)
+    social_negative = Social_negative(data)
+
+    df_erotic = Category_Dataframe(erotic,dimension)
+    df_horror = Category_Dataframe(horror,dimension)
+    df_scenery = Category_Dataframe(scenery,dimension)
+    df_positive = Category_Dataframe(social_positive,dimension)
+    df_negative = Category_Dataframe(social_negative,dimension)
+
+    df = (((df_erotic.join(df_horror)).join(df_negative)).join(df_scenery)).join(df_positive)
+
+    return df
+
 # path = 'G:\\O meu disco\\PhD\\1st Study\\PsychoPy Data\\'
 # data = CSV_Load(path)
 # horror = Horror(data)
