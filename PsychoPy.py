@@ -13,7 +13,7 @@ def Horror(data):
                      'perceived_control': row['perceived_obstacles_slider.response'],
                      'novelty': row['novelty.response'],
                      'unexpectedness': row['unexpectedness.response'], 'intrisic_goal': row['intrisic_goal.response'],
-                     'pereived_obstacles': row['perceived_obstacles.response'],
+                     'perceived_obstacles': row['perceived_obstacles.response'],
                      'control_stress': row['control_stress.response']}
                 x = x.append(d, ignore_index=True)
         horror[users] = x
@@ -35,7 +35,7 @@ def Erotic(data):
                      'perceived_control': row['perceived_obstacles_slider.response'],
                      'novelty': row['novelty.response'],
                      'unexpectedness': row['unexpectedness.response'], 'intrisic_goal': row['intrisic_goal.response'],
-                     'pereived_obstacles': row['perceived_obstacles.response'],
+                     'perceived_obstacles': row['perceived_obstacles.response'],
                      'control_stress': row['control_stress.response']}
                 x = x.append(d, ignore_index=True)
         erotic[users] = x
@@ -57,7 +57,7 @@ def Scenery(data):
                      'perceived_control': row['perceived_obstacles_slider.response'],
                      'novelty': row['novelty.response'],
                      'unexpectedness': row['unexpectedness.response'], 'intrisic_goal': row['intrisic_goal.response'],
-                     'pereived_obstacles': row['perceived_obstacles.response'],
+                     'perceived_obstacles': row['perceived_obstacles.response'],
                      'control_stress': row['control_stress.response']}
                 x = x.append(d, ignore_index=True)
         scenery[users] = x
@@ -79,7 +79,7 @@ def Social_positive(data):
                      'perceived_control': row['perceived_obstacles_slider.response'],
                      'novelty': row['novelty.response'],
                      'unexpectedness': row['unexpectedness.response'], 'intrisic_goal': row['intrisic_goal.response'],
-                     'pereived_obstacles': row['perceived_obstacles.response'],
+                     'perceived_obstacles': row['perceived_obstacles.response'],
                      'control_stress': row['control_stress.response']}
                 x = x.append(d, ignore_index=True)
         social_positive[users] = x
@@ -101,7 +101,7 @@ def Social_negative(data):
                      'perceived_control': row['perceived_obstacles_slider.response'],
                      'novelty': row['novelty.response'],
                      'unexpectedness': row['unexpectedness.response'], 'intrisic_goal': row['intrisic_goal.response'],
-                     'pereived_obstacles': row['perceived_obstacles.response'],
+                     'perceived_obstacles': row['perceived_obstacles.response'],
                      'control_stress': row['control_stress.response']}
                 x = x.append(d, ignore_index=True)
         social_negative[users] = x
