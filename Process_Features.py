@@ -79,3 +79,17 @@ def Process_EDA(data,fs,resolution):
     EDA_Dataframe = (pd.DataFrame.from_dict(EDA_dict)).join(pd.DataFrame.from_dict(frequency_features))
 
     return EDA_Dataframe
+
+def process_EEG(data,fs,resolution):
+    EEG_dict={}
+    EEG_filtered={}
+    band_powers={}
+    freqs = {}
+    power={}
+
+    for keys in data.keys():
+        EEG_dict[keys] = EEG(data[keys],fs,resolution)
+        EEG_filtered[keys],freqs[keys],power[keys],band_powers[keys] = EEG_dict[keys].getFeatures()
+
+
+    return EEG_filtered,freqs,power,band_powers

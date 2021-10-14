@@ -6,6 +6,7 @@ except (ImportError, ModuleNotFoundError):
 import scipy as sc
 import json
 import neurokit2 as nk
+from sklearn.decomposition import FastICA
 from sklearn.linear_model import LinearRegression
 from scipy.signal import welch
 from scipy import integrate
@@ -549,7 +550,7 @@ class fNIRS(Sensor):
 
     @staticmethod
     def filterData(data, fs):
-        return bsnb.bandpass(data, 0.05, 1, fs=fs, use_filtfilt=True)
+        return bsnb.bandpass(data, 0.05, 0.4, fs=fs, use_filtfilt=True)
 
     @staticmethod
     def root_mean_square(signal):
@@ -592,23 +593,68 @@ class EEG(Sensor):
         self.data = data # converted and filtered EEG data
         self.fs = fs
         self.resolution = resolution
-        self.bands = {'alpha': [8, 12], 'betha': [12, 35], 'gamma': [35, 49], 'theta': [4, 8], 'delta': [.5, 4]}
-    
+        self.bands = {'alpha': [8, 14], 'betha': [14, 30], 'gamma': [30, 49], 'theta': [4, 8], 'delta': [.5, 4]}
+
+
+    def ICA(self):
+        ica = FastICA()
+        EEG_ICA = ica.fit_transform(self.data.reshape(-1,1))
+
+        return EEG_ICA
+
+    def filterData(self,data):
+        EEG_shift = data[:,0]-np.mean(data)
+        EEG_filtered = bsnb.bandpass(EEG_shift,1,40,order=8,fs=self.fs,use_filtfilt=True)
+
+        return EEG_filtered
+
+    def frequencyAnalysis(self,data):
+        freqs,power = welch(data,self.fs,nperseg=self.fs/2)
+
+        alpha_indexes = np.where((freqs[:] >= self.bands["alpha"][0]) & (freqs[:] < self.bands["alpha"][1]))[0]
+        betha_indexes = np.where((freqs[:] >= self.bands["betha"][0]) & (freqs[:] < self.bands["betha"][1]))[0]
+        gamma_indexes = np.where((freqs[:] >= self.bands["gamma"][0]) & (freqs[:] < self.bands["gamma"][1]))[0]
+        theta_indexes = np.where((freqs[:] >= self.bands["theta"][0]) & (freqs[:] < self.bands["theta"][1]))[0]
+        delta_indexes = np.where((freqs[:] >= self.bands["delta"][0]) & (freqs[:] < self.bands["delta"][1]))[0]
+
+        alpha = sc.integrate.trapz(power[alpha_indexes],x=freqs[alpha_indexes])
+        betha = sc.integrate.trapz(power[betha_indexes], x=freqs[betha_indexes])
+        gamma = sc.integrate.trapz(power[gamma_indexes], x=freqs[gamma_indexes])
+        theta = sc.integrate.trapz(power[theta_indexes], x=freqs[theta_indexes])
+        delta = sc.integrate.trapz(power[delta_indexes], x=freqs[delta_indexes])
+
+        bands_power = {"alpha":alpha,"betha":betha,"gamma":gamma,"theta":theta,"delta":delta}
+
+        return freqs,power,bands_power
+
+
     @staticmethod
     def extractBand(data: np.array, band: list, fs: int):
         f1, f2 = band
-        win = 4 * fs
+        win = fs/2
         freq, power = welch(data, fs, nperseg=win)
         idx_band = np.logical_and(freq >= f1, freq <= f2)  # Get the band of frequencies
-        power_freq = np.trapz(power[idx_band],dx=np.mean(np.diff(freq)))  # Calculate the power of the band of frequencies
+        power_freq = np.trapz(power[idx_band],x=freq[idx_band])  # Calculate the power of the band of frequencies
+
         return power_freq
 
-    def extractAllBands(self, bands):
+    def extractAllBands(self,data,bands):
+        print(self.bands["alpha"][0])
         band_powers = {}
+
         for key, item in bands.items():
-            band_powers[key] = self.extractBand(self.data, item, self.fs)
+            band_powers[key] = self.extractBand(data, item, self.fs)
+
         return band_powers
-    
+
+    def getFeatures(self):
+        EEG_ICA = self.ICA()
+        EEG_filtered = self.filterData(EEG_ICA)
+
+        freqs,power,band_powers = self.frequencyAnalysis(EEG_filtered)
+
+        return EEG_filtered,freqs,power,band_powers
+
     def getDominantFreq(self, data, fs):
         win = 4 * fs
         freq, power = welch(data, fs, nperseg=win)
@@ -623,12 +669,12 @@ class EEG(Sensor):
                     combinations[f"{key}/{other_key}"] = item/other_item
         return combinations
     
-    def getFeatures(self):
-        power_freqs = self.extractAllBands(self.bands)
-        dominant_freq = self.getDominantFreq(self.data, self.fs)
-        combinations = self.getCombinationFreq(power_freqs)
-        features = np.concatenate([[dominant_freq], list(power_freqs.values()), list(combinations.values())])
-        return features
+    # def getFeatures(self):
+    #     power_freqs = self.extractAllBands(self.bands)
+    #     dominant_freq = self.getDominantFreq(self.data, self.fs)
+    #     combinations = self.getCombinationFreq(power_freqs)
+    #     features = np.concatenate([[dominant_freq], list(power_freqs.values()), list(combinations.values())])
+    #     return features
 
 
 class ACC(Sensor):
