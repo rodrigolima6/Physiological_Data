@@ -2,7 +2,28 @@ from Physiological_Data.lib.sensors import *
 import numpy as np
 from lib.sensors import *
 import pandas as pd
+from Load import *
 from scipy.integrate import simps
+
+def Run_files(fname):
+    data, header = pyxdf.load_xdf(fname)
+
+    return data
+
+def Load_Data(data):
+    marker, timestamps = Load_Psychopy(data)
+    CH1, CH2, CH3, CH4, CH5, CH6, time_Opensignals, fs = Load_Opensignals(data)
+    EEG_data, time_EEG, EEG_fs = Load_EEG(data)
+
+    d = {'Time': time_Opensignals, 'ECG': CH1, 'EDA': CH2, 'RESP': CH3, 'TEMP': CH4, 'fNIRS_RED': CH5,
+         'fNIRS_IRED': CH6}
+    Signals = pd.DataFrame(data=d)
+
+    EEG_Signals = pd.DataFrame.from_dict(EEG_data)
+    EEG_Signals.insert(0, 'Time', time_EEG)
+
+    return Signals,EEG_Signals,marker,timestamps
+
 
 def Process_ECG(data,fs,resolution):
 
@@ -80,7 +101,7 @@ def Process_EDA(data,fs,resolution):
 
     return EDA_Dataframe
 
-def process_EEG(data,fs,resolution):
+def Process_EEG(data,fs,resolution):
     EEG_dict={}
     EEG_filtered={}
     band_powers={}
@@ -91,5 +112,15 @@ def process_EEG(data,fs,resolution):
         EEG_dict[keys] = EEG(data[keys],fs,resolution)
         EEG_filtered[keys],freqs[keys],power[keys],band_powers[keys] = EEG_dict[keys].getFeatures()
 
+    bands_df = pd.DataFrame.from_dict(band_powers,orient="index")
 
-    return EEG_filtered,freqs,power,band_powers
+    return bands_df
+
+def Process_TEMP(data,fs,resolution):
+    sensor = TEMP(data,fs,resolution)
+
+    temp = sensor.filterData()
+
+    Temp_Dataframe = sensor.getFeatures(temp)
+
+    return Temp_Dataframe

@@ -1,4 +1,6 @@
 import biosignalsnotebooks as bsnb
+import pandas as pd
+
 try:
     from Physiological_Data.lib.acquisition import *
 except (ImportError, ModuleNotFoundError):
@@ -416,7 +418,7 @@ class HRV(Sensor):
         hf_norm = round(hf / (total_power - vlf) * 100, 2)
         ratio = round(lf_norm / hf_norm, 2)
 
-        frequency_features={"VLF Power":[vlf],"LF Power":[lf],"HF Power":[hf],"Total Power":[total_power],"LF (nu)":[lf_norm],"HF (nu)":[hf_norm],"LF/HF":[ratio]}
+        frequency_features={"HRV VLF Power":[vlf],"HRV LF Power":[lf],"HRV HF Power":[hf],"HRV Total Power":[total_power],"HRV LF (nu)":[lf_norm],"HRV HF (nu)":[hf_norm],"HRV LF/HF":[ratio]}
 
         return frequency_features
 
@@ -529,13 +531,13 @@ class PPG(Sensor):
 class fNIRS(Sensor):
     def __init__(self, data, fs, resolution):
         super().__init__(data, fs, resolution)
-        self.red = self.convertPhys(data[:, 0], resolution)
-        self.infrared = self.convertPhys(data[:, 1], resolution)
+        # self.red = self.convertPhys(data[:, 0], resolution)
+        # self.infrared = self.convertPhys(data[:, 1], resolution)
 
-        self.red = self.filterData(self.red, fs)
-        self.infrared = self.filterData(self.infrared, fs)
+        self.red = self.filterData(data[:,0], fs)
+        self.infrared = self.filterData(data[:,1], fs)
 
-        print(self.red, self.infrared)
+        # print(self.red, self.infrared)
     
     @staticmethod
     def convertPhys(data, resolution):
@@ -639,7 +641,7 @@ class EEG(Sensor):
         return power_freq
 
     def extractAllBands(self,data,bands):
-        print(self.bands["alpha"][0])
+        # print(self.bands["alpha"][0])
         band_powers = {}
 
         for key, item in bands.items():
@@ -676,6 +678,28 @@ class EEG(Sensor):
     #     features = np.concatenate([[dominant_freq], list(power_freqs.values()), list(combinations.values())])
     #     return features
 
+class TEMP(Sensor):
+    def __init__(self, data, fs, resolution):
+        super().__init__(data, fs, resolution)
+
+        self.data = data
+        self.fs = fs
+        self.resolution = resolution
+
+    def filterData(self,lowpassfreq=0.1):
+
+        data_filtered = bsnb.lowpass(self.data,lowpassfreq,order=2,fs=self.fs,use_filtfilt=True)
+
+        return data_filtered
+
+    def getFeatures(self,data):
+        temp = self.statistical_Features(data)
+
+        temp_dict = {"AVG Temp":[temp["AVG"]],"Max Temp":[temp["Maximum"]],"Min Temp":[temp["Minimum"]],"STD Temp":[temp["STD"]]}
+
+        temp_Dataframe = pd.DataFrame.from_dict(temp_dict,orient="columns")
+
+        return temp_Dataframe
 
 class ACC(Sensor):
     def __init__(self, data, fs, resolution):

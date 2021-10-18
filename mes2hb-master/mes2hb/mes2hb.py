@@ -64,7 +64,7 @@ class Mes2Hb:
 
         mes_data_shape = ir_mes_data.shape
         
-        print("Time to reshape: ", time() - t, "; Shape: ", mes_data_shape)
+        # print("Time to reshape: ", time() - t, "; Shape: ", mes_data_shape)
 
         wlen_red = wavelength[0]
         wlen_ir = wavelength[1]
@@ -84,13 +84,13 @@ class Mes2Hb:
             wlen_ir, "dxy"
             )
         
-        print("Time to get coefficients: ", time() - t, "Coefficients: ", oxy_red, oxy_ir, dxy_red, dxy_ir)
+        # print("Time to get coefficients: ", time() - t, "Coefficients: ", oxy_red, oxy_ir, dxy_red, dxy_ir)
         t = time()
 
         mean_baseline_red = np.mean(red_mes_data[baseline[0]:baseline[1]])
         mean_baseline_ir = np.mean(ir_mes_data[baseline[0]:baseline[1]])
         
-        print("Time to compute mean: ", time() - t)
+        # print("Time to compute mean: ", time() - t)
         t = time()
         
         
@@ -102,12 +102,12 @@ class Mes2Hb:
         pos_ired = np.where(
             ir_mes_data*mean_baseline_ir > 0
             )
-        print("Time to compute baseline: ", time()-t)
+        # print("Time to compute baseline: ", time()-t)
         t = time()
 
         a_red, a_ir = _compute_log(pos_red[0], pos_ired[0], red_mes_data, ir_mes_data, mean_baseline_red, mean_baseline_ir)
 
-        print("Time to compute log: ", time()-t)
+        # print("Time to compute log: ", time()-t)
         t = time()
         #################################################################################################################################
         #################################################################################################################################
@@ -120,13 +120,13 @@ class Mes2Hb:
         ####### Oxy Hb #######
         if ((oxy_red*dxy_ir - oxy_ir*dxy_red)!=0):
             hbo = (a_red*dxy_ir - a_ir*dxy_red)/(oxy_red*dxy_ir - oxy_ir*dxy_red)
-        print("Time to compute Oxy Hb: ", time()-t)
+        # print("Time to compute Oxy Hb: ", time()-t)
         t = time()
 
         ####### DeOxy Hb #######
         if ((dxy_red*oxy_ir - dxy_ir*oxy_red)!=0):
         	hb = (a_red*oxy_ir - a_ir*oxy_red)/(dxy_red*oxy_ir - dxy_ir*oxy_red)
-        print("Time to compute Deoxy Hb: ", time()-t)
+        # print("Time to compute Deoxy Hb: ", time()-t)
 
         hbt = hbo + hb
         return hbo[baseline[1]:], hb[baseline[1]:], hbt[baseline[1]:]
