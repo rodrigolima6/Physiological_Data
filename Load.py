@@ -3,8 +3,8 @@ import pyxdf
 def Load_Psychopy(data):
     for stream in data:
         if (stream['info']['name'][0] == "PsychoPyStream"):
-            markers = stream['time_series']
-            timestamps = stream['time_stamps']
+            markers = list(stream['time_series'])
+            timestamps = list(stream['time_stamps'])
 
     return markers,timestamps
 

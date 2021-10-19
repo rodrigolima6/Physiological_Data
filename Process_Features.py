@@ -124,3 +124,71 @@ def Process_TEMP(data,fs,resolution):
     Temp_Dataframe = sensor.getFeatures(temp)
 
     return Temp_Dataframe
+
+def correctP1(data):
+
+    markers1,timestamps1 = Load_Psychopy(data["P1_S2_GroupA_eeg_1.xdf"])
+    markers2, timestamps2 = Load_Psychopy(data["P1_S2_GroupA_eeg.xdf"])
+
+    Signals, EEG_Signals, marker, timestamps = Load_Data(data["P1_S2_GroupA_eeg.xdf"])
+    Signals_1, EEG_Signals_1, marker_1, timestamps_1 = Load_Data(data["P1_S2_GroupA_eeg_1.xdf"])
+
+    markers2.reverse()
+    timestamps2.reverse()
+
+    for element in markers2:
+        markers1.insert(0, element)
+
+    for timestamp in timestamps2:
+        timestamps1.insert(0, timestamp)
+
+    Signals = pd.concat([Signals, Signals_1])
+    EEG_Signals = pd.concat([EEG_Signals,EEG_Signals_1])
+    marker = markers1
+    timestamps = timestamps1
+
+    return Signals, EEG_Signals, marker, timestamps
+
+def correctP2(data):
+
+    Signals,EEG_Signals,markers4,timestamps4 = Load_Data(data["P2_S1_GroupA_eeg.xdf"])
+
+    CH1_1, CH2_1, CH3_1, CH4_1, CH5_1, CH6_1, time_Opensignals_1, fs_1 = Load_Opensignals(data["P2_S1_GroupA_eeg_1.xdf"])
+    EEG_data_1, time_EEG_1, EEG_fs_1 = Load_EEG(data["P2_S1_GroupA_eeg_1.xdf"])
+
+    d = {'Time': time_Opensignals_1, 'ECG': CH1_1, 'EDA': CH2_1, 'RESP': CH3_1, 'TEMP': CH4_1, 'fNIRS_RED': CH5_1,
+         'fNIRS_IRED': CH6_1}
+    Signals_1 = pd.DataFrame(data=d)
+
+    EEG_Signals_1 = pd.DataFrame.from_dict(EEG_data_1)
+    EEG_Signals_1.insert(0, 'Time', time_EEG_1)
+
+    Signals = pd.concat([Signals, Signals_1])
+    EEG_Signals = pd.concat([EEG_Signals,EEG_Signals_1])
+
+    missing_markers = [['EMDB/A/Scenery/5003.avi', '1'], ['EMDB/A/Scenery/5003.avi', '0'],
+                       ['EMDB/A/Scenery/5001.avi', '1'], ['EMDB/A/Scenery/5001.avi', '0'],
+                       ['EMDB/A/Scenery/5000.avi', '1'], ['EMDB/A/Scenery/5000.avi', '0'],
+                       ['EMDB/A/Scenery/5002.avi', '1'], ['EMDB/A/Scenery/5002.avi', '0'],
+                       ['EMDB/A/Erotic/2004.avi', '1'], ['EMDB/A/Erotic/2004.avi', '0'],
+                       ['EMDB/A/Erotic/2002.avi', '1'], ['EMDB/A/Erotic/2002.avi', '0'],
+                       ['EMDB/A/Erotic/2003.avi', '1'], ['EMDB/A/Erotic/2003.avi', '0'],
+                       ['EMDB/A/Erotic/2000.avi', '1'], ['EMDB/A/Erotic/2000.avi', '0'],
+                       ['EMDB/A/Erotic/2001.avi', '1'], ['EMDB/A/Erotic/2001.avi', '0']]
+
+    missing_timestamps = [(timestamps4[0] - 78.49) + 40.45737604831811, timestamps4[0] - 78.49,
+                          (timestamps4[0] - 162) + 40.217181624873774, timestamps4[0] - 162,
+                          (timestamps4[0] - 247) + 40.61692033614963, timestamps4[0] - 247,
+                          (timestamps4[0] - 345) + 40.37409253764781, timestamps4[0] - 345,
+                          (timestamps4[0] - 427) + 40.13403391290922, timestamps4[0] - 427,
+                          (timestamps4[0] - 512) + 40.46176630666014, timestamps4[0] - 512,
+                          (timestamps4[0] - 602) + 40.653548489004606, timestamps4[0] - 602,
+                          (timestamps4[0] - 690) + 40.130320348078385, timestamps4[0] - 690,
+                          (timestamps4[0] - 789) + 40.13610309327487, timestamps4[0] - 789]
+
+    for marker in missing_markers:
+        markers4.insert(0, marker)
+    for timestamps in missing_timestamps:
+        timestamps4.insert(0, timestamps)
+
+    return Signals,EEG_Signals,markers4,timestamps4
