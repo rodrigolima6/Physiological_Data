@@ -1,9 +1,45 @@
-from Physiological_Data.lib.sensors import *
-import numpy as np
+import pyxdf
 from lib.sensors import *
-import pandas as pd
 from Load import *
-from scipy.integrate import simps
+from Epochs import *
+
+def getEvents(users):
+    Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1 = correctP1(users)
+    Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2 = correctP2(users)
+
+    del users["P1_S2_GroupA_eeg_1.xdf"]
+    del users["P2_S1_GroupA_eeg_1.xdf"]
+
+    data = {}
+    for user in users.keys():
+        data[user.split("_")[0] + "_" + user.split("_")[1]] = Load_Data(users[user])
+
+    data["P1_S2"] = (Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1)
+    data["P2_S1"] = (Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2)
+
+    for keys in data.keys():
+        if ("baseline" in data[keys][2][0]):
+            data[keys][2][0][1] = '0'
+
+    onset = {}
+    offset = {}
+    videos = {}
+
+    for keys in data.keys():
+        onset[keys], offset[keys], videos[keys] = getMarkers(data[keys][2], data[keys][3])
+
+    onset_index = {}
+    offset_index = {}
+
+    for keys in data.keys():
+        onset_index[keys], offset_index[keys] = getMarkersIndex(onset[keys], offset[keys], data[keys][0]["Time"])
+
+    events_diff = {}
+
+    for keys in onset.keys():
+        events_diff[keys] = CalculateEventsDiff(onset[keys],offset[keys])
+
+    return events_diff,videos,onset_index,offset_index
 
 def Run_files(fname):
     data, header = pyxdf.load_xdf(fname)
@@ -15,6 +51,10 @@ def Load_Data(data):
     CH1, CH2, CH3, CH4, CH5, CH6, time_Opensignals, fs = Load_Opensignals(data)
     EEG_data, time_EEG, EEG_fs = Load_EEG(data)
 
+    # timestamps -= time_Opensignals[0]
+    # time_Opensignals -= time_Opensignals[0]
+    # time_EEG -= time_EEG[0]
+
     d = {'Time': time_Opensignals, 'ECG': CH1, 'EDA': CH2, 'RESP': CH3, 'TEMP': CH4, 'fNIRS_RED': CH5,
          'fNIRS_IRED': CH6}
     Signals = pd.DataFrame(data=d)
@@ -24,6 +64,16 @@ def Load_Data(data):
 
     return Signals,EEG_Signals,marker,timestamps
 
+def getDataframe(dataframe,fs,resolution):
+    HRV_Dataframe = Process_HRV(dataframe["ECG"], fs, resolution)
+    Temp_Dataframe = Process_TEMP(dataframe["TEMP"], fs, resolution)
+    fNIRS_Dataframe = Process_fNIRS(np.vstack((dataframe["fNIRS_RED"], dataframe["fNIRS_IRED"])).T, fs, resolution)
+    RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
+    EDA_Dataframe = Process_EDA(dataframe["EDA"], fs, resolution)
+
+    Dataframe = (((HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)).join(fNIRS_Dataframe)).join(Temp_Dataframe)
+
+    return Dataframe
 
 def Process_ECG(data,fs,resolution):
 
@@ -70,6 +120,8 @@ def Process_RESP(data,fs,resolution):
     signals,info = sensor.process_RESP()
 
     df = sensor.RESP_RRV(signals)
+
+    print(df)
 
     resp_Dataframe = sensor.getFeatures(signals,df)
 

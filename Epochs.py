@@ -1,11 +1,7 @@
-import pyxdf
-import matplotlib.pyplot as plt
-import biosignalsnotebooks as bsnb
-import novainstrumentation as ni
 import neurokit2 as nk
 import pandas as pd
 import numpy as np
-import os
+
 
 def getMarkers(marker,timestamps):
 
@@ -14,10 +10,13 @@ def getMarkers(marker,timestamps):
     offset = list()
 
     for timestamp, markers in zip(timestamps, marker):
-        if (markers[0].split(".")[0] == '1'):
+        if (markers[1] == '1' and "baseline" not in markers):
             offset.append(timestamp)
-            videos.append(markers[0].split("\\")[-1])
-        elif (markers[0].split(".")[0] == '0'):
+            videos.append(markers[0].split("/")[2]+"/"+markers[0].split("/")[3])
+        elif(markers[1] == '1' and "baseline" in markers):
+            offset.append(timestamp)
+            videos.append(markers[0].split("/")[-1])
+        elif (markers[1] == '0'):
             onset.append(timestamp)
 
     return onset,offset,videos
