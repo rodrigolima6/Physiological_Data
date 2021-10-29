@@ -2,6 +2,7 @@ import pyxdf
 from lib.sensors import *
 from Load import *
 from Epochs import *
+from math import *
 
 def getEvents(users):
     Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1 = correctP1(users)
@@ -17,6 +18,8 @@ def getEvents(users):
     data["P1_S2"] = (Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1)
     data["P2_S1"] = (Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2)
 
+    data["P4_S2"][1]["Time"] = np.arange(data["P4_S2"][0]["Time"][1],np.array(data["P4_S2"][0]["Time"])[-1],(np.array(data["P4_S2"][0]["Time"])[-1]-data["P4_S2"][0]["Time"][0])/len(data["P4_S2"][1]["Time"]))
+
     for keys in data.keys():
         if ("baseline" in data[keys][2][0]):
             data[keys][2][0][1] = '0'
@@ -30,16 +33,20 @@ def getEvents(users):
 
     onset_index = {}
     offset_index = {}
+    onset_index_EEG={}
+    offset_index_EEG={}
 
     for keys in data.keys():
+        print(keys)
         onset_index[keys], offset_index[keys] = getMarkersIndex(onset[keys], offset[keys], data[keys][0]["Time"])
+        onset_index_EEG[keys],offset_index_EEG[keys] = getMarkersIndex(onset[keys],offset[keys],np.array(data[keys][1]["Time"]))
 
     events_diff = {}
 
     for keys in onset.keys():
         events_diff[keys] = CalculateEventsDiff(onset[keys],offset[keys])
 
-    return events_diff,videos,onset_index,offset_index
+    return events_diff,videos,onset,offset,onset_index,offset_index,onset_index_EEG,offset_index_EEG,data
 
 def Run_files(fname):
     data, header = pyxdf.load_xdf(fname)
@@ -50,6 +57,8 @@ def Load_Data(data):
     marker, timestamps = Load_Psychopy(data)
     CH1, CH2, CH3, CH4, CH5, CH6, time_Opensignals, fs = Load_Opensignals(data)
     EEG_data, time_EEG, EEG_fs = Load_EEG(data)
+
+    # time_EEG = np.arange(time_Opensignals[1],time_Opensignals[-1],(time_Opensignals[-1]-time_Opensignals[0])/len(time_EEG))
 
     # timestamps -= time_Opensignals[0]
     # time_Opensignals -= time_Opensignals[0]

@@ -1,3 +1,5 @@
+import pyxdf
+
 def Load_Psychopy(data):
     for stream in data:
         if (stream['info']['name'][0] == "PsychoPyStream"):

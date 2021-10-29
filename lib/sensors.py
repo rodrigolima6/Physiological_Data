@@ -1,6 +1,6 @@
 import biosignalsnotebooks as bsnb
 import pandas as pd
-
+import math
 try:
     from Physiological_Data.lib.acquisition import *
 except (ImportError, ModuleNotFoundError):
@@ -597,27 +597,30 @@ class EEG(Sensor):
         self.resolution = resolution
         self.bands = {'alpha': [8, 14], 'betha': [14, 30], 'gamma': [30, 49], 'theta': [4, 8], 'delta': [.5, 4]}
 
-
-    def ICA(self):
+    @staticmethod
+    def ICA(data):
         ica = FastICA()
-        EEG_ICA = ica.fit_transform(self.data.reshape(-1,1))
+
+        EEG_ICA = ica.fit_transform(np.array(data).reshape(-1,1))
 
         return EEG_ICA
 
-    def filterData(self,data):
+    @staticmethod
+    def filterData(data,fs):
         EEG_shift = data[:,0]-np.mean(data)
-        EEG_filtered = bsnb.bandpass(EEG_shift,1,40,order=8,fs=self.fs,use_filtfilt=True)
+        EEG_filtered = bsnb.bandpass(EEG_shift,1,40,order=8,fs=fs,use_filtfilt=True)
 
         return EEG_filtered
 
-    def frequencyAnalysis(self,data):
-        freqs,power = welch(data,self.fs,nperseg=self.fs/2)
+    @staticmethod
+    def frequencyAnalysis(data,fs):
+        freqs,power = welch(data,fs,nperseg=fs/2)
 
-        alpha_indexes = np.where((freqs[:] >= self.bands["alpha"][0]) & (freqs[:] < self.bands["alpha"][1]))[0]
-        betha_indexes = np.where((freqs[:] >= self.bands["betha"][0]) & (freqs[:] < self.bands["betha"][1]))[0]
-        gamma_indexes = np.where((freqs[:] >= self.bands["gamma"][0]) & (freqs[:] < self.bands["gamma"][1]))[0]
-        theta_indexes = np.where((freqs[:] >= self.bands["theta"][0]) & (freqs[:] < self.bands["theta"][1]))[0]
-        delta_indexes = np.where((freqs[:] >= self.bands["delta"][0]) & (freqs[:] < self.bands["delta"][1]))[0]
+        alpha_indexes = np.where((freqs[:] >= 8) & (freqs[:] < 14))[0]
+        betha_indexes = np.where((freqs[:] >= 14) & (freqs[:] < 30))[0]
+        gamma_indexes = np.where((freqs[:] >= 30) & (freqs[:] < 49))[0]
+        theta_indexes = np.where((freqs[:] >= 4) & (freqs[:] < 8))[0]
+        delta_indexes = np.where((freqs[:] >= 0.5) & (freqs[:] < 4))[0]
 
         alpha = sc.integrate.trapz(power[alpha_indexes],x=freqs[alpha_indexes])
         betha = sc.integrate.trapz(power[betha_indexes], x=freqs[betha_indexes])
@@ -627,7 +630,25 @@ class EEG(Sensor):
 
         bands_power = {"alpha":alpha,"betha":betha,"gamma":gamma,"theta":theta,"delta":delta}
 
-        return freqs,power,bands_power
+        return bands_power
+    # def frequencyAnalysis(self,data):
+    #     freqs,power = welch(data,self.fs,nperseg=self.fs/2)
+    #
+    #     alpha_indexes = np.where((freqs[:] >= self.bands["alpha"][0]) & (freqs[:] < self.bands["alpha"][1]))[0]
+    #     betha_indexes = np.where((freqs[:] >= self.bands["betha"][0]) & (freqs[:] < self.bands["betha"][1]))[0]
+    #     gamma_indexes = np.where((freqs[:] >= self.bands["gamma"][0]) & (freqs[:] < self.bands["gamma"][1]))[0]
+    #     theta_indexes = np.where((freqs[:] >= self.bands["theta"][0]) & (freqs[:] < self.bands["theta"][1]))[0]
+    #     delta_indexes = np.where((freqs[:] >= self.bands["delta"][0]) & (freqs[:] < self.bands["delta"][1]))[0]
+    #
+    #     alpha = sc.integrate.trapz(power[alpha_indexes],x=freqs[alpha_indexes])
+    #     betha = sc.integrate.trapz(power[betha_indexes], x=freqs[betha_indexes])
+    #     gamma = sc.integrate.trapz(power[gamma_indexes], x=freqs[gamma_indexes])
+    #     theta = sc.integrate.trapz(power[theta_indexes], x=freqs[theta_indexes])
+    #     delta = sc.integrate.trapz(power[delta_indexes], x=freqs[delta_indexes])
+    #
+    #     bands_power = {"alpha":alpha,"betha":betha,"gamma":gamma,"theta":theta,"delta":delta}
+    #
+    #     return freqs,power,bands_power
 
 
     @staticmethod
@@ -649,13 +670,14 @@ class EEG(Sensor):
 
         return band_powers
 
-    def getFeatures(self):
-        EEG_ICA = self.ICA()
-        EEG_filtered = self.filterData(EEG_ICA)
 
-        freqs,power,band_powers = self.frequencyAnalysis(EEG_filtered)
+    def getFeatures(self,data):
+        # EEG_ICA = self.ICA()
+        # EEG_filtered = self.filterData(EEG_ICA)
 
-        return EEG_filtered,freqs,power,band_powers
+        freqs,power,band_powers = self.frequencyAnalysis(data)
+
+        return freqs,power,band_powers
 
     def getDominantFreq(self, data, fs):
         win = 4 * fs
