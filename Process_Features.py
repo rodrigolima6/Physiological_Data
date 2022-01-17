@@ -37,7 +37,7 @@ def getEvents(users):
     offset_index_EEG={}
 
     for keys in data.keys():
-        print(keys)
+        # print(keys)
         onset_index[keys], offset_index[keys] = getMarkersIndex(onset[keys], offset[keys], data[keys][0]["Time"])
         onset_index_EEG[keys],offset_index_EEG[keys] = getMarkersIndex(onset[keys],offset[keys],np.array(data[keys][1]["Time"]))
 
@@ -77,10 +77,11 @@ def getDataframe(dataframe,fs,resolution):
     HRV_Dataframe = Process_HRV(dataframe["ECG"], fs, resolution)
     Temp_Dataframe = Process_TEMP(dataframe["TEMP"], fs, resolution)
     fNIRS_Dataframe = Process_fNIRS(np.vstack((dataframe["fNIRS_RED"], dataframe["fNIRS_IRED"])).T, fs, resolution)
-    RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
+    # RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
     EDA_Dataframe = Process_EDA(dataframe["EDA"], fs, resolution)
 
-    Dataframe = (((HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)).join(fNIRS_Dataframe)).join(Temp_Dataframe)
+    # Dataframe = (((HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)).join(fNIRS_Dataframe)).join(Temp_Dataframe)
+    Dataframe = (((HRV_Dataframe.join(EDA_Dataframe)).join(fNIRS_Dataframe)).join(Temp_Dataframe))
 
     return Dataframe
 
@@ -203,12 +204,12 @@ def correctP1(data):
     for timestamp in timestamps2:
         timestamps1.insert(0, timestamp)
 
-    Signals = pd.concat([Signals, Signals_1])
-    EEG_Signals = pd.concat([EEG_Signals,EEG_Signals_1])
+    Signals_new = pd.concat([Signals, Signals_1],ignore_index=True)
+    EEG_Signals = pd.concat([EEG_Signals,EEG_Signals_1],ignore_index=True)
     marker = markers1
     timestamps = timestamps1
 
-    return Signals, EEG_Signals, marker, timestamps
+    return Signals_new, EEG_Signals, marker, timestamps
 
 def correctP2(data):
 
@@ -224,8 +225,8 @@ def correctP2(data):
     EEG_Signals_1 = pd.DataFrame.from_dict(EEG_data_1)
     EEG_Signals_1.insert(0, 'Time', time_EEG_1)
 
-    Signals = pd.concat([Signals, Signals_1])
-    EEG_Signals = pd.concat([EEG_Signals,EEG_Signals_1])
+    Signals_new = pd.concat([Signals_1, Signals],ignore_index=True)
+    EEG_Signals = pd.concat([EEG_Signals_1,EEG_Signals],ignore_index=True)
 
     missing_markers = [['EMDB/A/Scenery/5003.avi', '1'], ['EMDB/A/Scenery/5003.avi', '0'],
                        ['EMDB/A/Scenery/5001.avi', '1'], ['EMDB/A/Scenery/5001.avi', '0'],
@@ -252,4 +253,4 @@ def correctP2(data):
     for timestamps in missing_timestamps:
         timestamps4.insert(0, timestamps)
 
-    return Signals,EEG_Signals,markers4,timestamps4
+    return Signals_new,EEG_Signals,markers4,timestamps4

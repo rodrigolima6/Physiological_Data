@@ -60,7 +60,7 @@ class EDA(Sensor):
 
 
     def featuresSCR(self,eda_phasic):
-        info,signals = nk.eda_peaks(eda_phasic,self.fs,method="gamboa2008")
+        info,signals = nk.eda_peaks(eda_phasic,self.fs,method="neurokit")
 
         SCR_Amplitude = signals["SCR_Amplitude"]
         SCR_RiseTime = signals["SCR_RiseTime"]
@@ -229,6 +229,7 @@ class ECG(Sensor):
     
     def processECG(self):
         peaks = self._detectRPeaks()
+
         return peaks
         # hr, time = self.calculateHR(peaks)
         # return hr, time
@@ -764,7 +765,7 @@ class RESP(Sensor):
         self.resolution = resolution
 
     def process_RESP(self):
-        signals,info = nk.rsp_process(self.data,self.fs,method="biosppy")
+        signals,info = nk.rsp_process(self.data,self.fs,method="khodadad2018")
 
         return signals,info
 
@@ -778,12 +779,12 @@ class RESP(Sensor):
 
     def getFeatures(self,signals,rrv_dataframe):
         rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
-        rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
+        # rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
 
-        rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
-        rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True)
-        rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True)
-        rrv_dataframe.insert(0,"Mean_RSP_Amplitude",rsp_amp_dict["AVG"],True)
+        # rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
+        # rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True)
+        # rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True)
+        # rrv_dataframe.insert(0,"Mean_RSP_Amplitude",rsp_amp_dict["AVG"],True)
 
         rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"], True)
         rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
