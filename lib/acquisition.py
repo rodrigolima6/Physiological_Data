@@ -1,15 +1,16 @@
 import numpy as np
 import os
 from json import load
+
 try:
-    from Physiological_Data.lib.biosignals import *
-    from Physiological_Data.lib.psychopy import *
+    from lib.biosignals import *
+    from lib.psychopy import *
 except (ImportError, ModuleNotFoundError):
-    from Physiological_Data.lib.biosignals import *
-    from Physiological_Data.lib.psychopy import *
+    from lib.biosignals import *
+    from lib.psychopy import *
 
 
-class Acquisition():
+class Acquisition:
     def __init__(self, dir_path):
         self.dir_path = dir_path
         self.participantID = self.dir_path.split(os.sep)[-1]
@@ -23,7 +24,7 @@ class Acquisition():
         self.signal = []
         self.description = None
         try:
-            with open(os.path.join(dir_path, 'description.json'), 'r') as file:
+            with open(os.path.join(dir_path, "description.json"), "r") as file:
                 self.description = load(file)
         except FileNotFoundError as e:
             print(e, "The description file does not exist and will not be loaded.")
@@ -31,7 +32,7 @@ class Acquisition():
     @staticmethod
     def getPsychoFile(path):
         for file in os.listdir(path):
-            if 'results_' in file and '.csv' in file:
+            if "results_" in file and ".csv" in file:
                 return os.path.join(path, file)
 
     def getPsychoTimestamps(self):
@@ -43,19 +44,23 @@ class Acquisition():
     def getBiosignalsSensors(self, sensors=(FNIRS, ACC, EDA), rightPos=None):
         rightMAC = None
         if rightPos:
-            for key in self.description['Position'].keys():
-                if key != 'left':
-                    rightMAC = self.description['Position'][key]
+            for key in self.description["Position"].keys():
+                if key != "left":
+                    rightMAC = self.description["Position"][key]
 
         data = self.biosignals.getSensorsData(sensors, rightMAC)
-        self.signal = data['data']
-        self.sensors = data['sensors']
-    
+        self.signal = data["data"]
+        self.sensors = data["sensors"]
+
     def convertSensors(self):
         self.signal = self.biosignals.convertSensors()
 
-    def segmentWindowingBiosignals(self, signal, timestamps, labels, timeWindow=0.1, overlap=0, binary=True):
-        self.segmentedBiosignals, self.labels = self.biosignals.segmentSignalsWindowing(signal, timestamps, labels, timeWindow, overlap, binary)
+    def segmentWindowingBiosignals(
+        self, signal, timestamps, labels, timeWindow=0.1, overlap=0, binary=True
+    ):
+        self.segmentedBiosignals, self.labels = self.biosignals.segmentSignalsWindowing(
+            signal, timestamps, labels, timeWindow, overlap, binary
+        )
 
     def extractFeatures(self, segments, featuresFunc=[np.mean, np.std, np.max]):
         self.features = []
@@ -71,14 +76,21 @@ class Acquisition():
         return [self.dir_path.split(os.sep)[-1]] * len(self.labels)
 
     def getDataset(self):
-        return self.features, np.reshape(self.labels, (-1, 1)), np.reshape(self.getParticipantIDClassification(), (-1, 1))
+        return (
+            self.features,
+            np.reshape(self.labels, (-1, 1)),
+            np.reshape(self.getParticipantIDClassification(), (-1, 1)),
+        )
 
     def deleteArtifacts(self):
         if self.description != None:
-            self.signal = self.biosignals.deleteArtifacts(self.description['Push Button']['singles'], self.description['Push Button']['doubles'])
+            self.signal = self.biosignals.deleteArtifacts(
+                self.description["Push Button"]["singles"],
+                self.description["Push Button"]["doubles"],
+            )
         else:
             print(f"description.json file is not available for the acquisition.")
 
 
-if __name__ == '__main__':
-    data = Acquisition(r'..\..\acquisitions\Acquisitions\03_11_2020')
+# if __name__ == '__main__':
+#     data = Acquisition(r'..\..\acquisitions\Acquisitions\03_11_2020')

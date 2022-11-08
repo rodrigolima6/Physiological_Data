@@ -1,15 +1,18 @@
 import numpy as np
+
 # import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.model_selection import KFold, LeavePGroupsOut
 from sklearn.ensemble import RandomForestClassifier
+
 # from biosignalsnotebooks import features_extraction
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.tree import DecisionTreeClassifier
+
 try:
-    from Physiological_Data.lib.peak_detector import peak_detector
+    from lib.peak_detector import peak_detector
 except (ImportError, ModuleNotFoundError):
-    from Physiological_Data.lib.peak_detector import peak_detector
+    from lib.peak_detector import peak_detector
 
 
 def closestIndex(data, value):
@@ -24,7 +27,7 @@ def strIndex(input, corr):
     return np.ravel(result)
 
 
-def windowing(signal, sampling_rate=1000, time_window=.25, overlap=0):
+def windowing(signal, sampling_rate=1000, time_window=0.25, overlap=0):
 
     app_window = int(sampling_rate * time_window)
 
@@ -34,7 +37,7 @@ def windowing(signal, sampling_rate=1000, time_window=.25, overlap=0):
 
     for i, win in enumerate(range(0, signal.shape[0], app_window)):
         if win + app_window < len(signal) and i < num_windows:
-            signal_windows[i] = signal[win:win + app_window]
+            signal_windows[i] = signal[win : win + app_window]
     return signal_windows
 
 
@@ -49,18 +52,19 @@ def standardizeFeatures(features, mean=None, std=None):
 
 def normalizeFeatures(features, mean=None, max_value=None):
     if mean is None and max_value is None:
-        mean_value = np.mean(features) # Calculate the mean of the signal
-        abs_features = np.abs(features) # Calculate the absolute of the signal
-        max_value = np.max(features) # Get the maximum value of the absolute signal
-        
+        mean_value = np.mean(features)  # Calculate the mean of the signal
+        abs_features = np.abs(features)  # Calculate the absolute of the signal
+        max_value = np.max(features)  # Get the maximum value of the absolute signal
+
     normalised_features = (features - mean_value) / max_value
     return normalised_features, mean, max_value
 
+
 def quantize(data, d=1000):
-    scaled_data = data*d
+    scaled_data = data * d
     rounded_data = np.around(scaled_data)
     quantised_data = np.array(rounded_data, dtype=np.int)
-    return quantised_data   
+    return quantised_data
 
 
 # def plotDataset(features, labels):
@@ -79,8 +83,8 @@ def quantize(data, d=1000):
 
 
 def saveToTSV(features, labels):
-    np.savetxt('features.tsv', features, delimiter='\t')
-    np.savetxt('labels.tsv', np.reshape(labels, (-1, 1)), fmt='%s')
+    np.savetxt("features.tsv", features, delimiter="\t")
+    np.savetxt("labels.tsv", np.reshape(labels, (-1, 1)), fmt="%s")
 
 
 def classify(features, labels, groups=None, n_estimators=100):
@@ -99,10 +103,15 @@ def classify(features, labels, groups=None, n_estimators=100):
 
         samples_train, mean, std = normalizeFeatures(samples_train)
         samples_test, _, _ = normalizeFeatures(samples_test, mean, std)
-        saveToTSV(np.vstack([samples_train, samples_test]), np.vstack([labels_train, labels_test]))
+        saveToTSV(
+            np.vstack([samples_train, samples_test]),
+            np.vstack([labels_train, labels_test]),
+        )
 
         # Build the random forest clasdsifier.
-        random_forest = RandomForestClassifier(n_estimators=n_estimators, criterion='entropy', n_jobs=-1, random_state=42)
+        random_forest = RandomForestClassifier(
+            n_estimators=n_estimators, criterion="entropy", n_jobs=-1, random_state=42
+        )
 
         # random_forest = DecisionTreeClassifier(random_state=42)
 
@@ -114,11 +123,19 @@ def classify(features, labels, groups=None, n_estimators=100):
 
         # This step is not necessary for the classification procedure, but is important to store the values
         # of accuracy to calculate the mean and standard deviation values and evaluate the performance of the classifier.
-        acc.append(accuracy_score(np.ravel(labels_test), results)*100)
-        f1.append(f1_score([0 if x =='task' else 1 for x in labels_test], [0 if x =='task' else 1 for x in results])*100)
-        print(f"{i} - Accuracy: {accuracy_score(labels_test, results)*100:.2f}; F1-Score: {f1_score([0 if x =='task' else 1 for x in labels_test], [0 if x =='task' else 1 for x in results])*100:.2f}%")
+        acc.append(accuracy_score(np.ravel(labels_test), results) * 100)
+        f1.append(
+            f1_score(
+                [0 if x == "task" else 1 for x in labels_test],
+                [0 if x == "task" else 1 for x in results],
+            )
+            * 100
+        )
+        print(
+            f"{i} - Accuracy: {accuracy_score(labels_test, results)*100:.2f}; F1-Score: {f1_score([0 if x =='task' else 1 for x in labels_test], [0 if x =='task' else 1 for x in results])*100:.2f}%"
+        )
     return acc, f1, random_forest
 
 
-if __name__ == '__main__':
-    print(closestIndex([-1, 1, 2, 0, 35], .5))
+# if __name__ == '__main__':
+#     print(closestIndex([-1, 1, 2, 0, 35], .5))
