@@ -1,3 +1,5 @@
+import numpy as np
+
 try:
     from lib.biosignals import *
 except (ImportError, ModuleNotFoundError):
@@ -11,6 +13,7 @@ from scipy import integrate
 from biosppy.signals.eda import *
 import novainstrumentation as ni
 import pandas as pd
+
 
 try:
     from lib.tools import *
@@ -417,7 +420,7 @@ class HRV(Sensor):
 
     @staticmethod
     def frequencyAnalysis(
-        rr_interval_time_NN, rr_interval_NN, window="hanning", interpolation_rate=4
+        rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
     ):
 
         init_time = int(rr_interval_time_NN[0])
@@ -695,26 +698,18 @@ class EEG(Sensor):
             "delta": [0.5, 4],
         }
 
-    @staticmethod
-    def ICA(data):
+    def ICA(self):
         ica = FastICA()
+        self.data = ica.fit_transform(np.array(self.data).reshape(-1, 1))
 
-        EEG_ICA = ica.fit_transform(np.array(data).reshape(-1, 1))
-
-        return EEG_ICA
-
-    @staticmethod
-    def filterData(data, fs):
-        EEG_shift = data[:, 0] - np.mean(data)
-        EEG_filtered = bsnb.bandpass(
-            EEG_shift, 1, 50, order=8, fs=fs, use_filtfilt=True
+    def filterData(self):
+        self.data = self.data - np.mean(self.data)
+        self.data = bsnb.bandpass(
+            self.data, 1, 50, order=8, fs=self.fs, use_filtfilt=True
         )
 
-        return EEG_filtered
-
-    @staticmethod
-    def frequencyAnalysis(data, fs):
-        freqs, power = welch(data, fs, nperseg=fs / 2)
+    def frequencyAnalysis(self):
+        freqs, power = welch(self.data, self.fs, nperseg=self.fs / 2)
 
         alpha_indexes = np.where((freqs[:] >= 8) & (freqs[:] < 14))[0]
         betha_indexes = np.where((freqs[:] >= 14) & (freqs[:] < 30))[0]
@@ -733,15 +728,14 @@ class EEG(Sensor):
             "betha": betha,
             "gamma": gamma,
             "theta": theta,
-        }  # ,"delta":delta}
+        }
 
         return bands_power
 
-    @staticmethod
-    def extractBand(data: np.array, band: list, fs: int):
+    def extractBand(self, band: list):
         f1, f2 = band
-        win = fs / 2
-        freq, power = welch(data, fs, nperseg=win)
+        win = self.fs / 2
+        freq, power = welch(self.data, self.fs, nperseg=win)
         idx_band = np.logical_and(freq >= f1, freq <= f2)  # Get the band of frequencies
         power_freq = np.trapz(
             power[idx_band], x=freq[idx_band]
@@ -749,22 +743,21 @@ class EEG(Sensor):
 
         return power_freq
 
-    def extractAllBands(self, data, bands):
-        # print(self.bands["alpha"][0])
+    def extractAllBands(self):
         band_powers = {}
 
-        for key, item in bands.items():
-            band_powers[key] = self.extractBand(data, item, self.fs)
+        for key, item in self.bands.items():
+            band_powers[key] = self.extractBand(self.data, item)
 
         return band_powers
 
-    def getFeatures(self, data):
-        # EEG_ICA = self.ICA()
-        # EEG_filtered = self.filterData(EEG_ICA)
+    def getFeatures(self):
+        # self.ICA()
+        self.filterData()
 
-        freqs, power, band_powers = self.frequencyAnalysis(data)
+        band_powers = self.frequencyAnalysis()
 
-        return freqs, power, band_powers
+        return band_powers
 
     def getDominantFreq(self, data, fs):
         win = 4 * fs
@@ -780,13 +773,6 @@ class EEG(Sensor):
                     combinations[f"{key}/{other_key}"] = item / other_item
         return combinations
 
-
-# def getFeatures(self):
-#     power_freqs = self.extractAllBands(self.bands)
-#     dominant_freq = self.getDominantFreq(self.data, self.fs)
-#     combinations = self.getCombinationFreq(power_freqs)
-#     features = np.concatenate([[dominant_freq], list(power_freqs.values()), list(combinations.values())])
-#     return features
 
 """TEMP Class"""
 
