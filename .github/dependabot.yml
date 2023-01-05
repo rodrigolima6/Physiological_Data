@@ -5,9 +5,13 @@
 
 version: 2
 updates:
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "pip"
+    directory: "/"
     schedule:
       interval: "weekly"
-    # Allow up to 200 open pull requests
     open-pull-requests-limit: 200
+    commit:
+      username: HarryVasanth
+      email: 14015057+HarryVasanth@users.noreply.github.com
+    rebase: true
+    merge: true
