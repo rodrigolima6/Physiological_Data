@@ -62,7 +62,7 @@ javascripthon==0.11
 jedi @ file:///C:/ci/jedi_1644297241925/work
 Jinja2 @ file:///opt/conda/conda-bld/jinja2_1647436528585/work
 joblib==1.2.0
-json-tricks==3.15.5
+json-tricks==3.16.1
 json5 @ file:///tmp/build/80754af9/json5_1624432770122/work
 jsonschema @ file:///C:/ci/jsonschema_1650026210703/work
 jupyter==1.0.0
