@@ -33,7 +33,7 @@ decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
 defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
 deprecation @ file:///tmp/build/80754af9/deprecation_1628181869014/work
 docopt==0.6.2
-dukpy==0.2.3
+dukpy==0.3.0
 entrypoints @ file:///C:/ci/entrypoints_1649926659561/work
 esprima==4.0.1
 et-xmlfile==1.1.0
