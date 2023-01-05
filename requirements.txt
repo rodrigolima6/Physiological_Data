@@ -70,7 +70,7 @@ jupyter-client @ file:///C:/ci/jupyter_client_1650534191587/work
 jupyter-console @ file:///opt/conda/conda-bld/jupyter_console_1647002188872/work
 jupyter-core @ file:///C:/ci/jupyter_core_1651656282279/work
 jupyter-dashboards-bundlers @ file:///C:/ci/jupyter_dashboards_bundlers_1615395415960/work
-jupyter-kernel-gateway==2.5.0
+jupyter-kernel-gateway==2.5.1
 jupyter-packaging @ file:///opt/conda/conda-bld/jupyter-packaging_1644335119875/work
 jupyter-server @ file:///opt/conda/conda-bld/jupyter_server_1644494914632/work
 jupyter-telemetry @ file:///tmp/build/80754af9/jupyter_telemetry_1601311816873/work
