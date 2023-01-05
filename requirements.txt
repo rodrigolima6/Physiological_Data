@@ -109,7 +109,7 @@ numba==0.53.1
 numexpr==2.7.3
 numpy==1.22.0
 oauthlib @ file:///opt/conda/conda-bld/oauthlib_1644332107998/work
-openpyxl==3.0.7
+openpyxl==3.0.10
 packaging @ file:///tmp/build/80754af9/packaging_1637314298585/work
 pamela @ file:///Users/ktietz/demo/mc3/conda-bld/pamela_1629727572510/work
 pandas==1.2.4
