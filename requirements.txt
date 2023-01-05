@@ -196,5 +196,5 @@ wxPython==4.1.1
 xarray==0.18.2
 xlrd==2.0.1
 zipp @ file:///opt/conda/conda-bld/zipp_1641824620731/work
-zope.event==4.5.0
+zope.event==4.6
 zope.interface==5.4.0
