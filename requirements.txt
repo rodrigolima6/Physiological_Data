@@ -157,7 +157,7 @@ qtconsole @ file:///opt/conda/conda-bld/qtconsole_1649078897110/work
 QtPy @ file:///opt/conda/conda-bld/qtpy_1649073884068/work
 questplus==2019.4
 requests @ file:///opt/conda/conda-bld/requests_1641824580448/work
-requests-toolbelt==0.9.1
+requests-toolbelt==0.10.1
 ruamel.yaml @ file:///C:/ci/ruamel.yaml_1600552913059/work
 ruamel.yaml.clib @ file:///C:/ci/ruamel.yaml.clib_1601994561760/work
 scikit-learn==0.24.2
