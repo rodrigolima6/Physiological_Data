@@ -130,7 +130,7 @@ pyglet==1.4.11
 Pygments @ file:///opt/conda/conda-bld/pygments_1644249106324/work
 PyJWT @ file:///C:/ci/pyjwt_1619651810943/work
 pylsl==1.14.0
-PyOpenGL==3.1.5
+PyOpenGL==3.1.6
 pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1608057966937/work
 pyosf==1.0.5
 pyparsing @ file:///tmp/build/80754af9/pyparsing_1635766073266/work
