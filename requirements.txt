@@ -122,7 +122,7 @@ prometheus-client @ file:///opt/conda/conda-bld/prometheus_client_1643788673601/
 prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1633440160888/work
 psutil @ file:///C:/ci/psutil_1612298033174/work
 PsychoPy==2021.1.4
-psychtoolbox==3.0.16
+psychtoolbox==3.0.18.2
 pyasn1 @ file:///Users/ktietz/demo/mc3/conda-bld/pyasn1_1629708007385/work
 pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
 pycurl==7.44.1
