@@ -12,7 +12,7 @@ backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
 beautifulsoup4 @ file:///C:/ci/beautifulsoup4_1650292996413/work
 bidict==0.21.2
 bioread==2.1.2
-biosignalsnotebooks==0.6.5
+biosignalsnotebooks==0.6.10
 biosppy==0.7.0
 bleach @ file:///opt/conda/conda-bld/bleach_1641577558959/work
 blinker==1.4
