@@ -171,7 +171,7 @@ sklearn==0.0
 smmap==4.0.0
 sniffio @ file:///C:/ci/sniffio_1614030522573/work
 sounddevice==0.4.1
-SoundFile==0.10.3.post1
+SoundFile==0.11.0
 soupsieve @ file:///tmp/build/80754af9/soupsieve_1636706018808/work
 SQLAlchemy @ file:///C:/ci/sqlalchemy_1647600013392/work
 tables==3.6.1
