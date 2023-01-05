@@ -10,8 +10,4 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 200
-    commit:
-      username: HarryVasanth
-      email: 14015057+HarryVasanth@users.noreply.github.com
-    rebase: true
-    merge: true
+    
