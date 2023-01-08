@@ -95,7 +95,7 @@ mistune @ file:///C:/ci/mistune_1594373272338/work
 mne==1.3.0
 moviepy==1.0.3
 msgpack==1.0.2
-msgpack-numpy==0.4.7.1
+msgpack-numpy==0.4.8
 nbclassic @ file:///opt/conda/conda-bld/nbclassic_1644943264176/work
 nbclient @ file:///C:/ci/nbclient_1650308542913/work
 nbconvert @ file:///C:/ci/nbconvert_1649759177374/work
