@@ -1,7 +1,7 @@
 alembic @ file:///tmp/build/80754af9/alembic_1637680647426/work
 anyio @ file:///C:/ci/anyio_1644463705902/work/dist
 appdirs==1.4.4
-arabic-reshaper==2.1.3
+arabic-reshaper==3.0.0
 argon2-cffi @ file:///opt/conda/conda-bld/argon2-cffi_1645000214183/work
 argon2-cffi-bindings @ file:///C:/ci/argon2-cffi-bindings_1644569848815/work
 astunparse==1.6.3
