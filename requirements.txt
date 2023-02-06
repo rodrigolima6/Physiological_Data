@@ -187,7 +187,7 @@ ujson==5.7.0
 urllib3 @ file:///C:/ci/urllib3_1650639842077/work
 wcwidth @ file:///Users/ktietz/demo/mc3/conda-bld/wcwidth_1629357192024/work
 webencodings==0.5.1
-websocket-client==1.0.1
+websocket-client==1.5.1
 wget==3.2
 widgetsnbextension @ file:///C:/ci/widgetsnbextension_1645009553925/work
 win-inet-pton @ file:///C:/ci/win_inet_pton_1605306165655/work
