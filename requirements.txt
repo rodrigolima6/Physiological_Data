@@ -165,7 +165,7 @@ scipy==1.6.3
 seaborn==0.11.2
 Send2Trash @ file:///tmp/build/80754af9/send2trash_1632406701022/work
 shortuuid==1.0.11
-sip==6.7.5
+sip==6.7.7
 six @ file:///tmp/build/80754af9/six_1644875935023/work
 sklearn==0.0.post1
 smmap==4.0.0
