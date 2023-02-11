@@ -147,7 +147,7 @@ python-magic-bin==0.4.14
 python-vlc==3.0.12118
 pytz==2021.3
 PyWavelets==1.4.1
-pywin32==302
+pywin32==305
 pyWinhook==1.6.2
 pywinpty @ file:///C:/ci_310/pywinpty_1644230983541/work/target/wheels/pywinpty-2.0.2-cp37-none-win_amd64.whl
 pyxdf==1.16.3
