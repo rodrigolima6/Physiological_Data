@@ -168,7 +168,7 @@ shortuuid==1.0.11
 sip==6.7.7
 six @ file:///tmp/build/80754af9/six_1644875935023/work
 sklearn==0.0.post1
-smmap==4.0.0
+smmap==5.0.0
 sniffio @ file:///C:/ci/sniffio_1614030522573/work
 sounddevice==0.4.5
 SoundFile==0.11.0
