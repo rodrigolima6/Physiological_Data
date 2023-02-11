@@ -58,7 +58,7 @@ ipynb==0.5.1
 ipython @ file:///C:/ci/ipython_1643800131373/work
 ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/work
 ipywidgets @ file:///tmp/build/80754af9/ipywidgets_1634143127070/work
-javascripthon==0.11
+javascripthon==0.12
 jedi @ file:///C:/ci/jedi_1644297241925/work
 Jinja2 @ file:///opt/conda/conda-bld/jinja2_1647436528585/work
 joblib==1.2.0
