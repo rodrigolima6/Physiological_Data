@@ -44,7 +44,7 @@ future==0.18.3
 gevent==22.10.2
 gitdb==4.0.10
 GitPython==3.1.30
-glfw==2.1.0
+glfw==2.5.6
 greenlet @ file:///C:/ci/greenlet_1628888257991/work
 h5py==3.8.0
 idna @ file:///tmp/build/80754af9/idna_1637925883363/work
