@@ -121,7 +121,7 @@ proglog==0.1.10
 prometheus-client @ file:///opt/conda/conda-bld/prometheus_client_1643788673601/work
 prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1633440160888/work
 psutil @ file:///C:/ci/psutil_1612298033174/work
-PsychoPy==2022.2.5
+PsychoPy==2023.1.0
 psychtoolbox==3.0.18.2
 pyasn1 @ file:///Users/ktietz/demo/mc3/conda-bld/pyasn1_1629708007385/work
 pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
