@@ -6,25 +6,25 @@ from math import *
 
 
 def getEvents(users):
-    Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1 = correctP1(users)
-    Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2 = correctP2(users)
-
-    del users["P1_S2_GroupA_eeg_1.xdf"]
-    del users["P2_S1_GroupA_eeg_1.xdf"]
+    # Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1 = correctP1(users)
+    # Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2 = correctP2(users)
+    #
+    # del users["P1_S2_GroupA_eeg_1.xdf"]
+    # del users["P2_S1_GroupA_eeg_1.xdf"]
 
     data = {}
     for user in users.keys():
         data[user.split("_")[0] + "_" + user.split("_")[1]] = Load_Data(users[user])
 
-    data["P1_S2"] = (Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1)
-    data["P2_S1"] = (Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2)
-
-    data["P4_S2"][1]["Time"] = np.arange(
-        data["P4_S2"][0]["Time"][1],
-        np.array(data["P4_S2"][0]["Time"])[-1],
-        (np.array(data["P4_S2"][0]["Time"])[-1] - data["P4_S2"][0]["Time"][0])
-        / len(data["P4_S2"][1]["Time"]),
-    )
+    # data["P1_S2"] = (Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1)
+    # data["P2_S1"] = (Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2)
+    #
+    # data["P4_S2"][1]["Time"] = np.arange(
+    #     data["P4_S2"][0]["Time"][1],
+    #     np.array(data["P4_S2"][0]["Time"])[-1],
+    #     (np.array(data["P4_S2"][0]["Time"])[-1] - data["P4_S2"][0]["Time"][0])
+    #     / len(data["P4_S2"][1]["Time"]),
+    # )
 
     for keys in data.keys():
         if "baseline" in data[keys][2][0]:
@@ -107,17 +107,17 @@ def Load_Data(data):
 
 def getDataframe(dataframe, fs, resolution):
     HRV_Dataframe = Process_HRV(dataframe["ECG"], fs, resolution)
-    Temp_Dataframe = Process_TEMP(dataframe["TEMP"], fs, resolution)
-    fNIRS_Dataframe = Process_fNIRS(
-        np.vstack((dataframe["fNIRS_RED"], dataframe["fNIRS_IRED"])).T, fs, resolution
-    )
+    # Temp_Dataframe = Process_TEMP(dataframe["TEMP"], fs, resolution)
+    # fNIRS_Dataframe = Process_fNIRS(
+    #     np.vstack((dataframe["fNIRS_RED"], dataframe["fNIRS_IRED"])).T, fs, resolution
+    # )
     RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
     EDA_Dataframe = Process_EDA(dataframe["EDA"], fs, resolution)
 
-    Dataframe = (
-        ((HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)).join(fNIRS_Dataframe)
-    ).join(Temp_Dataframe)
-    # Dataframe = (((HRV_Dataframe.join(EDA_Dataframe)).join(fNIRS_Dataframe)).join(Temp_Dataframe))
+    # Dataframe = (
+    #     ((HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)).join(fNIRS_Dataframe)
+    # ).join(Temp_Dataframe)
+    Dataframe = (HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)
 
     return Dataframe
 

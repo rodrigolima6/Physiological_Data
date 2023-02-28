@@ -690,6 +690,9 @@ class EEG(Sensor):
     def __init__(self, data, fs, resolution):
         super().__init__(data, fs, resolution)
 
+        self.data = data  # converted and filtered EEG data
+        self.fs = fs
+        self.resolution = resolution
         self.bands = {
             "alpha": [8, 14],
             "betha": [14, 30],
@@ -698,18 +701,26 @@ class EEG(Sensor):
             "delta": [0.5, 4],
         }
 
-    def ICA(self):
-        ica = FastICA()
-        self.data = ica.fit_transform(np.array(self.data).reshape(-1, 1))
+    @staticmethod
+    def ICA(data):
+        ica = FastICA(whiten="unit-variance")
 
-    def filterData(self):
-        self.data = self.data - np.mean(self.data)
-        self.data = bsnb.bandpass(
-            self.data, 1, 50, order=8, fs=self.fs, use_filtfilt=True
+        EEG_ICA = ica.fit_transform(np.array(data).reshape(-1, 1))
+
+        return EEG_ICA
+
+    @staticmethod
+    def filterData(data, fs):
+        EEG_shift = data[:, 0] - np.mean(data)
+        EEG_filtered = bsnb.bandpass(
+            EEG_shift, 1, 50, order=8, fs=fs, use_filtfilt=True
         )
 
-    def frequencyAnalysis(self):
-        freqs, power = welch(self.data, self.fs, nperseg=self.fs / 2)
+        return EEG_filtered
+
+    @staticmethod
+    def frequencyAnalysis(data, fs):
+        freqs, power = welch(data, fs, nperseg=fs / 2)
 
         alpha_indexes = np.where((freqs[:] >= 8) & (freqs[:] < 14))[0]
         betha_indexes = np.where((freqs[:] >= 14) & (freqs[:] < 30))[0]
@@ -728,7 +739,7 @@ class EEG(Sensor):
             "betha": betha,
             "gamma": gamma,
             "theta": theta,
-        }
+        }  # ,"delta":delta}
 
         return bands_power
 
