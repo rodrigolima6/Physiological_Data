@@ -347,15 +347,15 @@ class HRV(Sensor):
         pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
 
         time_domain_features = {
-            "AVG RR": [statistical_features["AVG"]],
-            "Minimum RR": [statistical_features["Minimum"]],
-            "Maximum RR": [statistical_features["Maximum"]],
-            "SDNN": [SDNN],
-            "RMSSD": [RMSSD],
-            "NN50": [NN50],
-            "pNN50": [pNN50],
-            "NN20": [NN20],
-            "pNN20": [pNN20],
+            "AVG RR": statistical_features["AVG"],
+            "Minimum RR": statistical_features["Minimum"],
+            "Maximum RR": statistical_features["Maximum"],
+            "SDNN": SDNN,
+            "RMSSD": RMSSD,
+            "NN50": NN50,
+            "pNN50": pNN50,
+            "NN20": NN20,
+            "pNN20": pNN20,
         }
 
         return time_domain_features
