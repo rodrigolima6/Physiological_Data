@@ -88,7 +88,7 @@ llvmlite==0.39.1
 macropy3==1.1.0b2
 Mako @ file:///tmp/build/80754af9/mako_1610650590832/work
 MarkupSafe @ file:///C:/ci/markupsafe_1621528383308/work
-matplotlib==3.7.0
+matplotlib==3.7.1
 matplotlib-inline @ file:///tmp/build/80754af9/matplotlib-inline_1628242447089/work
 mes2hb==1.0.0
 mistune @ file:///C:/ci/mistune_1594373272338/work
