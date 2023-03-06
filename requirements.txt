@@ -180,7 +180,7 @@ testpath @ file:///tmp/build/80754af9/testpath_1624638946665/work
 threadpoolctl==3.1.0
 tomlkit @ file:///opt/conda/conda-bld/tomlkit_1644481977758/work
 tornado @ file:///C:/ci/tornado_1606935947090/work
-tqdm==4.64.1
+tqdm==4.65.0
 traitlets @ file:///tmp/build/80754af9/traitlets_1636710298902/work
 typing_extensions @ file:///opt/conda/conda-bld/typing_extensions_1647553014482/work
 ujson==5.7.0
