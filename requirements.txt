@@ -39,7 +39,7 @@ esprima==4.0.1
 et-xmlfile==1.1.0
 fastjsonschema @ file:///tmp/build/80754af9/python-fastjsonschema_1620414857593/work/dist
 freetype-py==2.3.0
-fsspec==2023.1.0
+fsspec==2023.3.0
 future==0.18.3
 gevent==22.10.2
 gitdb==4.0.10
@@ -88,7 +88,7 @@ llvmlite==0.39.1
 macropy3==1.1.0b2
 Mako @ file:///tmp/build/80754af9/mako_1610650590832/work
 MarkupSafe @ file:///C:/ci/markupsafe_1621528383308/work
-matplotlib==3.7.0
+matplotlib==3.7.1
 matplotlib-inline @ file:///tmp/build/80754af9/matplotlib-inline_1628242447089/work
 mes2hb==1.0.0
 mistune @ file:///C:/ci/mistune_1594373272338/work
@@ -180,7 +180,7 @@ testpath @ file:///tmp/build/80754af9/testpath_1624638946665/work
 threadpoolctl==3.1.0
 tomlkit @ file:///opt/conda/conda-bld/tomlkit_1644481977758/work
 tornado @ file:///C:/ci/tornado_1606935947090/work
-tqdm==4.64.1
+tqdm==4.65.0
 traitlets @ file:///tmp/build/80754af9/traitlets_1636710298902/work
 typing_extensions @ file:///opt/conda/conda-bld/typing_extensions_1647553014482/work
 ujson==5.7.0
