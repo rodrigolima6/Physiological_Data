@@ -1,40 +1,23 @@
-import pyxdf
 from lib.sensors import *
 from Load import *
 from Epochs import *
-from math import *
 
 
-def getEvents(users):
-    # Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1 = correctP1(users)
-    # Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2 = correctP2(users)
-    #
-    # del users["P1_S2_GroupA_eeg_1.xdf"]
-    # del users["P2_S1_GroupA_eeg_1.xdf"]
+def getEvents(users, stream_name_markers: str, stream_name_ratings: str):
 
     data = {}
     for user in users.keys():
-        data[user.split("_")[0] + "_" + user.split("_")[1]] = Load_Data(users[user])
-
-    # data["P1_S2"] = (Signals_P1, EEG_Signals_P1, marker_P1, timestamps_P1)
-    # data["P2_S1"] = (Signals_P2, EEG_Signals_P2, marker_P2, timestamps_P2)
-    #
-    # data["P4_S2"][1]["Time"] = np.arange(
-    #     data["P4_S2"][0]["Time"][1],
-    #     np.array(data["P4_S2"][0]["Time"])[-1],
-    #     (np.array(data["P4_S2"][0]["Time"])[-1] - data["P4_S2"][0]["Time"][0])
-    #     / len(data["P4_S2"][1]["Time"]),
-    # )
+        data[user.split("_")[0] + "_" + user.split("_")[1]] = Load_Data(
+            users[user], stream_name_markers, stream_name_ratings
+        )
 
     for keys in data.keys():
         if "baseline" in data[keys][2][0]:
             data[keys][2][0][1] = "0"
 
-    onset = {}
-    offset = {}
-    videos = {}
-
+    onset, offset, videos, valence, arousal = ({}, {}, {}, {}, {})
     for keys in data.keys():
+        valence[keys], arousal[keys] = Load_Ratings(data[keys], stream_name_ratings)
         onset[keys], offset[keys], videos[keys] = getMarkers(
             data[keys][2], data[keys][3]
         )
@@ -68,6 +51,8 @@ def getEvents(users):
         onset_index_EEG,
         offset_index_EEG,
         data,
+        valence,
+        arousal,
     )
 
 
@@ -77,16 +62,11 @@ def Run_files(fname):
     return data
 
 
-def Load_Data(data):
-    marker, timestamps = Load_Psychopy(data)
+def Load_Data(data, stream_name_markers: str, stream_name_ratings: str):
+    marker, timestamps = Load_PsychopyMarkers(data, stream_name_markers)
+    valence, arousal = Load_Ratings(data, stream_name_ratings)
     CH1, CH2, CH3, CH4, CH5, CH6, time_Opensignals, fs = Load_Opensignals(data)
     EEG_data, time_EEG, EEG_fs = Load_EEG(data)
-
-    # time_EEG = np.arange(time_Opensignals[1],time_Opensignals[-1],(time_Opensignals[-1]-time_Opensignals[0])/len(time_EEG))
-
-    # timestamps -= time_Opensignals[0]
-    # time_Opensignals -= time_Opensignals[0]
-    # time_EEG -= time_EEG[0]
 
     d = {
         "Time": time_Opensignals,
@@ -102,7 +82,7 @@ def Load_Data(data):
     EEG_Signals = pd.DataFrame.from_dict(EEG_data)
     EEG_Signals.insert(0, "Time", time_EEG)
 
-    return Signals, EEG_Signals, marker, timestamps
+    return Signals, EEG_Signals, marker, timestamps, valence, arousal
 
 
 def getDataframe(dataframe, fs, resolution):
@@ -113,10 +93,6 @@ def getDataframe(dataframe, fs, resolution):
     # )
     RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
     EDA_Dataframe = Process_EDA(dataframe["EDA"], fs, resolution)
-
-    # Dataframe = (
-    #     ((HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)).join(fNIRS_Dataframe)
-    # ).join(Temp_Dataframe)
     Dataframe = (HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)
 
     return Dataframe
@@ -256,24 +232,26 @@ def Process_EEG(data, fs, resolution):
     return bands_df
 
 
-def Process_TEMP(data, fs, resolution):
-    sensor = TEMP(data, fs, resolution)
+# def Process_TEMP(data, fs, resolution):
+#     sensor = TEMP(data, fs, resolution)
+#
+#     temp = sensor.filterData()
+#
+#     Temp_Dataframe = sensor.getFeatures(temp)
+#
+#     return Temp_Dataframe
 
-    temp = sensor.filterData()
 
-    Temp_Dataframe = sensor.getFeatures(temp)
+def correctP1(data, stream_name_markers: str, stream_name_ratings: str):
 
-    return Temp_Dataframe
+    markers1, timestamps1 = Load_PsychopyMarkers(data["P1_S2_GroupA_eeg_1.xdf"])
+    markers2, timestamps2 = Load_PsychopyMarkers(data["P1_S2_GroupA_eeg.xdf"])
 
-
-def correctP1(data):
-
-    markers1, timestamps1 = Load_Psychopy(data["P1_S2_GroupA_eeg_1.xdf"])
-    markers2, timestamps2 = Load_Psychopy(data["P1_S2_GroupA_eeg.xdf"])
-
-    Signals, EEG_Signals, marker, timestamps = Load_Data(data["P1_S2_GroupA_eeg.xdf"])
-    Signals_1, EEG_Signals_1, marker_1, timestamps_1 = Load_Data(
-        data["P1_S2_GroupA_eeg_1.xdf"]
+    Signals, EEG_Signals, marker, timestamps, valence, arousal = Load_Data(
+        data["P1_S2_GroupA_eeg.xdf"], stream_name_markers, stream_name_ratings
+    )
+    Signals_1, EEG_Signals_1, marker_1, timestamps_1, valence1, arousal1 = Load_Data(
+        data["P1_S2_GroupA_eeg_1.xdf"], stream_name_markers, stream_name_ratings
     )
 
     markers2.reverse()
@@ -293,10 +271,10 @@ def correctP1(data):
     return Signals_new, EEG_Signals, marker, timestamps
 
 
-def correctP2(data):
+def correctP2(data, stream_name_markers: str, stream_name_ratings: str):
 
-    Signals, EEG_Signals, markers4, timestamps4 = Load_Data(
-        data["P2_S1_GroupA_eeg.xdf"]
+    Signals, EEG_Signals, markers4, timestamps4, valence4, arousal4 = Load_Data(
+        data["P2_S1_GroupA_eeg.xdf"], stream_name_markers, stream_name_ratings
     )
 
     (
