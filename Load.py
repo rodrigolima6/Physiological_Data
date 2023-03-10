@@ -1,8 +1,5 @@
-import pyxdf
-
-
-@staticmethod
 def Load_PsychopyMarkers(data, stream_name: str):
+    markers, timestamps = list(), list()
     for stream in data:
         if stream["info"]["name"][0] == stream_name:
             markers = list(stream["time_series"])
@@ -11,52 +8,52 @@ def Load_PsychopyMarkers(data, stream_name: str):
     return markers, timestamps
 
 
-@staticmethod
-def Load_Ratings(data, stream_name: str) -> tuple:
-    valence, arousal = list(), list()
+def Load_Ratings(data, stream_name: str):
+    timeseries, valence, arousal = list(), list(), list()
     for stream in data:
         if stream["info"]["name"][0] == stream_name:
             timeseries = list(stream["time_series"])
-            timestamps = list(stream["time_stamps"])
 
-    for item in timeseries:
-        if float(item[1]) < 4:
-            if item[0] == "Valence":
-                valence.append("Low")
-            else:
-                arousal.append("Low")
-        elif float(item[1]) >= 4 and float(item[1]) < 7:
-            if item[0] == "Valence":
-                valence.append("Medium")
-            else:
-                arousal.append("Medium")
-        else:
-            if float(item[0]) == "Valence":
-                valence.append("High")
-            else:
-                arousal.append("High")
+            for item in timeseries:
+                if float(item[1]) < 4:
+                    if item[0] == "Valence":
+                        valence.append("Low")
+                    else:
+                        arousal.append("Low")
+                elif float(item[1]) >= 4 and float(item[1]) < 7:
+                    if item[0] == "Valence":
+                        valence.append("Medium")
+                    else:
+                        arousal.append("Medium")
+                else:
+                    if float(item[0]) == "Valence":
+                        valence.append("High")
+                    else:
+                        arousal.append("High")
 
     return valence, arousal
 
 
 def Load_Opensignals(data, stream_name: str):
+
+    Opensignals_Data = {}
+    fs = int()
+
     for stream in data:
         if stream["info"]["name"][0] == stream_name:
-            CH1 = stream["time_series"][:, 1]  # ECG
-            CH2 = stream["time_series"][:, 2]  # EDA
-            CH3 = stream["time_series"][:, 3]  # RESP
-            CH4 = stream["time_series"][:, 4]  # TEMP
-            CH5 = stream["time_series"][:, 5]  # fnirs RED
-            CH6 = stream["time_series"][:, 6]  # fnirs IRED
-            time_Opensignals = stream["time_stamps"]
+            Opensignals_Data["time_Opensignals"] = stream["time_stamps"]
             fs = int(stream["info"]["nominal_srate"][0])
+            for i in range(0, int(stream["info"]["channel_count"][0]) - 1):
+                Opensignals_Data["CH" + str(i + 1)] = stream["time_series"][:, i + 1]
 
-    return CH1, CH2, CH3, CH4, CH5, CH6, time_Opensignals, fs
+    return Opensignals_Data, fs
 
 
 def Load_EEG(data, stream_name: str):
 
     EEG_data = {}
+    time_EEG = []
+    EEG_fs = int()
 
     for stream in data:
         if stream["info"]["name"][0] == stream_name:
@@ -67,7 +64,3 @@ def Load_EEG(data, stream_name: str):
             EEG_fs = int(stream["info"]["nominal_srate"][0])
 
     return EEG_data, time_EEG, EEG_fs
-
-
-# data, header = pyxdf.load_xdf('G:\\O meu disco\\PhD\\1st Study\\data\\P8_S1_GroupA_eeg.xdf')
-# EEG,time_EEG,EEG_fs = Load_EEG(data)
