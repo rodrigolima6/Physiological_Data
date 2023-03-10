@@ -8,19 +8,17 @@ def getMarkers(marker, timestamps):
     videos = list()
     onset = list()
     offset = list()
-
     for timestamp, markers in zip(timestamps, marker):
         if markers[1] == "1" and "baseline" not in markers:
             offset.append(timestamp)
-            videos.append(markers[0].split("/")[2] + "/" + markers[0].split("/")[3])
+            videos.append(markers[0])
         elif markers[1] == "1" and "baseline" in markers:
             offset.append(timestamp)
-            videos.append(markers[0].split("/")[-1])
+            videos.append(markers[0])
         elif markers[1] == "0":
             onset.append(timestamp)
 
     return onset, offset, videos
-
 
 def getMarkersIndex(onset, offset, time_Opensignals):
     onset_index = list()

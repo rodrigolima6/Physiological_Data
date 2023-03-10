@@ -1,25 +1,41 @@
+import pandas as pd
+
 from lib.sensors import *
 from Load import *
 from Epochs import *
+import pyxdf
 
 
-def getEvents(users, stream_name_markers: str, stream_name_ratings: str):
+def getEvents(
+    users,
+    openSignals_stream_name: str,
+    EEG_stream_name: str,
+    markers_stream_name: str,
+    ratings_stream_name,
+    sensors: list,
+):
 
     data = {}
     for user in users.keys():
-        data[user.split("_")[0] + "_" + user.split("_")[1]] = Load_Data(
-            users[user], stream_name_markers, stream_name_ratings
+        data[user.split(".")[0]] = Load_Data(
+            users[user],
+            openSignals_stream_name,
+            EEG_stream_name,
+            markers_stream_name,
+            ratings_stream_name,
+            sensors,
         )
 
-    for keys in data.keys():
-        if "baseline" in data[keys][2][0]:
-            data[keys][2][0][1] = "0"
+    for user in data.keys():
+        if "baseline" in data[user]["Markers"][0]:
+            data[user]["Markers"][0][1] = "0"
 
     onset, offset, videos, valence, arousal = ({}, {}, {}, {}, {})
-    for keys in data.keys():
-        valence[keys], arousal[keys] = Load_Ratings(data[keys], stream_name_ratings)
-        onset[keys], offset[keys], videos[keys] = getMarkers(
-            data[keys][2], data[keys][3]
+    for user in data.keys():
+        valence[user] = data[user]["Valence"]
+        arousal[user] = data[user]["Arousal"]
+        onset[user], offset[user], videos[user] = getMarkers(
+            data[user]["Markers"], data[user]["Markers Timestamps"]
         )
 
     onset_index = {}
@@ -27,13 +43,12 @@ def getEvents(users, stream_name_markers: str, stream_name_ratings: str):
     onset_index_EEG = {}
     offset_index_EEG = {}
 
-    for keys in data.keys():
-        # print(keys)
-        onset_index[keys], offset_index[keys] = getMarkersIndex(
-            onset[keys], offset[keys], data[keys][0]["Time"]
+    for user in data.keys():
+        onset_index[user], offset_index[user] = getMarkersIndex(
+            onset[user], offset[user], data[user]["Signals"]["Time"]
         )
-        onset_index_EEG[keys], offset_index_EEG[keys] = getMarkersIndex(
-            onset[keys], offset[keys], np.array(data[keys][1]["Time"])
+        onset_index_EEG[user], offset_index_EEG[user] = getMarkersIndex(
+            onset[user], offset[user], np.array(data[user]["EEG"]["Time"])
         )
 
     events_diff = {}
@@ -62,27 +77,37 @@ def Run_files(fname):
     return data
 
 
-def Load_Data(data, stream_name_markers: str, stream_name_ratings: str):
-    marker, timestamps = Load_PsychopyMarkers(data, stream_name_markers)
-    valence, arousal = Load_Ratings(data, stream_name_ratings)
-    CH1, CH2, CH3, CH4, CH5, CH6, time_Opensignals, fs = Load_Opensignals(data)
-    EEG_data, time_EEG, EEG_fs = Load_EEG(data)
+def Load_Data(
+    data,
+    openSignals_stream_name: str,
+    EEG_stream_name: str,
+    markers_stream_name: str,
+    ratings_stream_name: str,
+    sensors: list,
+):
+    Signals, EEG_Signals = pd.DataFrame(), pd.DataFrame()
 
-    d = {
-        "Time": time_Opensignals,
-        "ECG": CH1,
-        "EDA": CH2,
-        "RESP": CH3,
-        "TEMP": CH4,
-        "fNIRS_RED": CH5,
-        "fNIRS_IRED": CH6,
+    marker, timestamps = Load_PsychopyMarkers(data, markers_stream_name)
+    valence, arousal = Load_Ratings(data, ratings_stream_name)
+    opensignals_data, fs = Load_Opensignals(data, openSignals_stream_name)
+    EEG_data, time_EEG, EEG_fs = Load_EEG(data, EEG_stream_name)
+
+    if len(opensignals_data.keys()) > 0:
+        Signals = pd.DataFrame(data=opensignals_data)
+        sensors.insert(0, "Time")
+        Signals.columns = sensors
+    if len(EEG_data.keys()) > 0:
+        EEG_Signals = pd.DataFrame.from_dict(EEG_data)
+        EEG_Signals.insert(0, "Time", time_EEG)
+
+    return {
+        "Signals": Signals,
+        "EEG": EEG_Signals,
+        "Markers": marker,
+        "Markers Timestamps": timestamps,
+        "Valence": valence,
+        "Arousal": arousal,
     }
-    Signals = pd.DataFrame(data=d)
-
-    EEG_Signals = pd.DataFrame.from_dict(EEG_data)
-    EEG_Signals.insert(0, "Time", time_EEG)
-
-    return Signals, EEG_Signals, marker, timestamps, valence, arousal
 
 
 def getDataframe(dataframe, fs, resolution):
@@ -240,117 +265,3 @@ def Process_EEG(data, fs, resolution):
 #     Temp_Dataframe = sensor.getFeatures(temp)
 #
 #     return Temp_Dataframe
-
-
-def correctP1(data, stream_name_markers: str, stream_name_ratings: str):
-
-    markers1, timestamps1 = Load_PsychopyMarkers(data["P1_S2_GroupA_eeg_1.xdf"])
-    markers2, timestamps2 = Load_PsychopyMarkers(data["P1_S2_GroupA_eeg.xdf"])
-
-    Signals, EEG_Signals, marker, timestamps, valence, arousal = Load_Data(
-        data["P1_S2_GroupA_eeg.xdf"], stream_name_markers, stream_name_ratings
-    )
-    Signals_1, EEG_Signals_1, marker_1, timestamps_1, valence1, arousal1 = Load_Data(
-        data["P1_S2_GroupA_eeg_1.xdf"], stream_name_markers, stream_name_ratings
-    )
-
-    markers2.reverse()
-    timestamps2.reverse()
-
-    for element in markers2:
-        markers1.insert(0, element)
-
-    for timestamp in timestamps2:
-        timestamps1.insert(0, timestamp)
-
-    Signals_new = pd.concat([Signals, Signals_1], ignore_index=True)
-    EEG_Signals = pd.concat([EEG_Signals, EEG_Signals_1], ignore_index=True)
-    marker = markers1
-    timestamps = timestamps1
-
-    return Signals_new, EEG_Signals, marker, timestamps
-
-
-def correctP2(data, stream_name_markers: str, stream_name_ratings: str):
-
-    Signals, EEG_Signals, markers4, timestamps4, valence4, arousal4 = Load_Data(
-        data["P2_S1_GroupA_eeg.xdf"], stream_name_markers, stream_name_ratings
-    )
-
-    (
-        CH1_1,
-        CH2_1,
-        CH3_1,
-        CH4_1,
-        CH5_1,
-        CH6_1,
-        time_Opensignals_1,
-        fs_1,
-    ) = Load_Opensignals(data["P2_S1_GroupA_eeg_1.xdf"])
-    EEG_data_1, time_EEG_1, EEG_fs_1 = Load_EEG(data["P2_S1_GroupA_eeg_1.xdf"])
-
-    d = {
-        "Time": time_Opensignals_1,
-        "ECG": CH1_1,
-        "EDA": CH2_1,
-        "RESP": CH3_1,
-        "TEMP": CH4_1,
-        "fNIRS_RED": CH5_1,
-        "fNIRS_IRED": CH6_1,
-    }
-    Signals_1 = pd.DataFrame(data=d)
-
-    EEG_Signals_1 = pd.DataFrame.from_dict(EEG_data_1)
-    EEG_Signals_1.insert(0, "Time", time_EEG_1)
-
-    Signals_new = pd.concat([Signals_1, Signals], ignore_index=True)
-    EEG_Signals = pd.concat([EEG_Signals_1, EEG_Signals], ignore_index=True)
-
-    missing_markers = [
-        ["EMDB/A/Scenery/5003.avi", "1"],
-        ["EMDB/A/Scenery/5003.avi", "0"],
-        ["EMDB/A/Scenery/5001.avi", "1"],
-        ["EMDB/A/Scenery/5001.avi", "0"],
-        ["EMDB/A/Scenery/5000.avi", "1"],
-        ["EMDB/A/Scenery/5000.avi", "0"],
-        ["EMDB/A/Scenery/5002.avi", "1"],
-        ["EMDB/A/Scenery/5002.avi", "0"],
-        ["EMDB/A/Erotic/2004.avi", "1"],
-        ["EMDB/A/Erotic/2004.avi", "0"],
-        ["EMDB/A/Erotic/2002.avi", "1"],
-        ["EMDB/A/Erotic/2002.avi", "0"],
-        ["EMDB/A/Erotic/2003.avi", "1"],
-        ["EMDB/A/Erotic/2003.avi", "0"],
-        ["EMDB/A/Erotic/2000.avi", "1"],
-        ["EMDB/A/Erotic/2000.avi", "0"],
-        ["EMDB/A/Erotic/2001.avi", "1"],
-        ["EMDB/A/Erotic/2001.avi", "0"],
-    ]
-
-    missing_timestamps = [
-        (timestamps4[0] - 78.49) + 40.45737604831811,
-        timestamps4[0] - 78.49,
-        (timestamps4[0] - 162) + 40.217181624873774,
-        timestamps4[0] - 162,
-        (timestamps4[0] - 247) + 40.61692033614963,
-        timestamps4[0] - 247,
-        (timestamps4[0] - 345) + 40.37409253764781,
-        timestamps4[0] - 345,
-        (timestamps4[0] - 427) + 40.13403391290922,
-        timestamps4[0] - 427,
-        (timestamps4[0] - 512) + 40.46176630666014,
-        timestamps4[0] - 512,
-        (timestamps4[0] - 602) + 40.653548489004606,
-        timestamps4[0] - 602,
-        (timestamps4[0] - 690) + 40.130320348078385,
-        timestamps4[0] - 690,
-        (timestamps4[0] - 789) + 40.13610309327487,
-        timestamps4[0] - 789,
-    ]
-
-    for marker in missing_markers:
-        markers4.insert(0, marker)
-    for timestamps in missing_timestamps:
-        timestamps4.insert(0, timestamps)
-
-    return Signals_new, EEG_Signals, markers4, timestamps4
