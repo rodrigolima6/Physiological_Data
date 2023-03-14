@@ -20,6 +20,7 @@ def getMarkers(marker, timestamps):
 
     return onset, offset, videos
 
+
 def getMarkersIndex(onset, offset, time_Opensignals):
     onset_index = list()
     offset_index = list()
