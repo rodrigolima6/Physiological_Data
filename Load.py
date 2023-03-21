@@ -26,7 +26,7 @@ def Load_Ratings(data, stream_name: str):
                     else:
                         arousal.append("Medium")
                 else:
-                    if float(item[0]) == "Valence":
+                    if item[0] == "Valence":
                         valence.append("High")
                     else:
                         arousal.append("High")
