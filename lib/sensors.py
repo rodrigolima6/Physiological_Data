@@ -762,13 +762,13 @@ class EEG(Sensor):
 
         return band_powers
 
-    def getFeatures(self):
-        # self.ICA()
-        self.filterData()
-
-        band_powers = self.frequencyAnalysis()
-
-        return band_powers
+    # def getFeatures(self):
+    #     # self.ICA()
+    #     self.filterData()
+    #
+    #     band_powers = self.frequencyAnalysis()
+    #
+    #     return band_powers
 
     def getDominantFreq(self, data, fs):
         win = 4 * fs
