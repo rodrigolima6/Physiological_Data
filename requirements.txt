@@ -145,7 +145,7 @@ python-gitlab==3.13.0
 python-json-logger @ file:///tmp/build/80754af9/python-json-logger_1602614476658/work
 python-magic-bin==0.4.14
 python-vlc==3.0.12118
-pytz==2022.7.1
+pytz==2023.2
 PyWavelets==1.4.1
 pywin32==305
 pyWinhook==1.6.2
