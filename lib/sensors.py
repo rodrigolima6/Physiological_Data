@@ -101,8 +101,8 @@ class EDA(Sensor):
         Balance - LF(n.u)/HF(n.u)
         """
 
-        lf_norm = round(lf / (total_power - vlf) * 100, 2)
-        hf_norm = round(hf / (total_power - vlf) * 100, 2)
+        lf_norm = round((lf / (total_power - vlf)) * 100, 2)
+        hf_norm = round((hf / (total_power - vlf)) * 100, 2)
         ratio = round(lf_norm / hf_norm, 2)
 
         frequency_features = {
