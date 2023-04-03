@@ -25,10 +25,9 @@ def getEvents(
             ratings_stream_name,
             sensors,
         )
-
-    for user in data.keys():
-        if "baseline" in data[user]["Markers"][0]:
-            data[user]["Markers"][0][1] = "0"
+    # for user in data.keys():
+    #     if "baseline" in data[user]["Markers"][0]:
+    #         data[user]["Markers"][0][1] = "0"
 
     onset, offset, videos, valence, arousal = ({}, {}, {}, {}, {})
     for user in data.keys():
@@ -99,7 +98,7 @@ def Load_Data(
     if len(EEG_data.keys()) > 0:
         EEG_Signals = pd.DataFrame.from_dict(EEG_data)
         EEG_Signals.insert(0, "Time", time_EEG)
-
+    print(Signals)
     return {
         "Signals": Signals,
         "EEG": EEG_Signals,
