@@ -16,7 +16,7 @@ biosignalsnotebooks==0.6.10
 biosppy==1.0.0
 bleach @ file:///opt/conda/conda-bld/bleach_1641577558959/work
 blinker==1.5
-bokeh==2.3.2
+bokeh==3.1.0
 brotlipy==0.7.0
 cached-property==1.5.2
 certifi==2022.12.7
@@ -27,7 +27,7 @@ colorama @ file:///tmp/build/80754af9/colorama_1607707115595/work
 cryptography @ file:///C:/ci/cryptography_1633502396740/work
 cvxopt==1.3.0
 cycler==0.11.0
-DateTime==5.0
+DateTime==5.1
 debugpy @ file:///C:/ci/debugpy_1637091911212/work
 decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
 defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
@@ -44,11 +44,11 @@ future==0.18.3
 gevent==22.10.2
 gitdb==4.0.10
 GitPython==3.1.31
-glfw==2.5.6
+glfw==2.5.7
 greenlet @ file:///C:/ci/greenlet_1628888257991/work
 h5py==3.8.0
 idna @ file:///tmp/build/80754af9/idna_1637925883363/work
-imageio==2.26.0
+imageio==2.27.0
 imageio-ffmpeg==0.4.8
 import-ipynb==0.1.4
 importlib-metadata @ file:///C:/ci/importlib-metadata_1648562631189/work
@@ -94,7 +94,7 @@ mes2hb==1.0.0
 mistune @ file:///C:/ci/mistune_1594373272338/work
 mne==1.3.1
 moviepy==1.0.3
-msgpack==1.0.4
+msgpack==1.0.5
 msgpack-numpy==0.4.7.1
 nbclassic @ file:///opt/conda/conda-bld/nbclassic_1644943264176/work
 nbclient @ file:///C:/ci/nbclient_1650308542913/work
@@ -109,7 +109,7 @@ numba==0.56.4
 numexpr==2.7.3
 numpy==1.24.2
 oauthlib @ file:///opt/conda/conda-bld/oauthlib_1644332107998/work
-openpyxl==3.1.1
+openpyxl==3.1.2
 packaging @ file:///tmp/build/80754af9/packaging_1637314298585/work
 pamela @ file:///Users/ktietz/demo/mc3/conda-bld/pamela_1629727572510/work
 pandas==1.5.3
@@ -122,7 +122,7 @@ prometheus-client @ file:///opt/conda/conda-bld/prometheus_client_1643788673601/
 prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1633440160888/work
 psutil @ file:///C:/ci/psutil_1612298033174/work
 PsychoPy==2023.1.0
-psychtoolbox==3.0.18.2
+psychtoolbox==3.0.19.0
 pyasn1 @ file:///Users/ktietz/demo/mc3/conda-bld/pyasn1_1629708007385/work
 pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
 pycurl==7.44.1
@@ -145,9 +145,9 @@ python-gitlab==3.13.0
 python-json-logger @ file:///tmp/build/80754af9/python-json-logger_1602614476658/work
 python-magic-bin==0.4.14
 python-vlc==3.0.12118
-pytz==2022.7.1
+pytz==2023.2
 PyWavelets==1.4.1
-pywin32==305
+pywin32==306
 pyWinhook==1.6.2
 pywinpty @ file:///C:/ci_310/pywinpty_1644230983541/work/target/wheels/pywinpty-2.0.2-cp37-none-win_amd64.whl
 pyxdf==1.16.4
@@ -160,7 +160,7 @@ requests @ file:///opt/conda/conda-bld/requests_1641824580448/work
 requests-toolbelt==0.10.1
 ruamel.yaml @ file:///C:/ci/ruamel.yaml_1600552913059/work
 ruamel.yaml.clib @ file:///C:/ci/ruamel.yaml.clib_1601994561760/work
-scikit-learn==1.2.1
+scikit-learn==1.2.2
 scipy==1.10.1
 seaborn==0.12.2
 Send2Trash @ file:///tmp/build/80754af9/send2trash_1632406701022/work
@@ -193,8 +193,8 @@ widgetsnbextension @ file:///C:/ci/widgetsnbextension_1645009553925/work
 win-inet-pton @ file:///C:/ci/win_inet_pton_1605306165655/work
 wincertstore==0.2
 wxPython==4.2.0
-xarray==2023.2.0
+xarray==2023.3.0
 xlrd==2.0.1
 zipp @ file:///opt/conda/conda-bld/zipp_1641824620731/work
 zope.event==4.6
-zope.interface==5.5.2
+zope.interface==6.0
