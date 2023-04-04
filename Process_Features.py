@@ -98,7 +98,7 @@ def Load_Data(
     if len(EEG_data.keys()) > 0:
         EEG_Signals = pd.DataFrame.from_dict(EEG_data)
         EEG_Signals.insert(0, "Time", time_EEG)
-    print(Signals)
+
     return {
         "Signals": Signals,
         "EEG": EEG_Signals,
