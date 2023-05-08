@@ -19,7 +19,7 @@ blinker==1.6.2
 bokeh==3.1.0
 brotlipy==0.7.0
 cached-property==1.5.2
-certifi==2022.12.7
+certifi==2023.5.7
 certipy @ file:///Users/ktietz/demo/mc3/conda-bld/certipy_1630675329981/work
 cffi @ file:///C:/ci_310/cffi_1642682485096/work
 charset-normalizer @ file:///tmp/build/80754af9/charset-normalizer_1630003229654/work
