@@ -141,7 +141,7 @@ pyserial==3.5
 PySocks @ file:///C:/ci/pysocks_1594394709107/work
 python-bidi==0.4.2
 python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
-python-gitlab==3.14.0
+python-gitlab==3.15.0
 python-json-logger @ file:///tmp/build/80754af9/python-json-logger_1602614476658/work
 python-magic-bin==0.4.14
 python-vlc==3.0.18122
