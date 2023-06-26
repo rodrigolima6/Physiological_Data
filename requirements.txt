@@ -84,7 +84,7 @@ jupyterlab-widgets @ file:///tmp/build/80754af9/jupyterlab_widgets_1609884341231
 kiwisolver==1.4.4
 ldap3 @ file:///tmp/build/80754af9/ldap3_1626855370698/work
 libmagic==1.0
-llvmlite==0.40.0
+llvmlite==0.40.1
 macropy3==1.1.0b2
 Mako @ file:///tmp/build/80754af9/mako_1610650590832/work
 MarkupSafe @ file:///C:/ci/markupsafe_1621528383308/work
