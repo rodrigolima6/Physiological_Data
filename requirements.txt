@@ -112,7 +112,7 @@ oauthlib @ file:///opt/conda/conda-bld/oauthlib_1644332107998/work
 openpyxl==3.1.2
 packaging @ file:///tmp/build/80754af9/packaging_1637314298585/work
 pamela @ file:///Users/ktietz/demo/mc3/conda-bld/pamela_1629727572510/work
-pandas==2.0.2
+pandas==2.0.3
 pandocfilters @ file:///opt/conda/conda-bld/pandocfilters_1643405455980/work
 parso @ file:///opt/conda/conda-bld/parso_1641458642106/work
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
