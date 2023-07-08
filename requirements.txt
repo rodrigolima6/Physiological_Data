@@ -161,7 +161,7 @@ requests-toolbelt==1.0.0
 ruamel.yaml @ file:///C:/ci/ruamel.yaml_1600552913059/work
 ruamel.yaml.clib @ file:///C:/ci/ruamel.yaml.clib_1601994561760/work
 scikit-learn==1.3.0
-scipy==1.11.0
+scipy==1.11.1
 seaborn==0.12.2
 Send2Trash @ file:///tmp/build/80754af9/send2trash_1632406701022/work
 shortuuid==1.0.11
