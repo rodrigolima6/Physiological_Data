@@ -177,7 +177,7 @@ SQLAlchemy @ file:///C:/ci/sqlalchemy_1647600013392/work
 tables==3.8.0
 terminado @ file:///C:/ci/terminado_1644322782754/work
 testpath @ file:///tmp/build/80754af9/testpath_1624638946665/work
-threadpoolctl==3.1.0
+threadpoolctl==3.2.0
 tomlkit @ file:///opt/conda/conda-bld/tomlkit_1644481977758/work
 tornado @ file:///C:/ci/tornado_1606935947090/work
 tqdm==4.65.0
