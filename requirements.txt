@@ -151,7 +151,7 @@ pywin32==306
 pyWinhook==1.6.2
 pywinpty @ file:///C:/ci_310/pywinpty_1644230983541/work/target/wheels/pywinpty-2.0.2-cp37-none-win_amd64.whl
 pyxdf==1.16.4
-PyYAML==6.0
+PyYAML==6.0.1
 pyzmq @ file:///C:/ci/pyzmq_1638435182681/work
 qtconsole @ file:///opt/conda/conda-bld/qtconsole_1649078897110/work
 QtPy @ file:///opt/conda/conda-bld/qtpy_1649073884068/work
