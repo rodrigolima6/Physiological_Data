@@ -106,7 +106,7 @@ neurokit2==0.2.5
 nolds==0.5.2
 notebook @ file:///C:/ci/notebook_1651666865091/work
 numba==0.57.1
-numexpr==2.7.3
+numexpr==2.8.5
 numpy==1.25.1
 oauthlib @ file:///opt/conda/conda-bld/oauthlib_1644332107998/work
 openpyxl==3.1.2
