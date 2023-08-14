@@ -51,93 +51,113 @@ class EDA(Sensor):
         return eda_phasic, eda_tonic
 
     def featuresSCR(self, eda_phasic):
-        info, signals = nk.eda_peaks(eda_phasic, self.fs, method="neurokit")
+        try:
+            info, signals = nk.eda_peaks(eda_phasic, self.fs, method="neurokit")
 
-        SCR_Amplitude = signals["SCR_Amplitude"]
-        SCR_RiseTime = signals["SCR_RiseTime"]
-        SCR_RecoveryTime = signals["SCR_RecoveryTime"]
+            SCR_Amplitude = signals["SCR_Amplitude"]
+            SCR_RiseTime = signals["SCR_RiseTime"]
+            SCR_RecoveryTime = signals["SCR_RecoveryTime"]
 
-        return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
+            return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def frequencyAnalysis(data_filtered):
+        try:
+            downsampled1 = sc.signal.decimate(data_filtered, q=10, n=8)
+            downsampled2 = sc.signal.decimate(downsampled1, q=10, n=8)
+            downsampled3 = sc.signal.decimate(downsampled2, q=10, n=8)
 
-        downsampled1 = sc.signal.decimate(data_filtered, q=10, n=8)
-        downsampled2 = sc.signal.decimate(downsampled1, q=10, n=8)
-        downsampled3 = sc.signal.decimate(downsampled2, q=10, n=8)
+            signal_filtered = bsnb.highpass(downsampled3, 0.01, order=8)
 
-        signal_filtered = bsnb.highpass(downsampled3, 0.01, order=8)
+            freqs, power = sc.signal.welch(
+                signal_filtered, nperseg=128, window="blackman"
+            )
 
-        freqs, power = sc.signal.welch(signal_filtered, nperseg=128, window="blackman")
+            return freqs, power
 
-        return freqs, power
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def frequencyFeatures(freq, power):
-        """
-        Indexes of Frequencies of each component
-        """
-        vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
-        lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
-        hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
-        total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
-        """
-        Power of each frequency component in the desired range of frequencies
-        """
+        try:
+            """
+            Indexes of Frequencies of each component
+            """
+            vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
+            lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
+            hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
+            total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
+            """
+            Power of each frequency component in the desired range of frequencies
+            """
 
-        vlf = round(
-            sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000, 4
-        )
-        lf = round(sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4)
-        hf = round(sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4)
-        total_power = round(
-            sc.integrate.trapz(power[total_power_indexes], freq[total_power_indexes])
-            * 1000000,
-            4,
-        )
+            vlf = round(
+                sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000, 4
+            )
+            lf = round(
+                sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
+            )
+            hf = round(
+                sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
+            )
+            total_power = round(
+                sc.integrate.trapz(
+                    power[total_power_indexes], freq[total_power_indexes]
+                )
+                * 1000000,
+                4,
+            )
 
-        """
-        Frequency components in normalized units (n.u)
-        Balance - LF(n.u)/HF(n.u)
-        """
+            """
+            Frequency components in normalized units (n.u)
+            Balance - LF(n.u)/HF(n.u)
+            """
 
-        lf_norm = round((lf / (total_power - vlf)) * 100, 2)
-        hf_norm = round((hf / (total_power - vlf)) * 100, 2)
-        ratio = round(lf_norm / hf_norm, 2)
+            lf_norm = round((lf / (total_power - vlf)) * 100, 2)
+            hf_norm = round((hf / (total_power - vlf)) * 100, 2)
+            ratio = round(lf_norm / hf_norm, 2)
 
-        frequency_features = {
-            "VLF Power": [vlf],
-            "LF Power": [lf],
-            "HF Power": [hf],
-            "Total Power": [total_power],
-            "LF (nu)": [lf_norm],
-            "HF (nu)": [hf_norm],
-            "LF/HF": [ratio],
-        }
+            frequency_features = {
+                "VLF Power": [vlf],
+                "LF Power": [lf],
+                "HF Power": [hf],
+                "Total Power": [total_power],
+                "LF (nu)": [lf_norm],
+                "HF (nu)": [hf_norm],
+                "LF/HF": [ratio],
+            }
 
-        return frequency_features
+            return frequency_features
+        except Exception as e:
+            print(e)
 
     def getFeatures(self):
-        eda_filtered = self.filterEDA()
-        eda_phasic, eda_tonic = self.componentsEDA(eda_filtered)
-        SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime = self.featuresSCR(eda_phasic)
-        freqs, power = self.frequencyAnalysis(eda_filtered)
-        frequency_features = self.frequencyFeatures(freqs, power)
+        try:
+            eda_filtered = self.filterEDA()
+            eda_phasic, eda_tonic = self.componentsEDA(eda_filtered)
+            SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime = self.featuresSCR(eda_phasic)
+            freqs, power = self.frequencyAnalysis(eda_filtered)
+            frequency_features = self.frequencyFeatures(freqs, power)
 
-        eda_phasic_dict = self.statistical_Features(eda_phasic)
-        eda_tonic_dict = self.statistical_Features(eda_tonic)
-        SCR_Amplitude_dict = self.statistical_Features(SCR_Amplitude)
-        SCR_RiseTime_dict = self.statistical_Features(SCR_RiseTime)
-        SCR_RecoveryTime_dict = self.statistical_Features(SCR_RecoveryTime)
+            eda_phasic_dict = self.statistical_Features(eda_phasic)
+            eda_tonic_dict = self.statistical_Features(eda_tonic)
+            SCR_Amplitude_dict = self.statistical_Features(SCR_Amplitude)
+            SCR_RiseTime_dict = self.statistical_Features(SCR_RiseTime)
+            SCR_RecoveryTime_dict = self.statistical_Features(SCR_RecoveryTime)
 
-        return (
-            eda_phasic_dict,
-            eda_tonic_dict,
-            SCR_Amplitude_dict,
-            SCR_RiseTime_dict,
-            SCR_RecoveryTime_dict,
-            frequency_features,
-        )
+            return (
+                eda_phasic_dict,
+                eda_tonic_dict,
+                SCR_Amplitude_dict,
+                SCR_RiseTime_dict,
+                SCR_RecoveryTime_dict,
+                frequency_features,
+            )
+        except Exception as e:
+            print(e)
 
 
 """ECG Class"""
@@ -238,20 +258,26 @@ class ECG(Sensor):
         return peaks
 
     def calculateHR(self, peaks):
-        hr = []
-        time = []
-        for i in range(1, len(peaks)):
-            value = (peaks[i] - peaks[i - 1]) * 60 / self.fs
-            hr.append(value)
-            time.append(peaks[i] - peaks[i - 1] / self.fs)
-        return hr, time
+        try:
+            hr = []
+            time = []
+            for i in range(1, len(peaks)):
+                value = (peaks[i] - peaks[i - 1]) * 60 / self.fs
+                hr.append(value)
+                time.append(peaks[i] - peaks[i - 1] / self.fs)
+            return hr, time
+        except Exception as e:
+            print(e)
 
     def processECG(self):
-        peaks = self._detectRPeaks()
+        try:
+            peaks = self._detectRPeaks()
 
-        return peaks
-        # hr, time = self.calculateHR(peaks)
-        # return hr, time
+            return peaks
+            # hr, time = self.calculateHR(peaks)
+            # return hr, time
+        except Exception as e:
+            print(e)
 
 
 """HRV Class"""
@@ -270,11 +296,14 @@ class HRV(Sensor):
                  rr_interval_time - RR interval series time axis.
         """
 
-        rr_interval, rr_interval_time = bsnb.tachogram(
-            self.data, self.fs, signal=True, out_seconds=True
-        )
+        try:
+            rr_interval, rr_interval_time = bsnb.tachogram(
+                self.data, self.fs, signal=True, out_seconds=True
+            )
 
-        return rr_interval, rr_interval_time
+            return rr_interval, rr_interval_time
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def remove_EctopyBeats(rr_interval, rr_interval_time):
@@ -285,15 +314,17 @@ class HRV(Sensor):
         :return: rr_interval_NN - RR interval series with no ectopic beats
                  rr_interval_time_NN - RR interval series time axis with no ectopic beats
         """
+        try:
+            rr_interval_NN, rr_interval_time_NN = bsnb.remove_ectopy(
+                rr_interval, rr_interval_time
+            )
 
-        rr_interval_NN, rr_interval_time_NN = bsnb.remove_ectopy(
-            rr_interval, rr_interval_time
-        )
+            rr_interval_NN = np.array(rr_interval_NN)
+            rr_interval_time_NN = np.array(rr_interval_time_NN)
 
-        rr_interval_NN = np.array(rr_interval_NN)
-        rr_interval_time_NN = np.array(rr_interval_time_NN)
-
-        return rr_interval_NN, rr_interval_time_NN
+            return rr_interval_NN, rr_interval_time_NN
+        except Exception as e:
+            print(e)
 
     def heart_rate(self, rr_interval_NN):
         """
@@ -318,47 +349,50 @@ class HRV(Sensor):
         return hr
 
     def timeDomainFeatures(self, rr_interval_NN):
+        try:
+            statistical_features = self.statistical_Features(rr_interval_NN)
 
-        statistical_features = self.statistical_Features(rr_interval_NN)
+            """
+            :param rr_interval_NN: RR interval series with no ectopic beats
+            :return: dict with time-domain features of HRV
+            """
 
-        """
-        :param rr_interval_NN: RR interval series with no ectopic beats
-        :return: dict with time-domain features of HRV
-        """
+            rr_interval_diff = np.diff(rr_interval_NN)
+            rr_interval_abs = np.abs(rr_interval_diff)
 
-        rr_interval_diff = np.diff(rr_interval_NN)
-        rr_interval_abs = np.abs(rr_interval_diff)
+            """Standard deviation of RR interval series with no ectopic beats"""
+            SDNN = round(np.std(rr_interval_NN) * 1000, 4)
 
-        """Standard deviation of RR interval series with no ectopic beats"""
-        SDNN = round(np.std(rr_interval_NN) * 1000, 4)
+            """Root Mean Square of the Standard deviation"""
+            RMSSD = round(
+                np.sqrt(np.sum((rr_interval_diff) ** 2) / (len(rr_interval_NN) - 1))
+                * 1000,
+                4,
+            )
 
-        """Root Mean Square of the Standard deviation"""
-        RMSSD = round(
-            np.sqrt(np.sum((rr_interval_diff) ** 2) / (len(rr_interval_NN) - 1)) * 1000,
-            4,
-        )
+            """Number and percentage of RR interval longer than 50 ms"""
+            NN50 = sum(1 for i in rr_interval_abs if i > 0.05)
+            pNN50 = round((float(NN50) / len(rr_interval_NN) * 100), 4)
 
-        """Number and percentage of RR interval longer than 50 ms"""
-        NN50 = sum(1 for i in rr_interval_abs if i > 0.05)
-        pNN50 = round((float(NN50) / len(rr_interval_NN) * 100), 4)
+            """Number and percentage of RR interval longer than 20 ms"""
+            NN20 = sum(1 for i in rr_interval_abs if i > 0.02)
+            pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
 
-        """Number and percentage of RR interval longer than 20 ms"""
-        NN20 = sum(1 for i in rr_interval_abs if i > 0.02)
-        pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
+            time_domain_features = {
+                "AVG RR": statistical_features["AVG"],
+                "Minimum RR": statistical_features["Minimum"],
+                "Maximum RR": statistical_features["Maximum"],
+                "SDNN": SDNN,
+                "RMSSD": RMSSD,
+                "NN50": NN50,
+                "pNN50": pNN50,
+                "NN20": NN20,
+                "pNN20": pNN20,
+            }
 
-        time_domain_features = {
-            "AVG RR": statistical_features["AVG"],
-            "Minimum RR": statistical_features["Minimum"],
-            "Maximum RR": statistical_features["Maximum"],
-            "SDNN": SDNN,
-            "RMSSD": RMSSD,
-            "NN50": NN50,
-            "pNN50": pNN50,
-            "NN20": NN20,
-            "pNN20": pNN20,
-        }
-
-        return time_domain_features
+            return time_domain_features
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def poincareFeatures(rr_interval_NN):
@@ -368,28 +402,31 @@ class HRV(Sensor):
         :return: dict with Poincare features - non-linear features
         """
 
-        """Standard Deviation of RR interval series"""
-        STD = round(float(np.std(rr_interval_NN)), 4)
+        try:
+            """Standard Deviation of RR interval series"""
+            STD = round(float(np.std(rr_interval_NN)), 4)
 
-        """Standard Deviation of the successive differences of RR interval series"""
-        SDSD = round(float(np.std(np.diff(rr_interval_NN))), 4)
+            """Standard Deviation of the successive differences of RR interval series"""
+            SDSD = round(float(np.std(np.diff(rr_interval_NN))), 4)
 
-        """Length of the longitudinal line in Poincaré plot"""
-        SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4)
+            """Length of the longitudinal line in Poincaré plot"""
+            SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4)
 
-        """Length of the transverse line in Poincaré plot"""
-        SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4)
+            """Length of the transverse line in Poincaré plot"""
+            SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4)
 
-        "SD2/SD1"
-        SD_ratio = round(SD2 / SD1, 4)
+            "SD2/SD1"
+            SD_ratio = round(SD2 / SD1, 4)
 
-        poincaré_features = {
-            "SD1": [SD1 * 1000],
-            "SD2": [SD2 * 1000],
-            "SD2/SD1": [SD_ratio],
-        }
+            poincaré_features = {
+                "SD1": [SD1 * 1000],
+                "SD2": [SD2 * 1000],
+                "SD2/SD1": [SD_ratio],
+            }
 
-        return poincaré_features
+            return poincaré_features
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def evenlySpaced_RR(rr_interval_NN, time, new_freq):
@@ -400,110 +437,136 @@ class HRV(Sensor):
         :param new_freq: Frequency to which the RR interval series will be downsampled
         :return: Interpolated and Downsampled RR interval series
         """
+        try:
+            """Time axis downsampled to new frequency"""
+            downsampled_time = np.linspace(0, int(time[-1]), int(time[-1] * new_freq))
 
-        """ Time axis downsampled to new frequency"""
-        downsampled_time = np.linspace(0, int(time[-1]), int(time[-1] * new_freq))
+            """Time array with RR interval series evenly time-spaced"""
+            evenlySpaced_time = np.linspace(0, int(time[-1]), int(len(rr_interval_NN)))
 
-        """Time array with RR interval series evenly time-spaced"""
-        evenlySpaced_time = np.linspace(0, int(time[-1]), int(len(rr_interval_NN)))
+            """
+            (t,c,k) a tuple containing the vector of knots, the B-spline coefficients, and degree of spline
+            Model of the RR interval series
+            """
+            tck = sc.interpolate.splrep(evenlySpaced_time, rr_interval_NN)
 
-        """
-        (t,c,k) a tuple containing the vector of knots, the B-spline coefficients, and degree of spline
-        Model of the RR interval series
-        """
-        tck = sc.interpolate.splrep(evenlySpaced_time, rr_interval_NN)
+            """Interpolated RR interval series using the model obtained"""
+            interpolatedRR = sc.interpolate.splev(downsampled_time, tck)
 
-        """Interpolated RR interval series using the model obtained"""
-        interpolatedRR = sc.interpolate.splev(downsampled_time, tck)
-
-        return interpolatedRR
+            return interpolatedRR
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def frequencyAnalysis(
         rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
     ):
 
-        init_time = int(rr_interval_time_NN[0])
-        fin_time = int(rr_interval_time_NN[-1])
-        tck = sc.interpolate.splrep(rr_interval_time_NN, rr_interval_NN)
+        try:
+            init_time = int(rr_interval_time_NN[0])
+            fin_time = int(rr_interval_time_NN[-1])
+            tck = sc.interpolate.splrep(rr_interval_time_NN, rr_interval_NN)
 
-        nn_time_even = np.linspace(
-            init_time, fin_time, (fin_time - init_time) * interpolation_rate
-        )
-        nn_tachogram_even = sc.interpolate.splev(nn_time_even, tck)
+            nn_time_even = np.linspace(
+                init_time, fin_time, (fin_time - init_time) * interpolation_rate
+            )
+            nn_tachogram_even = sc.interpolate.splev(nn_time_even, tck)
 
-        freq_axis, power_axis = sc.signal.welch(
-            nn_tachogram_even,
-            interpolation_rate,
-            window=sc.signal.get_window(window, min(len(nn_tachogram_even), 1000)),
-            nperseg=min(len(nn_tachogram_even), 1000),
-        )
+            freq_axis, power_axis = sc.signal.welch(
+                nn_tachogram_even,
+                interpolation_rate,
+                window=sc.signal.get_window(window, min(len(nn_tachogram_even), 1000)),
+                nperseg=min(len(nn_tachogram_even), 1000),
+            )
 
-        freqs = np.array([round(val, 3) for val in freq_axis if val < 0.5])
-        power = np.array(
-            [round(val, 4) for val, freq in zip(power_axis, freq_axis) if freq < 0.5]
-        )
+            freqs = np.array([round(val, 3) for val in freq_axis if val < 0.5])
+            power = np.array(
+                [
+                    round(val, 4)
+                    for val, freq in zip(power_axis, freq_axis)
+                    if freq < 0.5
+                ]
+            )
 
-        return freqs, power
+            return freqs, power
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def frequencyFeatures(freq, power):
-        """
-        Indexes of Frequencies of each component
-        """
-        vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
-        lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
-        hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
-        total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
-        """
-        Power of each frequency component in the desired range of frequencies
-        """
+        try:
+            """
+            Indexes of Frequencies of each component
+            """
+            vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
+            lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
+            hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
+            total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
+            """
+            Power of each frequency component in the desired range of frequencies
+            """
 
-        vlf = round(
-            sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000, 4
-        )
-        lf = round(sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4)
-        hf = round(sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4)
-        total_power = round(
-            sc.integrate.trapz(power[total_power_indexes], freq[total_power_indexes])
-            * 1000000,
-            4,
-        )
+            vlf = round(
+                sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000, 4
+            )
+            lf = round(
+                sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
+            )
+            hf = round(
+                sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
+            )
+            total_power = round(
+                sc.integrate.trapz(
+                    power[total_power_indexes], freq[total_power_indexes]
+                )
+                * 1000000,
+                4,
+            )
 
-        """
-        Frequency components in normalized units (n.u)
-        Balance - LF(n.u)/HF(n.u)
-        """
+            """
+            Frequency components in normalized units (n.u)
+            Balance - LF(n.u)/HF(n.u)
+            """
 
-        lf_norm = round(lf / (total_power - vlf) * 100, 2)
-        hf_norm = round(hf / (total_power - vlf) * 100, 2)
-        ratio = round(lf_norm / hf_norm, 2)
+            lf_norm = round(lf / (total_power - vlf) * 100, 2)
+            hf_norm = round(hf / (total_power - vlf) * 100, 2)
+            ratio = round(lf_norm / hf_norm, 2)
 
-        frequency_features = {
-            "HRV VLF Power": [vlf],
-            "HRV LF Power": [lf],
-            "HRV HF Power": [hf],
-            "HRV Total Power": [total_power],
-            "HRV LF (nu)": [lf_norm],
-            "HRV HF (nu)": [hf_norm],
-            "HRV LF/HF": [ratio],
-        }
+            frequency_features = {
+                "HRV VLF Power": [vlf],
+                "HRV LF Power": [lf],
+                "HRV HF Power": [hf],
+                "HRV Total Power": [total_power],
+                "HRV LF (nu)": [lf_norm],
+                "HRV HF (nu)": [hf_norm],
+                "HRV LF/HF": [ratio],
+            }
 
-        return frequency_features
+            return frequency_features
+        except Exception as e:
+            print(e)
 
     def getFeatures(self):
-        rr_interval, rr_interval_time = self.RR_interval()
-        rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(
-            rr_interval, rr_interval_time
-        )
-        heart_rate = self.heart_rate(rr_interval_NN)
-        heart_rate_features = self.heartRate_features(heart_rate)
-        freq, power = self.frequencyAnalysis(rr_interval_time_NN, rr_interval_NN)
-        time_features = self.timeDomainFeatures(rr_interval_NN)
-        poincare_features = self.poincareFeatures(rr_interval_NN)
-        frequency_features = self.frequencyFeatures(freq, power)
+        try:
+            rr_interval, rr_interval_time = self.RR_interval()
+            rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(
+                rr_interval, rr_interval_time
+            )
+            heart_rate = self.heart_rate(rr_interval_NN)
+            heart_rate_features = self.heartRate_features(heart_rate)
+            freq, power = self.frequencyAnalysis(rr_interval_time_NN, rr_interval_NN)
+            time_features = self.timeDomainFeatures(rr_interval_NN)
+            poincare_features = self.poincareFeatures(rr_interval_NN)
+            frequency_features = self.frequencyFeatures(freq, power)
 
-        return heart_rate_features, time_features, poincare_features, frequency_features
+            return (
+                heart_rate_features,
+                time_features,
+                poincare_features,
+                frequency_features,
+            )
+        except Exception as e:
+            print(e)
 
 
 """PPG Class"""
@@ -703,11 +766,14 @@ class EEG(Sensor):
 
     @staticmethod
     def ICA(data):
-        ica = FastICA(whiten="unit-variance")
+        try:
+            ica = FastICA(whiten="unit-variance")
 
-        EEG_ICA = ica.fit_transform(np.array(data).reshape(-1, 1))
+            EEG_ICA = ica.fit_transform(np.array(data).reshape(-1, 1))
 
-        return EEG_ICA
+            return EEG_ICA
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def filterData(data, fs):
@@ -720,47 +786,58 @@ class EEG(Sensor):
 
     @staticmethod
     def frequencyAnalysis(data, fs):
-        freqs, power = welch(data, fs, nperseg=fs / 2)
+        try:
+            freqs, power = welch(data, fs, nperseg=fs / 2)
 
-        alpha_indexes = np.where((freqs[:] >= 8) & (freqs[:] < 14))[0]
-        betha_indexes = np.where((freqs[:] >= 14) & (freqs[:] < 30))[0]
-        gamma_indexes = np.where((freqs[:] >= 30) & (freqs[:] < 49))[0]
-        theta_indexes = np.where((freqs[:] >= 4) & (freqs[:] < 8))[0]
-        delta_indexes = np.where((freqs[:] >= 0.5) & (freqs[:] < 4))[0]
+            alpha_indexes = np.where((freqs[:] >= 8) & (freqs[:] < 14))[0]
+            betha_indexes = np.where((freqs[:] >= 14) & (freqs[:] < 30))[0]
+            gamma_indexes = np.where((freqs[:] >= 30) & (freqs[:] < 49))[0]
+            theta_indexes = np.where((freqs[:] >= 4) & (freqs[:] < 8))[0]
+            delta_indexes = np.where((freqs[:] >= 0.5) & (freqs[:] < 4))[0]
 
-        alpha = sc.integrate.trapz(power[alpha_indexes], x=freqs[alpha_indexes])
-        betha = sc.integrate.trapz(power[betha_indexes], x=freqs[betha_indexes])
-        gamma = sc.integrate.trapz(power[gamma_indexes], x=freqs[gamma_indexes])
-        theta = sc.integrate.trapz(power[theta_indexes], x=freqs[theta_indexes])
-        delta = sc.integrate.trapz(power[delta_indexes], x=freqs[delta_indexes])
+            alpha = sc.integrate.trapz(power[alpha_indexes], x=freqs[alpha_indexes])
+            betha = sc.integrate.trapz(power[betha_indexes], x=freqs[betha_indexes])
+            gamma = sc.integrate.trapz(power[gamma_indexes], x=freqs[gamma_indexes])
+            theta = sc.integrate.trapz(power[theta_indexes], x=freqs[theta_indexes])
+            delta = sc.integrate.trapz(power[delta_indexes], x=freqs[delta_indexes])
 
-        bands_power = {
-            "alpha": alpha,
-            "betha": betha,
-            "gamma": gamma,
-            "theta": theta,
-        }  # ,"delta":delta}
+            bands_power = {
+                "alpha": alpha,
+                "betha": betha,
+                "gamma": gamma,
+                "theta": theta,
+            }  # ,"delta":delta}
 
-        return bands_power
+            return bands_power
+        except Exception as e:
+            print(e)
 
     def extractBand(self, band: list):
-        f1, f2 = band
-        win = self.fs / 2
-        freq, power = welch(self.data, self.fs, nperseg=win)
-        idx_band = np.logical_and(freq >= f1, freq <= f2)  # Get the band of frequencies
-        power_freq = np.trapz(
-            power[idx_band], x=freq[idx_band]
-        )  # Calculate the power of the band of frequencies
+        try:
+            f1, f2 = band
+            win = self.fs / 2
+            freq, power = welch(self.data, self.fs, nperseg=win)
+            idx_band = np.logical_and(
+                freq >= f1, freq <= f2
+            )  # Get the band of frequencies
+            power_freq = np.trapz(
+                power[idx_band], x=freq[idx_band]
+            )  # Calculate the power of the band of frequencies
 
-        return power_freq
+            return power_freq
+        except Exception as e:
+            print(e)
 
     def extractAllBands(self):
-        band_powers = {}
+        try:
+            band_powers = {}
 
-        for key, item in self.bands.items():
-            band_powers[key] = self.extractBand(self.data, item)
+            for key, item in self.bands.items():
+                band_powers[key] = self.extractBand(self.data, item)
 
-        return band_powers
+            return band_powers
+        except Exception as e:
+            print(e)
 
     # def getFeatures(self):
     #     # self.ICA()
@@ -857,7 +934,7 @@ class RESP(Sensor):
         self.data = np.array(data).astype(float)
 
     def process_RESP(self):
-        signals, info = nk.rsp_process(self.data, self.fs, method="khodadad2018")
+        signals, info = nk.rsp_process(self.data, self.fs, method="biosppy")
 
         return signals, info
 
