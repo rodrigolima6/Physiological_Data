@@ -436,10 +436,26 @@ class Sensor:
     @staticmethod
     def statistical_Features(signal):
 
-        maximum = np.nanmax(signal)
-        minimum = np.nanmin(signal)
-        average = np.nanmean(signal)
-        std = np.nanstd(signal)
+        try:
+            maximum = np.nanmax(signal)
+        except Exception as e:
+            print(e)
+            maximum = None
+        try:
+            minimum = np.nanmin(signal)
+        except Exception as e:
+            print(e)
+            minimum = None
+        try:
+            average = np.nanmean(signal)
+        except Exception as e:
+            print(e)
+            average = None
+        try:
+            std = np.nanstd(signal)
+        except Exception as e:
+            print(e)
+            std = None
 
         statistical_features = {
             "AVG": [average],

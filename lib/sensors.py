@@ -54,13 +54,26 @@ class EDA(Sensor):
         try:
             info, signals = nk.eda_peaks(eda_phasic, self.fs, method="neurokit")
 
-            SCR_Amplitude = signals["SCR_Amplitude"]
-            SCR_RiseTime = signals["SCR_RiseTime"]
-            SCR_RecoveryTime = signals["SCR_RecoveryTime"]
+            try:
+                SCR_Amplitude = signals["SCR_Amplitude"]
+            except Exception as e:
+                print(e)
+                SCR_Amplitude = None
+            try:
+                SCR_RiseTime = signals["SCR_RiseTime"]
+            except Exception as e:
+                print(e)
+                SCR_RiseTime = None
+            try:
+                SCR_RecoveryTime = signals["SCR_RecoveryTime"]
+            except Exception as e:
+                print(e)
+                SCR_RecoveryTime = None
 
             return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
         except Exception as e:
             print(e)
+            pass
 
     @staticmethod
     def frequencyAnalysis(data_filtered):
@@ -79,6 +92,7 @@ class EDA(Sensor):
 
         except Exception as e:
             print(e)
+            pass
 
     @staticmethod
     def frequencyFeatures(freq, power):
@@ -94,31 +108,60 @@ class EDA(Sensor):
             Power of each frequency component in the desired range of frequencies
             """
 
-            vlf = round(
-                sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000, 4
-            )
-            lf = round(
-                sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
-            )
-            hf = round(
-                sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
-            )
-            total_power = round(
-                sc.integrate.trapz(
-                    power[total_power_indexes], freq[total_power_indexes]
+            try:
+                vlf = round(
+                    sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000,
+                    4,
                 )
-                * 1000000,
-                4,
-            )
+            except Exception as e:
+                print(e)
+                vlf = None
+            try:
+                lf = round(
+                    sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
+                )
+            except Exception as e:
+                print(e)
+                lf = None
+            try:
+                hf = round(
+                    sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
+                )
+            except Exception as e:
+                print(e)
+                hf = None
+            try:
+                total_power = round(
+                    sc.integrate.trapz(
+                        power[total_power_indexes], freq[total_power_indexes]
+                    )
+                    * 1000000,
+                    4,
+                )
+            except Exception as e:
+                print(e)
+                total_power = None
 
             """
             Frequency components in normalized units (n.u)
             Balance - LF(n.u)/HF(n.u)
             """
 
-            lf_norm = round((lf / (total_power - vlf)) * 100, 2)
-            hf_norm = round((hf / (total_power - vlf)) * 100, 2)
-            ratio = round(lf_norm / hf_norm, 2)
+            try:
+                lf_norm = round((lf / (total_power - vlf)) * 100, 2)
+            except Exception as e:
+                print(e)
+                lf_norm = None
+            try:
+                hf_norm = round((hf / (total_power - vlf)) * 100, 2)
+            except Exception as e:
+                print(e)
+                hf_norm = None
+            try:
+                ratio = round(lf_norm / hf_norm, 2)
+            except Exception as e:
+                print(e)
+                ratio = None
 
             frequency_features = {
                 "VLF Power": [vlf],
@@ -133,6 +176,7 @@ class EDA(Sensor):
             return frequency_features
         except Exception as e:
             print(e)
+            pass
 
     def getFeatures(self):
         try:
@@ -158,6 +202,7 @@ class EDA(Sensor):
             )
         except Exception as e:
             print(e)
+            pass
 
 
 """ECG Class"""
@@ -268,6 +313,7 @@ class ECG(Sensor):
             return hr, time
         except Exception as e:
             print(e)
+            pass
 
     def processECG(self):
         try:
@@ -278,6 +324,7 @@ class ECG(Sensor):
             # return hr, time
         except Exception as e:
             print(e)
+            pass
 
 
 """HRV Class"""
@@ -304,6 +351,7 @@ class HRV(Sensor):
             return rr_interval, rr_interval_time
         except Exception as e:
             print(e)
+            pass
 
     @staticmethod
     def remove_EctopyBeats(rr_interval, rr_interval_time):
@@ -325,13 +373,18 @@ class HRV(Sensor):
             return rr_interval_NN, rr_interval_time_NN
         except Exception as e:
             print(e)
+            pass
 
     def heart_rate(self, rr_interval_NN):
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :return: array of Heart Rate in beats per minute (Bpm) along time.
         """
-        heart_rate = 60.0 / rr_interval_NN
+        try:
+            heart_rate = 60.0 / rr_interval_NN
+        except Exception as e:
+            print(e)
+            heart_rate = None
 
         return heart_rate
 
@@ -361,22 +414,46 @@ class HRV(Sensor):
             rr_interval_abs = np.abs(rr_interval_diff)
 
             """Standard deviation of RR interval series with no ectopic beats"""
-            SDNN = round(np.std(rr_interval_NN) * 1000, 4)
+            try:
+                SDNN = round(np.std(rr_interval_NN) * 1000, 4)
+            except Exception as e:
+                print(e)
+                SDNN = None
 
             """Root Mean Square of the Standard deviation"""
-            RMSSD = round(
-                np.sqrt(np.sum((rr_interval_diff) ** 2) / (len(rr_interval_NN) - 1))
-                * 1000,
-                4,
-            )
+            try:
+                RMSSD = round(
+                    np.sqrt(np.sum((rr_interval_diff) ** 2) / (len(rr_interval_NN) - 1))
+                    * 1000,
+                    4,
+                )
+            except Exception as e:
+                print(e)
+                RMSSD = None
 
             """Number and percentage of RR interval longer than 50 ms"""
-            NN50 = sum(1 for i in rr_interval_abs if i > 0.05)
-            pNN50 = round((float(NN50) / len(rr_interval_NN) * 100), 4)
+            try:
+                NN50 = sum(1 for i in rr_interval_abs if i > 0.05)
+            except Exception as e:
+                print(e)
+                NN50 = None
+            try:
+                pNN50 = round((float(NN50) / len(rr_interval_NN) * 100), 4)
+            except Exception as e:
+                print(e)
+                pNN50 = None
 
             """Number and percentage of RR interval longer than 20 ms"""
-            NN20 = sum(1 for i in rr_interval_abs if i > 0.02)
-            pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
+            try:
+                NN20 = sum(1 for i in rr_interval_abs if i > 0.02)
+            except Exception as e:
+                print(e)
+                NN20 = None
+            try:
+                pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
+            except Exception as e:
+                print(e)
+                pNN20 = None
 
             time_domain_features = {
                 "AVG RR": statistical_features["AVG"],
@@ -393,6 +470,7 @@ class HRV(Sensor):
             return time_domain_features
         except Exception as e:
             print(e)
+            pass
 
     @staticmethod
     def poincareFeatures(rr_interval_NN):
@@ -402,31 +480,48 @@ class HRV(Sensor):
         :return: dict with Poincare features - non-linear features
         """
 
+        """Standard Deviation of RR interval series"""
         try:
-            """Standard Deviation of RR interval series"""
             STD = round(float(np.std(rr_interval_NN)), 4)
-
-            """Standard Deviation of the successive differences of RR interval series"""
-            SDSD = round(float(np.std(np.diff(rr_interval_NN))), 4)
-
-            """Length of the longitudinal line in Poincaré plot"""
-            SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4)
-
-            """Length of the transverse line in Poincaré plot"""
-            SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4)
-
-            "SD2/SD1"
-            SD_ratio = round(SD2 / SD1, 4)
-
-            poincaré_features = {
-                "SD1": [SD1 * 1000],
-                "SD2": [SD2 * 1000],
-                "SD2/SD1": [SD_ratio],
-            }
-
-            return poincaré_features
         except Exception as e:
             print(e)
+            STD = None
+
+        """Standard Deviation of the successive differences of RR interval series"""
+        try:
+            SDSD = round(float(np.std(np.diff(rr_interval_NN))), 4)
+        except Exception as e:
+            print(e)
+            SDSD = None
+
+        """Length of the longitudinal line in Poincaré plot"""
+        try:
+            SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4) * 1000
+        except Exception as e:
+            print(e)
+            SD2 = None
+
+        """Length of the transverse line in Poincaré plot"""
+        try:
+            SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4) * 1000
+        except Exception as e:
+            print(e)
+            SD1 = None
+
+        "SD2/SD1"
+        try:
+            SD_ratio = round(SD2 / SD1, 4)
+        except Exception as e:
+            print(e)
+            SD_ratio = None
+
+        poincaré_features = {
+            "SD1": [SD1],
+            "SD2": [SD2],
+            "SD2/SD1": [SD_ratio],
+        }
+
+        return poincaré_features
 
     @staticmethod
     def evenlySpaced_RR(rr_interval_NN, time, new_freq):
@@ -456,6 +551,7 @@ class HRV(Sensor):
             return interpolatedRR
         except Exception as e:
             print(e)
+            pass
 
     @staticmethod
     def frequencyAnalysis(
@@ -491,6 +587,7 @@ class HRV(Sensor):
             return freqs, power
         except Exception as e:
             print(e)
+            pass
 
     @staticmethod
     def frequencyFeatures(freq, power):
@@ -505,32 +602,59 @@ class HRV(Sensor):
             """
             Power of each frequency component in the desired range of frequencies
             """
-
-            vlf = round(
-                sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000, 4
-            )
-            lf = round(
-                sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
-            )
-            hf = round(
-                sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
-            )
-            total_power = round(
-                sc.integrate.trapz(
-                    power[total_power_indexes], freq[total_power_indexes]
+            try:
+                vlf = round(
+                    sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000,
+                    4,
                 )
-                * 1000000,
-                4,
-            )
+            except Exception as e:
+                print(e)
+                vlf = None
+            try:
+                lf = round(
+                    sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
+                )
+            except Exception as e:
+                print(e)
+                lf = None
+            try:
+                hf = round(
+                    sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
+                )
+            except Exception as e:
+                print(e)
+                hf = None
+            try:
+                total_power = round(
+                    sc.integrate.trapz(
+                        power[total_power_indexes], freq[total_power_indexes]
+                    )
+                    * 1000000,
+                    4,
+                )
+            except Exception as e:
+                print(e)
+                total_power = None
 
             """
             Frequency components in normalized units (n.u)
             Balance - LF(n.u)/HF(n.u)
             """
-
-            lf_norm = round(lf / (total_power - vlf) * 100, 2)
-            hf_norm = round(hf / (total_power - vlf) * 100, 2)
-            ratio = round(lf_norm / hf_norm, 2)
+            try:
+                lf_norm = round(lf / (total_power - vlf) * 100, 2)
+            except Exception as e:
+                print(e)
+                lf_norm = None
+            try:
+                hf_norm = round(hf / (total_power - vlf) * 100, 2)
+            except Exception as e:
+                print(e)
+                hf_norm = None
+            try:
+                ratio = round(lf_norm / hf_norm, 2)
+            except Exception as e:
+                print(e)
+                ratio = None
 
             frequency_features = {
                 "HRV VLF Power": [vlf],
@@ -545,6 +669,7 @@ class HRV(Sensor):
             return frequency_features
         except Exception as e:
             print(e)
+            pass
 
     def getFeatures(self):
         try:
@@ -567,6 +692,7 @@ class HRV(Sensor):
             )
         except Exception as e:
             print(e)
+            pass
 
 
 """PPG Class"""
@@ -774,6 +900,7 @@ class EEG(Sensor):
             return EEG_ICA
         except Exception as e:
             print(e)
+            pass
 
     @staticmethod
     def filterData(data, fs):
@@ -811,6 +938,7 @@ class EEG(Sensor):
             return bands_power
         except Exception as e:
             print(e)
+            pass
 
     def extractBand(self, band: list):
         try:
@@ -827,6 +955,7 @@ class EEG(Sensor):
             return power_freq
         except Exception as e:
             print(e)
+            pass
 
     def extractAllBands(self):
         try:
@@ -838,6 +967,7 @@ class EEG(Sensor):
             return band_powers
         except Exception as e:
             print(e)
+            pass
 
     # def getFeatures(self):
     #     # self.ICA()
@@ -934,35 +1064,51 @@ class RESP(Sensor):
         self.data = np.array(data).astype(float)
 
     def process_RESP(self):
-        signals, info = nk.rsp_process(self.data, self.fs, method="biosppy")
+        try:
+            signals, info = nk.rsp_process(self.data, self.fs, method="biosppy")
 
-        return signals, info
+            return signals, info
+        except Exception as e:
+            print(e)
+            return signals, info
 
     @staticmethod
     def RESP_RRV(signals):
-        info, peak_signals = nk.rsp_peaks(signals["RSP_Clean"])
+        try:
+            info, peak_signals = nk.rsp_peaks(signals["RSP_Clean"])
 
-        rrv_dataframe = nk.rsp_rrv(
-            signals["RSP_Rate"], troughs=peak_signals["RSP_Troughs"]
-        )
+            rrv_dataframe = nk.rsp_rrv(
+                signals["RSP_Rate"], troughs=peak_signals["RSP_Troughs"]
+            )
 
-        return rrv_dataframe
+            return rrv_dataframe
+        except Exception as e:
+            print(e)
+            pass
 
     def getFeatures(self, signals, rrv_dataframe):
-        rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
-        rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
+        try:
+            rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
+            rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
 
-        rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
-        rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True)
-        rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True)
-        rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"], True)
+            rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
+            rrv_dataframe.insert(
+                0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True
+            )
+            rrv_dataframe.insert(
+                0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True
+            )
+            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"], True)
 
-        rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"], True)
-        rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
-        rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True)
-        rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"], True)
+            rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"], True)
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True)
+            rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"], True)
 
-        return rrv_dataframe
+            return rrv_dataframe
+        except Exception as e:
+            print(e)
+            pass
 
     def maxPeaks(self, peaks):
         return max(peaks)
