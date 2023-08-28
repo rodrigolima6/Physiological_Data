@@ -81,7 +81,7 @@ jupyterlab-launcher @ file:///tmp/build/80754af9/jupyterlab_launcher_16014906702
 jupyterlab-pygments @ file:///tmp/build/80754af9/jupyterlab_pygments_1601490720602/work
 jupyterlab-server @ file:///C:/ci/jupyterlab_server_1650271781334/work
 jupyterlab-widgets @ file:///tmp/build/80754af9/jupyterlab_widgets_1609884341231/work
-kiwisolver==1.4.4
+kiwisolver==1.4.5
 ldap3 @ file:///tmp/build/80754af9/ldap3_1626855370698/work
 libmagic==1.0
 llvmlite==0.40.1
