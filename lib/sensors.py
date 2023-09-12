@@ -58,17 +58,17 @@ class EDA(Sensor):
                 SCR_Amplitude = signals["SCR_Amplitude"]
             except Exception as e:
                 print(e)
-                SCR_Amplitude = None
+                SCR_Amplitude = np.nan
             try:
                 SCR_RiseTime = signals["SCR_RiseTime"]
             except Exception as e:
                 print(e)
-                SCR_RiseTime = None
+                SCR_RiseTime = np.nan
             try:
                 SCR_RecoveryTime = signals["SCR_RecoveryTime"]
             except Exception as e:
                 print(e)
-                SCR_RecoveryTime = None
+                SCR_RecoveryTime = np.nan
 
             return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
         except Exception as e:
@@ -115,21 +115,21 @@ class EDA(Sensor):
                 )
             except Exception as e:
                 print(e)
-                vlf = None
+                vlf = np.nan
             try:
                 lf = round(
                     sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
                 )
             except Exception as e:
                 print(e)
-                lf = None
+                lf = np.nan
             try:
                 hf = round(
                     sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
                 )
             except Exception as e:
                 print(e)
-                hf = None
+                hf = np.nan
             try:
                 total_power = round(
                     sc.integrate.trapz(
@@ -140,7 +140,7 @@ class EDA(Sensor):
                 )
             except Exception as e:
                 print(e)
-                total_power = None
+                total_power = np.nan
 
             """
             Frequency components in normalized units (n.u)
@@ -151,17 +151,17 @@ class EDA(Sensor):
                 lf_norm = round((lf / (total_power - vlf)) * 100, 2)
             except Exception as e:
                 print(e)
-                lf_norm = None
+                lf_norm = np.nan
             try:
                 hf_norm = round((hf / (total_power - vlf)) * 100, 2)
             except Exception as e:
                 print(e)
-                hf_norm = None
+                hf_norm = np.nan
             try:
                 ratio = round(lf_norm / hf_norm, 2)
             except Exception as e:
                 print(e)
-                ratio = None
+                ratio = np.nan
 
             frequency_features = {
                 "VLF Power": [vlf],
@@ -384,7 +384,7 @@ class HRV(Sensor):
             heart_rate = 60.0 / rr_interval_NN
         except Exception as e:
             print(e)
-            heart_rate = None
+            heart_rate = np.nan
 
         return heart_rate
 
@@ -418,7 +418,7 @@ class HRV(Sensor):
                 SDNN = round(np.std(rr_interval_NN) * 1000, 4)
             except Exception as e:
                 print(e)
-                SDNN = None
+                SDNN = np.nan
 
             """Root Mean Square of the Standard deviation"""
             try:
@@ -429,31 +429,31 @@ class HRV(Sensor):
                 )
             except Exception as e:
                 print(e)
-                RMSSD = None
+                RMSSD = np.nan
 
             """Number and percentage of RR interval longer than 50 ms"""
             try:
                 NN50 = sum(1 for i in rr_interval_abs if i > 0.05)
             except Exception as e:
                 print(e)
-                NN50 = None
+                NN50 = np.nan
             try:
                 pNN50 = round((float(NN50) / len(rr_interval_NN) * 100), 4)
             except Exception as e:
                 print(e)
-                pNN50 = None
+                pNN50 = np.nan
 
             """Number and percentage of RR interval longer than 20 ms"""
             try:
                 NN20 = sum(1 for i in rr_interval_abs if i > 0.02)
             except Exception as e:
                 print(e)
-                NN20 = None
+                NN20 = np.nan
             try:
                 pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
             except Exception as e:
                 print(e)
-                pNN20 = None
+                pNN20 = np.nan
 
             time_domain_features = {
                 "AVG RR": statistical_features["AVG"],
@@ -485,35 +485,35 @@ class HRV(Sensor):
             STD = round(float(np.std(rr_interval_NN)), 4)
         except Exception as e:
             print(e)
-            STD = None
+            STD = np.nan
 
         """Standard Deviation of the successive differences of RR interval series"""
         try:
             SDSD = round(float(np.std(np.diff(rr_interval_NN))), 4)
         except Exception as e:
             print(e)
-            SDSD = None
+            SDSD = np.nan
 
         """Length of the longitudinal line in Poincaré plot"""
         try:
             SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4) * 1000
         except Exception as e:
             print(e)
-            SD2 = None
+            SD2 = np.nan
 
         """Length of the transverse line in Poincaré plot"""
         try:
             SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4) * 1000
         except Exception as e:
             print(e)
-            SD1 = None
+            SD1 = np.nan
 
         "SD2/SD1"
         try:
             SD_ratio = round(SD2 / SD1, 4)
         except Exception as e:
             print(e)
-            SD_ratio = None
+            SD_ratio = np.nan
 
         poincaré_features = {
             "SD1": [SD1],
@@ -609,21 +609,21 @@ class HRV(Sensor):
                 )
             except Exception as e:
                 print(e)
-                vlf = None
+                vlf = np.nan
             try:
                 lf = round(
                     sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
                 )
             except Exception as e:
                 print(e)
-                lf = None
+                lf = np.nan
             try:
                 hf = round(
                     sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
                 )
             except Exception as e:
                 print(e)
-                hf = None
+                hf = np.nan
             try:
                 total_power = round(
                     sc.integrate.trapz(
@@ -634,7 +634,7 @@ class HRV(Sensor):
                 )
             except Exception as e:
                 print(e)
-                total_power = None
+                total_power = np.nan
 
             """
             Frequency components in normalized units (n.u)
@@ -644,17 +644,17 @@ class HRV(Sensor):
                 lf_norm = round(lf / (total_power - vlf) * 100, 2)
             except Exception as e:
                 print(e)
-                lf_norm = None
+                lf_norm = np.nan
             try:
                 hf_norm = round(hf / (total_power - vlf) * 100, 2)
             except Exception as e:
                 print(e)
-                hf_norm = None
+                hf_norm = np.nan
             try:
                 ratio = round(lf_norm / hf_norm, 2)
             except Exception as e:
                 print(e)
-                ratio = None
+                ratio = np.nan
 
             frequency_features = {
                 "HRV VLF Power": [vlf],
