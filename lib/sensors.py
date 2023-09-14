@@ -1103,11 +1103,28 @@ class RESP(Sensor):
 
             return rrv_dataframe
         except Exception as e:
-            print(e)
-            pass
+            rrv_dataframe = pd.DataFrame(
+                columns=[
+                    "RRV_RMSSD",
+                    "RRV_MeanBB",
+                    "RRV_SDBB",
+                    "RRV_SDSD",
+                    "RRV_CVBB",
+                    "RRV_CVSD",
+                    "RRV_MedianBB",
+                    "RRV_MadBB",
+                    "RRV_MCVBB",
+                    "RRV_nn20",
+                    "RRV_nn50",
+                    "RRV_pNN50",
+                    "RRV_pNN20",
+                    "RRV_HF",
+                    "RRV_SD1",
+                ]
+            )
+            return rrv_dataframe
 
     def getFeatures(self, signals, rrv_dataframe):
-        rrv_dataframe = pd.DataFrame()
         try:
             rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
         except Exception as e:
@@ -1155,17 +1172,13 @@ class RESP(Sensor):
             rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan, True)
 
         try:
-            rrv_dataframe.insert(
-                0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True
-            )
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
         except Exception as e:
             print(e)
             rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan, True)
 
         try:
-            rrv_dataframe.insert(
-                0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True
-            )
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True)
         except Exception as e:
             print(e)
             rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan, True)
@@ -1177,7 +1190,6 @@ class RESP(Sensor):
             rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan, True)
 
         return rrv_dataframe
-
 
     def maxPeaks(self, peaks):
         return max(peaks)

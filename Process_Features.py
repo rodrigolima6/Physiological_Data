@@ -187,11 +187,19 @@ def Process_RESP(data, fs, resolution):
         print(e)
         pass
 
-    columns_to_remove = ["RRV_VLF", "RRV_LF","RRV_LFHF","RRV_LFn","RRV_HFn","RRV_SD2","RRV_SD2SD1"]
+    columns_to_remove = [
+        "RRV_VLF",
+        "RRV_LF",
+        "RRV_LFHF",
+        "RRV_LFn",
+        "RRV_HFn",
+        "RRV_SD2",
+        "RRV_SD2SD1",
+    ]
 
     for column in columns_to_remove:
         if column in resp_Dataframe.columns:
-            resp_Dataframe = resp_Dataframe.drop(column,axis=1)
+            resp_Dataframe = resp_Dataframe.drop(column, axis=1)
     return resp_Dataframe
 
 
