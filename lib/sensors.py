@@ -922,11 +922,31 @@ class EEG(Sensor):
             theta_indexes = np.where((freqs[:] >= 4) & (freqs[:] < 8))[0]
             delta_indexes = np.where((freqs[:] >= 0.5) & (freqs[:] < 4))[0]
 
-            alpha = sc.integrate.trapz(power[alpha_indexes], x=freqs[alpha_indexes])
-            betha = sc.integrate.trapz(power[betha_indexes], x=freqs[betha_indexes])
-            gamma = sc.integrate.trapz(power[gamma_indexes], x=freqs[gamma_indexes])
-            theta = sc.integrate.trapz(power[theta_indexes], x=freqs[theta_indexes])
-            delta = sc.integrate.trapz(power[delta_indexes], x=freqs[delta_indexes])
+            try:
+                alpha = sc.integrate.trapz(power[alpha_indexes], x=freqs[alpha_indexes])
+            except Exception as e:
+                print(e)
+                alpha = np.nan
+            try:
+                betha = sc.integrate.trapz(power[betha_indexes], x=freqs[betha_indexes])
+            except Exception as e:
+                print(e)
+                betha = np.nan
+            try:
+                gamma = sc.integrate.trapz(power[gamma_indexes], x=freqs[gamma_indexes])
+            except Exception as e:
+                print(e)
+                gamma = np.nan
+            try:
+                theta = sc.integrate.trapz(power[theta_indexes], x=freqs[theta_indexes])
+            except Exception as e:
+                print(e)
+                theta = np.nan
+            try:
+                delta = sc.integrate.trapz(power[delta_indexes], x=freqs[delta_indexes])
+            except Exception as e:
+                print(e)
+                delta = np.nan
 
             bands_power = {
                 "alpha": alpha,
@@ -1091,19 +1111,61 @@ class RESP(Sensor):
             rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
             rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
 
-            rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
-            rrv_dataframe.insert(
-                0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True
-            )
-            rrv_dataframe.insert(
-                0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True
-            )
-            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"], True)
+            try:
+                rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "STD_RSP_Amplitude", np.nan, True)
 
-            rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"], True)
-            rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
-            rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True)
-            rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"], True)
+            try:
+                rrv_dataframe.insert(
+                    0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True
+                )
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", np.nan, True)
+
+            try:
+                rrv_dataframe.insert(
+                    0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True
+                )
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", np.nan, True)
+
+            try:
+                rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"], True)
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "Mean_RSP_Amplitude", np.nan, True)
+
+            try:
+                rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"], True)
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan, True)
+
+            try:
+                rrv_dataframe.insert(
+                    0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True
+                )
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan, True)
+
+            try:
+                rrv_dataframe.insert(
+                    0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True
+                )
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan, True)
+
+            try:
+                rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"], True)
+            except Exception as e:
+                print(e)
+                rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan, True)
 
             return rrv_dataframe
         except Exception as e:
