@@ -180,7 +180,7 @@ def Process_RESP(data, fs, resolution):
     signals, info = sensor.process_RESP()
 
     df = sensor.RESP_RRV(signals)
-    print(df)
+
     try:
         resp_Dataframe = sensor.getFeatures(signals, df)
     except Exception as e:
