@@ -1084,13 +1084,10 @@ class RESP(Sensor):
         self.data = np.array(data).astype(float)
 
     def process_RESP(self):
-        try:
-            signals, info = nk.rsp_process(self.data, self.fs, method="biosppy")
 
-            return signals, info
-        except Exception as e:
-            print(e)
-            return signals, info
+        signals, info = nk.rsp_process(self.data, self.fs, method="biosppy")
+
+        return signals, info
 
     @staticmethod
     def RESP_RRV(signals):
@@ -1125,69 +1122,57 @@ class RESP(Sensor):
             return rrv_dataframe
 
     def getFeatures(self, signals, rrv_dataframe):
-        try:
-            rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
-        except Exception as e:
-            print(e)
-            pass
+
+        rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
+        rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
 
         try:
-            rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
+            rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"])
         except Exception as e:
             print(e)
-            pass
+            rrv_dataframe.insert(0, "STD_RSP_Amplitude", np.nan)
 
         try:
-            rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"], True)
+            rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"])
         except Exception as e:
             print(e)
-            rrv_dataframe.insert(0, "STD_RSP_Amplitude", np.nan, True)
+            rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", np.nan)
 
         try:
-            rrv_dataframe.insert(
-                0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"], True
-            )
+            rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"])
         except Exception as e:
             print(e)
-            rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", np.nan, True)
+            rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", np.nan)
 
         try:
-            rrv_dataframe.insert(
-                0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"], True
-            )
+            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"])
         except Exception as e:
             print(e)
-            rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", np.nan, True)
+            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", np.nan)
 
         try:
-            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"], True)
+            rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"])
         except Exception as e:
             print(e)
-            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", np.nan, True)
+            rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan)
 
         try:
-            rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"], True)
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"])
         except Exception as e:
             print(e)
-            rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan, True)
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan)
 
         try:
-            rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"], True)
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"])
         except Exception as e:
             print(e)
-            rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan, True)
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan)
 
         try:
-            rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"], True)
+            rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"])
         except Exception as e:
             print(e)
-            rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan, True)
-
-        try:
-            rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"], True)
-        except Exception as e:
-            print(e)
-            rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan, True)
+            rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan)
 
         return rrv_dataframe
 

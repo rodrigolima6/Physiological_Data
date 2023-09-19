@@ -181,11 +181,7 @@ def Process_RESP(data, fs, resolution):
 
     df = sensor.RESP_RRV(signals)
 
-    try:
-        resp_Dataframe = sensor.getFeatures(signals, df)
-    except Exception as e:
-        print(e)
-        pass
+    resp_Dataframe = sensor.getFeatures(signals, df)
 
     columns_to_remove = [
         "RRV_VLF",
@@ -242,7 +238,8 @@ def Process_EDA(data, fs, resolution):
     EDA_Dataframe = (pd.DataFrame.from_dict(EDA_dict)).join(
         pd.DataFrame.from_dict(frequency_features)
     )
-    EDA_Dataframe = EDA_Dataframe.drop(["LF/HF"], axis=1)
+    if "LF/HF" in EDA_Dataframe.columns:
+        EDA_Dataframe = EDA_Dataframe.drop(["LF/HF"], axis=1)
 
     return EDA_Dataframe
 
