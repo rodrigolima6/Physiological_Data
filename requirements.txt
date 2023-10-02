@@ -94,7 +94,7 @@ mes2hb==1.0.0
 mistune @ file:///C:/ci/mistune_1594373272338/work
 mne==1.5.1
 moviepy==1.0.3
-msgpack==1.0.6
+msgpack==1.0.7
 msgpack-numpy==0.4.7.1
 nbclassic @ file:///opt/conda/conda-bld/nbclassic_1644943264176/work
 nbclient @ file:///C:/ci/nbclient_1650308542913/work
