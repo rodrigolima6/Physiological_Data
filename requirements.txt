@@ -174,7 +174,7 @@ sounddevice==0.4.6
 SoundFile==0.12.1
 soupsieve @ file:///tmp/build/80754af9/soupsieve_1636706018808/work
 SQLAlchemy @ file:///C:/ci/sqlalchemy_1647600013392/work
-tables==3.8.0
+tables==3.9.1
 terminado @ file:///C:/ci/terminado_1644322782754/work
 testpath @ file:///tmp/build/80754af9/testpath_1624638946665/work
 threadpoolctl==3.2.0
