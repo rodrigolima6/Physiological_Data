@@ -107,7 +107,7 @@ nolds==0.5.2
 notebook @ file:///C:/ci/notebook_1651666865091/work
 numba==0.58.1
 numexpr==2.8.7
-numpy==1.26.0
+numpy==1.26.1
 oauthlib @ file:///opt/conda/conda-bld/oauthlib_1644332107998/work
 openpyxl==3.1.2
 packaging @ file:///tmp/build/80754af9/packaging_1637314298585/work
