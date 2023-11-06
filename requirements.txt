@@ -144,7 +144,7 @@ python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
 python-gitlab==3.15.0
 python-json-logger @ file:///tmp/build/80754af9/python-json-logger_1602614476658/work
 python-magic-bin==0.4.14
-python-vlc==3.0.18122
+python-vlc==3.0.20123
 pytz==2023.3.post1
 PyWavelets==1.4.1
 pywin32==306
