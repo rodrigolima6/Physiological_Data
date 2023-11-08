@@ -343,15 +343,11 @@ class HRV(Sensor):
                  rr_interval_time - RR interval series time axis.
         """
 
-        try:
-            rr_interval, rr_interval_time = bsnb.tachogram(
-                self.data, self.fs, signal=True, out_seconds=True
-            )
+        rr_interval, rr_interval_time = bsnb.tachogram(
+            self.data, self.fs, signal=True, out_seconds=True
+        )
 
-            return rr_interval, rr_interval_time
-        except Exception as e:
-            print(e)
-            pass
+        return rr_interval, rr_interval_time
 
     @staticmethod
     def remove_EctopyBeats(rr_interval, rr_interval_time):
@@ -370,10 +366,13 @@ class HRV(Sensor):
             rr_interval_NN = np.array(rr_interval_NN)
             rr_interval_time_NN = np.array(rr_interval_time_NN)
 
-            return rr_interval_NN, rr_interval_time_NN
         except Exception as e:
+            rr_interval_NN = rr_interval
+            rr_interval_time_NN = rr_interval_time
+            print("Error on Remove EctopyBeats")
             print(e)
-            pass
+
+        return rr_interval_NN, rr_interval_time_NN
 
     def heart_rate(self, rr_interval_NN):
         """
@@ -383,6 +382,7 @@ class HRV(Sensor):
         try:
             heart_rate = 60.0 / rr_interval_NN
         except Exception as e:
+            print("Error on HR")
             print(e)
             heart_rate = np.nan
 
@@ -402,75 +402,77 @@ class HRV(Sensor):
         return hr
 
     def timeDomainFeatures(self, rr_interval_NN):
-        try:
-            statistical_features = self.statistical_Features(rr_interval_NN)
+        statistical_features = self.statistical_Features(rr_interval_NN)
 
-            """
+        """
             :param rr_interval_NN: RR interval series with no ectopic beats
             :return: dict with time-domain features of HRV
             """
 
-            rr_interval_diff = np.diff(rr_interval_NN)
-            rr_interval_abs = np.abs(rr_interval_diff)
+        rr_interval_diff = np.diff(rr_interval_NN)
+        rr_interval_abs = np.abs(rr_interval_diff)
 
-            """Standard deviation of RR interval series with no ectopic beats"""
-            try:
-                SDNN = round(np.std(rr_interval_NN) * 1000, 4)
-            except Exception as e:
-                print(e)
-                SDNN = np.nan
-
-            """Root Mean Square of the Standard deviation"""
-            try:
-                RMSSD = round(
-                    np.sqrt(np.sum((rr_interval_diff) ** 2) / (len(rr_interval_NN) - 1))
-                    * 1000,
-                    4,
-                )
-            except Exception as e:
-                print(e)
-                RMSSD = np.nan
-
-            """Number and percentage of RR interval longer than 50 ms"""
-            try:
-                NN50 = sum(1 for i in rr_interval_abs if i > 0.05)
-            except Exception as e:
-                print(e)
-                NN50 = np.nan
-            try:
-                pNN50 = round((float(NN50) / len(rr_interval_NN) * 100), 4)
-            except Exception as e:
-                print(e)
-                pNN50 = np.nan
-
-            """Number and percentage of RR interval longer than 20 ms"""
-            try:
-                NN20 = sum(1 for i in rr_interval_abs if i > 0.02)
-            except Exception as e:
-                print(e)
-                NN20 = np.nan
-            try:
-                pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
-            except Exception as e:
-                print(e)
-                pNN20 = np.nan
-
-            time_domain_features = {
-                "AVG RR": statistical_features["AVG"],
-                "Minimum RR": statistical_features["Minimum"],
-                "Maximum RR": statistical_features["Maximum"],
-                "SDNN": SDNN,
-                "RMSSD": RMSSD,
-                "NN50": NN50,
-                "pNN50": pNN50,
-                "NN20": NN20,
-                "pNN20": pNN20,
-            }
-
-            return time_domain_features
+        """Standard deviation of RR interval series with no ectopic beats"""
+        try:
+            SDNN = round(np.std(rr_interval_NN) * 1000, 4)
         except Exception as e:
             print(e)
-            pass
+            print("Error HRV SDNN")
+            SDNN = np.nan
+
+        """Root Mean Square of the Standard deviation"""
+        try:
+            RMSSD = round(
+                np.sqrt(np.sum((rr_interval_diff) ** 2) / (len(rr_interval_NN) - 1))
+                * 1000,
+                4,
+            )
+        except Exception as e:
+            print(e)
+            print("Error HRV RMSSD")
+            RMSSD = np.nan
+
+        """Number and percentage of RR interval longer than 50 ms"""
+        try:
+            NN50 = sum(1 for i in rr_interval_abs if i > 0.05)
+        except Exception as e:
+            print(e)
+            print("Error HRV NN50")
+            NN50 = np.nan
+        try:
+            pNN50 = round((float(NN50) / len(rr_interval_NN) * 100), 4)
+        except Exception as e:
+            print(e)
+            print("Error HRV pNN50")
+            pNN50 = np.nan
+
+        """Number and percentage of RR interval longer than 20 ms"""
+        try:
+            NN20 = sum(1 for i in rr_interval_abs if i > 0.02)
+        except Exception as e:
+            print(e)
+            print("Error HRV NN20")
+            NN20 = np.nan
+        try:
+            pNN20 = round((float(NN20) / len(rr_interval_NN) * 100), 4)
+        except Exception as e:
+            print(e)
+            print("Error HRV pNN20")
+            pNN20 = np.nan
+
+        time_domain_features = {
+            "AVG RR": statistical_features["AVG"],
+            "Minimum RR": statistical_features["Minimum"],
+            "Maximum RR": statistical_features["Maximum"],
+            "SDNN": SDNN,
+            "RMSSD": RMSSD,
+            "NN50": NN50,
+            "pNN50": pNN50,
+            "NN20": NN20,
+            "pNN20": pNN20,
+        }
+
+        return time_domain_features
 
     @staticmethod
     def poincareFeatures(rr_interval_NN):
@@ -485,6 +487,7 @@ class HRV(Sensor):
             STD = round(float(np.std(rr_interval_NN)), 4)
         except Exception as e:
             print(e)
+            print("Error HRV STD")
             STD = np.nan
 
         """Standard Deviation of the successive differences of RR interval series"""
@@ -492,6 +495,7 @@ class HRV(Sensor):
             SDSD = round(float(np.std(np.diff(rr_interval_NN))), 4)
         except Exception as e:
             print(e)
+            print("Error HRV SDSD")
             SDSD = np.nan
 
         """Length of the longitudinal line in Poincaré plot"""
@@ -499,6 +503,7 @@ class HRV(Sensor):
             SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4) * 1000
         except Exception as e:
             print(e)
+            print("Error HRV SD2")
             SD2 = np.nan
 
         """Length of the transverse line in Poincaré plot"""
@@ -506,13 +511,18 @@ class HRV(Sensor):
             SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4) * 1000
         except Exception as e:
             print(e)
+            print("Error HRV SD1")
             SD1 = np.nan
 
         "SD2/SD1"
         try:
-            SD_ratio = round(SD2 / SD1, 4)
+            if SD1 == 0:
+                SD_ratio = np.nan
+            else:
+                SD_ratio = round(SD2 / SD1, 4)
         except Exception as e:
             print(e)
+            print("Error HRV SD_ratio")
             SD_ratio = np.nan
 
         poincaré_features = {
@@ -561,12 +571,18 @@ class HRV(Sensor):
         try:
             init_time = int(rr_interval_time_NN[0])
             fin_time = int(rr_interval_time_NN[-1])
-            tck = sc.interpolate.splrep(rr_interval_time_NN, rr_interval_NN)
 
-            nn_time_even = np.linspace(
-                init_time, fin_time, (fin_time - init_time) * interpolation_rate
-            )
-            nn_tachogram_even = sc.interpolate.splev(nn_time_even, tck)
+            try:
+                tck = sc.interpolate.splrep(rr_interval_time_NN, rr_interval_NN)
+
+                nn_time_even = np.linspace(
+                    init_time, fin_time, (fin_time - init_time) * interpolation_rate
+                )
+                nn_tachogram_even = sc.interpolate.splev(nn_time_even, tck)
+            except Exception as e:
+                nn_tachogram_even = rr_interval_NN
+                print(e)
+                pass
 
             freq_axis, power_axis = sc.signal.welch(
                 nn_tachogram_even,
@@ -591,108 +607,107 @@ class HRV(Sensor):
 
     @staticmethod
     def frequencyFeatures(freq, power):
-        try:
-            """
-            Indexes of Frequencies of each component
-            """
-            vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
-            lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
-            hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
-            total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
-            """
+        """
+        Indexes of Frequencies of each component
+        """
+        vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
+        lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
+        hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
+        total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
+        """
             Power of each frequency component in the desired range of frequencies
             """
-            try:
-                vlf = round(
-                    sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000,
-                    4,
+        try:
+            vlf = round(
+                sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000,
+                4,
+            )
+        except Exception as e:
+            print("Error HRV VLF")
+            print(e)
+            vlf = np.nan
+        try:
+            lf = round(
+                sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
+            )
+        except Exception as e:
+            print(e)
+            print("Error HRV LF")
+            lf = np.nan
+        try:
+            hf = round(
+                sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
+            )
+        except Exception as e:
+            print(e)
+            print("Error HRV HF")
+            hf = np.nan
+        try:
+            total_power = round(
+                sc.integrate.trapz(
+                    power[total_power_indexes], freq[total_power_indexes]
                 )
-            except Exception as e:
-                print(e)
-                vlf = np.nan
-            try:
-                lf = round(
-                    sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
-                )
-            except Exception as e:
-                print(e)
-                lf = np.nan
-            try:
-                hf = round(
-                    sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
-                )
-            except Exception as e:
-                print(e)
-                hf = np.nan
-            try:
-                total_power = round(
-                    sc.integrate.trapz(
-                        power[total_power_indexes], freq[total_power_indexes]
-                    )
-                    * 1000000,
-                    4,
-                )
-            except Exception as e:
-                print(e)
-                total_power = np.nan
+                * 1000000,
+                4,
+            )
+        except Exception as e:
+            print(e)
+            print("Error HRV Total Power")
+            total_power = np.nan
 
-            """
+        """
             Frequency components in normalized units (n.u)
             Balance - LF(n.u)/HF(n.u)
             """
-            try:
-                lf_norm = round(lf / (total_power - vlf) * 100, 2)
-            except Exception as e:
-                print(e)
-                lf_norm = np.nan
-            try:
-                hf_norm = round(hf / (total_power - vlf) * 100, 2)
-            except Exception as e:
-                print(e)
-                hf_norm = np.nan
-            try:
-                ratio = round(lf_norm / hf_norm, 2)
-            except Exception as e:
-                print(e)
-                ratio = np.nan
-
-            frequency_features = {
-                "HRV VLF Power": [vlf],
-                "HRV LF Power": [lf],
-                "HRV HF Power": [hf],
-                "HRV Total Power": [total_power],
-                "HRV LF (nu)": [lf_norm],
-                "HRV HF (nu)": [hf_norm],
-                "HRV LF/HF": [ratio],
-            }
-
-            return frequency_features
+        try:
+            lf_norm = round(lf / (total_power - vlf) * 100, 2)
         except Exception as e:
             print(e)
-            pass
+            print("Error HRV LF(nu)")
+            lf_norm = np.nan
+        try:
+            hf_norm = round(hf / (total_power - vlf) * 100, 2)
+        except Exception as e:
+            print(e)
+            print("Error HRV HF(nu)")
+            hf_norm = np.nan
+        try:
+            ratio = round(lf_norm / hf_norm, 2)
+        except Exception as e:
+            print(e)
+            print("Error HRV ratio")
+            ratio = np.nan
+
+        frequency_features = {
+            "HRV VLF Power": [vlf],
+            "HRV LF Power": [lf],
+            "HRV HF Power": [hf],
+            "HRV Total Power": [total_power],
+            "HRV LF (nu)": [lf_norm],
+            "HRV HF (nu)": [hf_norm],
+            "HRV LF/HF": [ratio],
+        }
+
+        return frequency_features
 
     def getFeatures(self):
-        try:
-            rr_interval, rr_interval_time = self.RR_interval()
-            rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(
-                rr_interval, rr_interval_time
-            )
-            heart_rate = self.heart_rate(rr_interval_NN)
-            heart_rate_features = self.heartRate_features(heart_rate)
-            freq, power = self.frequencyAnalysis(rr_interval_time_NN, rr_interval_NN)
-            time_features = self.timeDomainFeatures(rr_interval_NN)
-            poincare_features = self.poincareFeatures(rr_interval_NN)
-            frequency_features = self.frequencyFeatures(freq, power)
+        rr_interval, rr_interval_time = self.RR_interval()
+        rr_interval_NN, rr_interval_time_NN = self.remove_EctopyBeats(
+            rr_interval, rr_interval_time
+        )
+        heart_rate = self.heart_rate(rr_interval_NN)
+        heart_rate_features = self.heartRate_features(heart_rate)
+        freq, power = self.frequencyAnalysis(rr_interval_time_NN, rr_interval_NN)
+        time_features = self.timeDomainFeatures(rr_interval_NN)
+        poincare_features = self.poincareFeatures(rr_interval_NN)
+        frequency_features = self.frequencyFeatures(freq, power)
 
-            return (
-                heart_rate_features,
-                time_features,
-                poincare_features,
-                frequency_features,
-            )
-        except Exception as e:
-            print(e)
-            pass
+        return (
+            heart_rate_features,
+            time_features,
+            poincare_features,
+            frequency_features,
+        )
 
 
 """PPG Class"""

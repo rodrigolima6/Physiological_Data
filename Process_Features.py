@@ -117,10 +117,7 @@ def getDataframe(dataframe, fs, resolution):
     # )
     RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
     EDA_Dataframe = Process_EDA(dataframe["EDA"], fs, resolution)
-    try:
-        Dataframe = (HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)
-    except Exception as e:
-        Dataframe = None
+    Dataframe = (HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)
 
     return Dataframe
 
@@ -147,6 +144,10 @@ def Process_HRV(data, fs, resolution):
         poincare_features,
         frequency_features,
     ) = sensor.getFeatures()
+    print(heart_rate)
+    print(time_features)
+    print(poincare_features)
+    print(frequency_features)
 
     heart_rate_df = pd.DataFrame.from_dict(heart_rate, orient="columns")
     time_features_df = pd.DataFrame.from_dict(time_features, orient="columns")

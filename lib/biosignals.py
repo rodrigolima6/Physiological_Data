@@ -440,21 +440,25 @@ class Sensor:
             maximum = np.nanmax(signal)
         except Exception as e:
             print(e)
+            print("Error on Maximum")
             maximum = np.nan
         try:
             minimum = np.nanmin(signal)
         except Exception as e:
             print(e)
+            print("Error on Minimum")
             minimum = np.nan
         try:
             average = np.nanmean(signal)
         except Exception as e:
             print(e)
+            print("Error on Average")
             average = np.nan
         try:
             std = np.nanstd(signal)
         except Exception as e:
             print(e)
+            print("Error on STD")
             std = np.nan
 
         statistical_features = {
