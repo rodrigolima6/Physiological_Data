@@ -102,7 +102,7 @@ nbconvert @ file:///C:/ci/nbconvert_1649759177374/work
 nbformat @ file:///C:/ci/nbformat_1649845122517/work
 nest-asyncio @ file:///C:/ci/nest-asyncio_1649848126026/work
 neurokit==0.2.0
-neurokit2==0.2.6
+neurokit2==0.2.7
 nolds==0.5.2
 notebook @ file:///C:/ci/notebook_1651666865091/work
 numba==0.58.1
