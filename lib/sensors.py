@@ -57,17 +57,20 @@ class EDA(Sensor):
             try:
                 SCR_Amplitude = signals["SCR_Amplitude"]
             except Exception as e:
+                print("Error SCR Amp")
                 print(e)
                 SCR_Amplitude = np.nan
             try:
                 SCR_RiseTime = signals["SCR_RiseTime"]
             except Exception as e:
                 print(e)
+                print("Error SCR Rise Time")
                 SCR_RiseTime = np.nan
             try:
                 SCR_RecoveryTime = signals["SCR_RecoveryTime"]
             except Exception as e:
                 print(e)
+                print("Error SCR Recovery Time")
                 SCR_RecoveryTime = np.nan
 
             return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
@@ -96,113 +99,112 @@ class EDA(Sensor):
 
     @staticmethod
     def frequencyFeatures(freq, power):
-        try:
-            """
-            Indexes of Frequencies of each component
-            """
-            vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
-            lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
-            hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
-            total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
-            """
+        """
+        Indexes of Frequencies of each component
+        """
+        vlf_indexes = np.where((freq[:] >= 0.0033) & (freq[:] < 0.04))[0]
+        lf_indexes = np.where((freq[:] >= 0.04) & (freq[:] < 0.15))[0]
+        hf_indexes = np.where((freq[:] >= 0.15) & (freq[:] < 0.4))[0]
+        total_power_indexes = np.where((freq[:] >= 0.0033) & (freq[:] <= 0.4))[0]
+        """
             Power of each frequency component in the desired range of frequencies
             """
 
-            try:
-                vlf = round(
-                    sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000,
-                    4,
+        try:
+            vlf = round(
+                sc.integrate.trapz(power[vlf_indexes], freq[vlf_indexes]) * 1000000,
+                4,
+            )
+        except Exception as e:
+            print(e)
+            print("Error EDA VLF")
+            vlf = np.nan
+        try:
+            lf = round(
+                sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
+            )
+        except Exception as e:
+            print(e)
+            print("Error EDA LF")
+            lf = np.nan
+        try:
+            hf = round(
+                sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
+            )
+        except Exception as e:
+            print(e)
+            print("Error EDA HF")
+            hf = np.nan
+        try:
+            total_power = round(
+                sc.integrate.trapz(
+                    power[total_power_indexes], freq[total_power_indexes]
                 )
-            except Exception as e:
-                print(e)
-                vlf = np.nan
-            try:
-                lf = round(
-                    sc.integrate.trapz(power[lf_indexes], freq[lf_indexes]) * 1000000, 4
-                )
-            except Exception as e:
-                print(e)
-                lf = np.nan
-            try:
-                hf = round(
-                    sc.integrate.trapz(power[hf_indexes], freq[hf_indexes]) * 1000000, 4
-                )
-            except Exception as e:
-                print(e)
-                hf = np.nan
-            try:
-                total_power = round(
-                    sc.integrate.trapz(
-                        power[total_power_indexes], freq[total_power_indexes]
-                    )
-                    * 1000000,
-                    4,
-                )
-            except Exception as e:
-                print(e)
-                total_power = np.nan
+                * 1000000,
+                4,
+            )
+        except Exception as e:
+            print(e)
+            print("Error EDA Total Power")
+            total_power = np.nan
 
-            """
+        """
             Frequency components in normalized units (n.u)
             Balance - LF(n.u)/HF(n.u)
             """
 
-            try:
-                lf_norm = round((lf / (total_power - vlf)) * 100, 2)
-            except Exception as e:
-                print(e)
-                lf_norm = np.nan
-            try:
-                hf_norm = round((hf / (total_power - vlf)) * 100, 2)
-            except Exception as e:
-                print(e)
-                hf_norm = np.nan
-            try:
-                ratio = round(lf_norm / hf_norm, 2)
-            except Exception as e:
-                print(e)
-                ratio = np.nan
-
-            frequency_features = {
-                "VLF Power": [vlf],
-                "LF Power": [lf],
-                "HF Power": [hf],
-                "Total Power": [total_power],
-                "LF (nu)": [lf_norm],
-                "HF (nu)": [hf_norm],
-                "LF/HF": [ratio],
-            }
-
-            return frequency_features
+        try:
+            lf_norm = round((lf / (total_power - vlf)) * 100, 2)
         except Exception as e:
             print(e)
-            pass
+            print("Error EDA LF(nu)")
+            lf_norm = np.nan
+        try:
+            hf_norm = round((hf / (total_power - vlf)) * 100, 2)
+        except Exception as e:
+            print(e)
+            print("Error EDA HF(nu)")
+            hf_norm = np.nan
+        try:
+            ratio = round(lf_norm / hf_norm, 2)
+        except Exception as e:
+            print(e)
+            print("Error EDA ratio")
+            ratio = np.nan
+
+        frequency_features = {
+            "VLF Power": [vlf],
+            "LF Power": [lf],
+            "HF Power": [hf],
+            "Total Power": [total_power],
+            "LF (nu)": [lf_norm],
+            "HF (nu)": [hf_norm],
+            "LF/HF": [ratio],
+        }
+
+        return frequency_features
 
     def getFeatures(self):
-        try:
-            eda_filtered = self.filterEDA()
-            eda_phasic, eda_tonic = self.componentsEDA(eda_filtered)
-            SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime = self.featuresSCR(eda_phasic)
-            freqs, power = self.frequencyAnalysis(eda_filtered)
-            frequency_features = self.frequencyFeatures(freqs, power)
+        eda_filtered = self.filterEDA()
+        eda_phasic, eda_tonic = self.componentsEDA(eda_filtered)
+        SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime = self.featuresSCR(eda_phasic)
+        freqs, power = self.frequencyAnalysis(eda_filtered)
+        frequency_features = self.frequencyFeatures(freqs, power)
 
-            eda_phasic_dict = self.statistical_Features(eda_phasic)
-            eda_tonic_dict = self.statistical_Features(eda_tonic)
-            SCR_Amplitude_dict = self.statistical_Features(SCR_Amplitude)
-            SCR_RiseTime_dict = self.statistical_Features(SCR_RiseTime)
-            SCR_RecoveryTime_dict = self.statistical_Features(SCR_RecoveryTime)
+        eda_phasic_dict = self.statistical_Features(eda_phasic)
+        eda_tonic_dict = self.statistical_Features(eda_tonic)
+        SCR_Amplitude_dict = self.statistical_Features(SCR_Amplitude)
+        SCR_RiseTime_dict = self.statistical_Features(SCR_RiseTime)
+        SCR_RecoveryTime_dict = self.statistical_Features(SCR_RecoveryTime)
 
-            return (
-                eda_phasic_dict,
-                eda_tonic_dict,
-                SCR_Amplitude_dict,
-                SCR_RiseTime_dict,
-                SCR_RecoveryTime_dict,
-                frequency_features,
-            )
-        except Exception as e:
-            print(e)
-            pass
+        return (
+            eda_phasic_dict,
+            eda_tonic_dict,
+            SCR_Amplitude_dict,
+            SCR_RiseTime_dict,
+            SCR_RecoveryTime_dict,
+            frequency_features,
+        )
 
 
 """ECG Class"""

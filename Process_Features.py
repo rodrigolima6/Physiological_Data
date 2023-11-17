@@ -144,10 +144,10 @@ def Process_HRV(data, fs, resolution):
         poincare_features,
         frequency_features,
     ) = sensor.getFeatures()
-    print(heart_rate)
-    print(time_features)
-    print(poincare_features)
-    print(frequency_features)
+    # print(heart_rate)
+    # print(time_features)
+    # print(poincare_features)
+    # print(frequency_features)
 
     heart_rate_df = pd.DataFrame.from_dict(heart_rate, orient="columns")
     time_features_df = pd.DataFrame.from_dict(time_features, orient="columns")
