@@ -146,7 +146,7 @@ python-json-logger @ file:///tmp/build/80754af9/python-json-logger_1602614476658
 python-magic-bin==0.4.14
 python-vlc==3.0.20123
 pytz==2023.3.post1
-PyWavelets==1.4.1
+PyWavelets==1.5.0
 pywin32==306
 pyWinhook==1.6.2
 pywinpty @ file:///C:/ci_310/pywinpty_1644230983541/work/target/wheels/pywinpty-2.0.2-cp37-none-win_amd64.whl
