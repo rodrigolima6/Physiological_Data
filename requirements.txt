@@ -92,7 +92,7 @@ matplotlib==3.8.2
 matplotlib-inline @ file:///tmp/build/80754af9/matplotlib-inline_1628242447089/work
 mes2hb==1.0.0
 mistune @ file:///C:/ci/mistune_1594373272338/work
-mne==1.5.1
+mne==1.6.0
 moviepy==1.0.3
 msgpack==1.0.7
 msgpack-numpy==0.4.7.1
