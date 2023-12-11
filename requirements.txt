@@ -48,7 +48,7 @@ glfw==2.6.4
 greenlet @ file:///C:/ci/greenlet_1628888257991/work
 h5py==3.10.0
 idna @ file:///tmp/build/80754af9/idna_1637925883363/work
-imageio==2.33.0
+imageio==2.33.1
 imageio-ffmpeg==0.4.9
 import-ipynb==0.1.4
 importlib-metadata @ file:///C:/ci/importlib-metadata_1648562631189/work
