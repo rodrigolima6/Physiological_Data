@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 try:
@@ -13,7 +15,6 @@ from scipy import integrate
 from biosppy.signals.eda import *
 import novainstrumentation as ni
 import pandas as pd
-
 
 try:
     from lib.tools import *
@@ -167,6 +168,9 @@ class EDA(Sensor):
             hf_norm = np.nan
         try:
             ratio = round(lf_norm / hf_norm, 2)
+
+            if math.isinf(ratio):
+                ratio = np.nan
         except Exception as e:
             print(e)
             print("Error EDA ratio")
@@ -364,8 +368,12 @@ class HRV(Sensor):
             rr_interval_NN, rr_interval_time_NN = bsnb.remove_ectopy(
                 rr_interval, rr_interval_time
             )
-
+            if len(rr_interval_NN) > 0:
+                rr_interval_NN.pop(0)
+            if len(rr_interval_time_NN):
+                rr_interval_time_NN.pop(0)
             rr_interval_NN = np.array(rr_interval_NN)
+            # print(rr_interval_NN)
             rr_interval_time_NN = np.array(rr_interval_time_NN)
 
         except Exception as e:
@@ -400,6 +408,8 @@ class HRV(Sensor):
             "Max HR": statistical_features["Maximum"],
             "SD": statistical_features["STD"],
         }
+
+        # print(hr)
 
         return hr
 
@@ -473,6 +483,7 @@ class HRV(Sensor):
             "NN20": NN20,
             "pNN20": pNN20,
         }
+        # print(time_domain_features)
 
         return time_domain_features
 
@@ -518,10 +529,11 @@ class HRV(Sensor):
 
         "SD2/SD1"
         try:
-            if SD1 == 0:
+            SD_ratio = round(SD2 / SD1, 4)
+
+            if math.isinf(SD_ratio):
                 SD_ratio = np.nan
-            else:
-                SD_ratio = round(SD2 / SD1, 4)
+
         except Exception as e:
             print(e)
             print("Error HRV SD_ratio")
@@ -569,10 +581,13 @@ class HRV(Sensor):
     def frequencyAnalysis(
         rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
     ):
-
         try:
-            init_time = int(rr_interval_time_NN[0])
-            fin_time = int(rr_interval_time_NN[-1])
+            try:
+                init_time = int(rr_interval_time_NN[0])
+                fin_time = int(rr_interval_time_NN[-1])
+            except Exception as e:
+                print(e)
+                pass
 
             try:
                 tck = sc.interpolate.splrep(rr_interval_time_NN, rr_interval_NN)
@@ -586,25 +601,37 @@ class HRV(Sensor):
                 print(e)
                 pass
 
-            freq_axis, power_axis = sc.signal.welch(
-                nn_tachogram_even,
-                interpolation_rate,
-                window=sc.signal.get_window(window, min(len(nn_tachogram_even), 1000)),
-                nperseg=min(len(nn_tachogram_even), 1000),
-            )
+            try:
+                freq_axis, power_axis = sc.signal.welch(
+                    nn_tachogram_even,
+                    interpolation_rate,
+                    window=sc.signal.get_window(
+                        window, min(len(nn_tachogram_even), 1000)
+                    ),
+                    nperseg=min(len(nn_tachogram_even), 1000),
+                )
+            except Exception as e:
+                print(e)
+                pass
 
-            freqs = np.array([round(val, 3) for val in freq_axis if val < 0.5])
-            power = np.array(
-                [
-                    round(val, 4)
-                    for val, freq in zip(power_axis, freq_axis)
-                    if freq < 0.5
-                ]
-            )
+            try:
+                freqs = np.array([round(val, 3) for val in freq_axis if val < 0.5])
+                power = np.array(
+                    [
+                        round(val, 4)
+                        for val, freq in zip(power_axis, freq_axis)
+                        if freq < 0.5
+                    ]
+                )
+            except Exception as e:
+                print(e)
+                pass
 
             return freqs, power
+
         except Exception as e:
             print(e)
+            print("Error on Frequency Analysis")
             pass
 
     @staticmethod
@@ -675,6 +702,9 @@ class HRV(Sensor):
             hf_norm = np.nan
         try:
             ratio = round(lf_norm / hf_norm, 2)
+
+            if math.isinf(ratio):
+                ratio = np.nan
         except Exception as e:
             print(e)
             print("Error HRV ratio")
