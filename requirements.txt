@@ -135,7 +135,7 @@ requests-toolbelt @ file:///Users/ktietz/demo/mc3/conda-bld/requests-toolbelt_16
 rsa @ file:///tmp/build/80754af9/rsa_1596998415516/work
 scikit-learn @ file:///C:/b/abs_eezai1guz5/croot/scikit-learn_1667587552067/work
 scipy==1.9.3
-seaborn==0.12.2
+seaborn==0.13.1
 Send2Trash @ file:///tmp/build/80754af9/send2trash_1632406701022/work
 shortuuid==1.0.9
 six @ file:///tmp/build/80754af9/six_1644875935023/work
