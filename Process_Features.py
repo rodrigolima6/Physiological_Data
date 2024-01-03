@@ -111,10 +111,6 @@ def Load_Data(
 
 def getDataframe(dataframe, fs, resolution):
     HRV_Dataframe = Process_HRV(dataframe["ECG"], fs, resolution)
-    # Temp_Dataframe = Process_TEMP(dataframe["TEMP"], fs, resolution)
-    # fNIRS_Dataframe = Process_fNIRS(
-    #     np.vstack((dataframe["fNIRS_RED"], dataframe["fNIRS_IRED"])).T, fs, resolution
-    # )
     RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
     EDA_Dataframe = Process_EDA(dataframe["EDA"], fs, resolution)
     Dataframe = (HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)
