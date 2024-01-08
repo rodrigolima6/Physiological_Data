@@ -25,7 +25,7 @@ charset-normalizer @ file:///tmp/build/80754af9/charset-normalizer_1630003229654
 click==8.1.3
 cmarkgfm @ file:///C:/ci_310/cmarkgfm_1642108802684/work
 colorama==0.4.5
-configobj==5.0.6
+configobj==5.0.8
 cryptography @ file:///C:/ci/cryptography_1652101729823/work
 cycler==0.11.0
 DateTime==4.7
