@@ -130,7 +130,7 @@ QtPy==2.4.1
 readme-renderer @ file:///C:/ci_310/readme_renderer_1642120771396/work
 regex==2023.12.25
 requests @ file:///C:/ci/requests_1657735340829/work
-requests-oauthlib==1.3.0
+requests-oauthlib==1.3.1
 requests-toolbelt @ file:///Users/ktietz/demo/mc3/conda-bld/requests-toolbelt_1629456163440/work
 rsa @ file:///tmp/build/80754af9/rsa_1596998415516/work
 scikit-learn @ file:///C:/b/abs_eezai1guz5/croot/scikit-learn_1667587552067/work
