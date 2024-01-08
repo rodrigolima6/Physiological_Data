@@ -56,7 +56,7 @@ jupyter-console==6.4.4
 jupyter-server @ file:///C:/Windows/TEMP/abs_d3c42c59-765d-4f9b-9fa3-ad5b1369485611i_yual/croots/recipe/jupyter_server_1658754493238/work
 jupyter_client @ file:///C:/b/abs_8fbm7986b_/croots/recipe/jupyter_client_1662504374117/work
 jupyter_core @ file:///C:/b/abs_bd7elvu3w2/croot/jupyter_core_1676538600510/work
-jupyterlab-pygments==0.2.2
+jupyterlab-pygments==0.3.0
 jupyterlab-widgets==1.1.1
 kiwisolver==1.4.4
 libmagic==1.0
