@@ -120,7 +120,7 @@ python-dateutil @ file:///tmp/build/80754af9/python-dateutil_1626374649649/work
 python-magic-bin==0.4.14
 pytz @ file:///C:/Windows/TEMP/abs_90eacd4e-8eff-491e-b26e-f707eba2cbe1ujvbhqz1/croots/recipe/pytz_1654762631027/work
 PyWavelets @ file:///C:/b/abs_a8r4b1511a/croot/pywavelets_1670425185881/work
-pywin32==304
+pywin32==306
 pywinpty==2.0.6
 pyxdf==1.16.4
 PyYAML==6.0.1
