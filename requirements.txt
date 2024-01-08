@@ -27,7 +27,7 @@ cmarkgfm @ file:///C:/ci_310/cmarkgfm_1642108802684/work
 colorama==0.4.5
 configobj==5.0.8
 cryptography @ file:///C:/ci/cryptography_1652101729823/work
-cycler==0.11.0
+cycler==0.12.1
 DateTime==4.7
 debugpy==1.8.0
 decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
