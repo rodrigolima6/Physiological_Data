@@ -87,7 +87,7 @@ pandas==1.4.3
 pandocfilters @ file:///opt/conda/conda-bld/pandocfilters_1643405455980/work
 parso==0.8.3
 pathlib @ file:///Users/ktietz/demo/mc3/conda-bld/pathlib_1629713961906/work
-pathspec==0.9.0
+pathspec==0.12.1
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
 Pillow==10.2.0
 pkginfo @ file:///tmp/build/80754af9/pkginfo_1643162084911/work
