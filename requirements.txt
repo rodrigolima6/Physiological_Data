@@ -151,7 +151,7 @@ sphinxcontrib-qthelp @ file:///home/ktietz/src/ci/sphinxcontrib-qthelp_161192105
 sphinxcontrib-serializinghtml @ file:///tmp/build/80754af9/sphinxcontrib-serializinghtml_1624451540180/work
 stack-data==0.3.0
 suds-jurko==0.6
-tenacity==8.1.0
+tenacity==8.2.3
 terminado==0.15.0
 threadpoolctl==3.1.0
 tinycss2 @ file:///C:/b/abs_52w5vfuaax/croot/tinycss2_1668168823131/work
