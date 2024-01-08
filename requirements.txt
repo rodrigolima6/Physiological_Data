@@ -93,7 +93,7 @@ Pillow==10.2.0
 pkginfo @ file:///tmp/build/80754af9/pkginfo_1643162084911/work
 platformdirs @ file:///C:/b/abs_73cc5cz_1u/croots/recipe/platformdirs_1662711386458/work
 plotly==5.18.0
-prometheus-client==0.15.0
+prometheus-client==0.19.0
 prompt-toolkit==3.0.30
 psutil==5.9.7
 pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
