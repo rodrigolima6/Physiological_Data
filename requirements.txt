@@ -123,7 +123,7 @@ PyWavelets @ file:///C:/b/abs_a8r4b1511a/croot/pywavelets_1670425185881/work
 pywin32==304
 pywinpty==2.0.6
 pyxdf==1.16.3
-PyYAML==6.0
+PyYAML==6.0.1
 pyzmq @ file:///C:/ci/pyzmq_1657616000714/work
 qtconsole==5.3.1
 QtPy==2.4.1
