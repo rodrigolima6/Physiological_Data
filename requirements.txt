@@ -75,7 +75,7 @@ nbclient==0.9.0
 nbconvert==7.2.5
 nbformat @ file:///C:/b/abs_1dw90o2uqb/croots/recipe/nbformat_1663744957967/work
 nest-asyncio @ file:///C:/ci/nest-asyncio_1649848132512/work
-neurokit2==0.2.0
+neurokit2==0.2.7
 notebook @ file:///C:/b/abs_ca13hqvuzw/croot/notebook_1668179888546/work
 notebook_shim @ file:///C:/b/abs_ebfczttg6x/croot/notebook-shim_1668160590914/work
 numba==0.58.1
