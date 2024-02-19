@@ -13,7 +13,7 @@ beautifulsoup4 @ file:///C:/ci/beautifulsoup4_1650293028159/work
 bidict==0.22.1
 biosignalsnotebooks==0.6.13
 biosppy==2.1.2
-black==24.1.1
+black==24.2.0
 bleach==6.1.0
 blinker==1.7.0
 bokeh==3.3.4
