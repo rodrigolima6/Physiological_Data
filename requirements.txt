@@ -137,7 +137,7 @@ scikit-learn @ file:///C:/b/abs_eezai1guz5/croot/scikit-learn_1667587552067/work
 scipy==1.12.0
 seaborn==0.13.2
 Send2Trash @ file:///tmp/build/80754af9/send2trash_1632406701022/work
-shortuuid==1.0.11
+shortuuid==1.0.12
 six @ file:///tmp/build/80754af9/six_1644875935023/work
 sniffio @ file:///C:/ci_310/sniffio_1642092172680/work
 snowballstemmer @ file:///tmp/build/80754af9/snowballstemmer_1637937080595/work
