@@ -153,7 +153,7 @@ stack-data==0.6.3
 suds-jurko==0.6
 tenacity==8.2.3
 terminado==0.18.1
-threadpoolctl==3.3.0
+threadpoolctl==3.4.0
 tinycss2 @ file:///C:/b/abs_52w5vfuaax/croot/tinycss2_1668168823131/work
 tk==0.1.0
 toml==0.10.2
