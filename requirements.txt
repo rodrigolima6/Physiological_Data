@@ -99,7 +99,7 @@ psutil==5.9.8
 pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
 py @ file:///opt/conda/conda-bld/py_1644396412707/work
 pyasn1 @ file:///Users/ktietz/demo/mc3/conda-bld/pyasn1_1629708007385/work
-pyasn1-modules==0.3.0
+pyasn1-modules==0.4.0
 pycodestyle @ file:///tmp/build/80754af9/pycodestyle_1636635402688/work
 pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
 pycurl==7.45.3
