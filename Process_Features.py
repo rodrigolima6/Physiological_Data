@@ -9,9 +9,7 @@ import pyxdf
 def getEvents(
     users,
     openSignals_stream_name: str,
-    EEG_stream_name: str,
     markers_stream_name: str,
-    ratings_stream_name,
     sensors: list,
 ):
 
@@ -20,34 +18,22 @@ def getEvents(
         data[user.split(".")[0]] = Load_Data(
             users[user],
             openSignals_stream_name,
-            EEG_stream_name,
             markers_stream_name,
-            ratings_stream_name,
             sensors,
         )
-    # for user in data.keys():
-    #     if "baseline" in data[user]["Markers"][0]:
-    #         data[user]["Markers"][0][1] = "0"
 
-    onset, offset, videos, valence, arousal = ({}, {}, {}, {}, {})
+    onset, offset, videos = ({}, {}, {})
     for user in data.keys():
-        valence[user] = data[user]["Valence"]
-        arousal[user] = data[user]["Arousal"]
         onset[user], offset[user], videos[user] = getMarkers(
             data[user]["Markers"], data[user]["Markers Timestamps"]
         )
 
     onset_index = {}
     offset_index = {}
-    onset_index_EEG = {}
-    offset_index_EEG = {}
 
     for user in data.keys():
         onset_index[user], offset_index[user] = getMarkersIndex(
             onset[user], offset[user], data[user]["Signals"]["Time"]
-        )
-        onset_index_EEG[user], offset_index_EEG[user] = getMarkersIndex(
-            onset[user], offset[user], np.array(data[user]["EEG"]["Time"])
         )
 
     events_diff = {}
@@ -62,11 +48,7 @@ def getEvents(
         offset,
         onset_index,
         offset_index,
-        onset_index_EEG,
-        offset_index_EEG,
         data,
-        valence,
-        arousal,
     )
 
 
@@ -79,33 +61,23 @@ def Run_files(fname):
 def Load_Data(
     data,
     openSignals_stream_name: str,
-    EEG_stream_name: str,
     markers_stream_name: str,
-    ratings_stream_name: str,
     sensors: list,
 ):
-    Signals, EEG_Signals = pd.DataFrame(), pd.DataFrame()
+    Signals = pd.DataFrame()
 
     marker, timestamps = Load_PsychopyMarkers(data, markers_stream_name)
-    valence, arousal = Load_Ratings(data, ratings_stream_name)
     opensignals_data, fs = Load_Opensignals(data, openSignals_stream_name)
-    EEG_data, time_EEG, EEG_fs = Load_EEG(data, EEG_stream_name)
 
     if len(opensignals_data.keys()) > 0:
         Signals = pd.DataFrame(data=opensignals_data)
         sensors.insert(0, "Time")
         Signals.columns = sensors
-    if len(EEG_data.keys()) > 0:
-        EEG_Signals = pd.DataFrame.from_dict(EEG_data)
-        EEG_Signals.insert(0, "Time", time_EEG)
 
     return {
         "Signals": Signals,
-        "EEG": EEG_Signals,
         "Markers": marker,
         "Markers Timestamps": timestamps,
-        "Valence": valence,
-        "Arousal": arousal,
     }
 
 
