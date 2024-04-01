@@ -176,9 +176,9 @@ def Process_RESP(data, fs, resolution):
 
     signals, info = sensor.process_RESP()
 
-    df = sensor.RESP_RRV(signals)
+    # df = sensor.RESP_RRV(signals)
 
-    resp_Dataframe = sensor.getFeatures(signals, df)
+    resp_Dataframe = sensor.getFeatures(signals)  # , df)
 
     columns_to_remove = [
         "RRV_VLF",
@@ -193,6 +193,7 @@ def Process_RESP(data, fs, resolution):
     for column in columns_to_remove:
         if column in resp_Dataframe.columns:
             resp_Dataframe = resp_Dataframe.drop(column, axis=1)
+
     return resp_Dataframe
 
 
