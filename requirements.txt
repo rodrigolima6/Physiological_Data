@@ -171,4 +171,4 @@ wget==3.2
 widgetsnbextension==4.0.10
 win-inet-pton @ file:///C:/ci_310/win_inet_pton_1642658466512/work
 wincertstore==0.2
-zope.interface==6.2
+zope.interface==6.3
