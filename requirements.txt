@@ -122,7 +122,7 @@ pytz @ file:///C:/Windows/TEMP/abs_90eacd4e-8eff-491e-b26e-f707eba2cbe1ujvbhqz1/
 PyWavelets @ file:///C:/b/abs_a8r4b1511a/croot/pywavelets_1670425185881/work
 pywin32==306
 pywinpty==2.0.13
-pyxdf==1.16.5
+pyxdf==1.16.6
 PyYAML==6.0.1
 pyzmq @ file:///C:/ci/pyzmq_1657616000714/work
 qtconsole==5.5.1
