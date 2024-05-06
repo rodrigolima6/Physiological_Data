@@ -72,7 +72,7 @@ mkl-service==2.4.1
 mypy-extensions==1.0.0
 nbclassic @ file:///C:/b/abs_26e3fkk516/croot/nbclassic_1668174974037/work
 nbclient==0.10.0
-nbconvert==7.16.3
+nbconvert==7.16.4
 nbformat @ file:///C:/b/abs_1dw90o2uqb/croots/recipe/nbformat_1663744957967/work
 nest-asyncio @ file:///C:/ci/nest-asyncio_1649848132512/work
 neurokit2==0.2.7
