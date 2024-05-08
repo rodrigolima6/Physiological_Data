@@ -48,7 +48,7 @@ ipython @ file:///C:/b/abs_536xsn7rj0/croot/ipython_1670919360443/work
 ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/work
 ipywidgets==8.1.2
 jedi==0.19.1
-Jinja2==3.1.3
+Jinja2==3.1.4
 joblib==1.4.2
 jsonschema @ file:///C:/b/abs_59eyhnbyej/croots/recipe/jsonschema_1663375476535/work
 jupyter==1.0.0
