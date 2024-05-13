@@ -128,7 +128,7 @@ pyzmq @ file:///C:/ci/pyzmq_1657616000714/work
 qtconsole==5.5.2
 QtPy==2.4.1
 readme-renderer @ file:///C:/ci_310/readme_renderer_1642120771396/work
-regex==2024.4.28
+regex==2024.5.10
 requests @ file:///C:/ci/requests_1657735340829/work
 requests-oauthlib==2.0.0
 requests-toolbelt @ file:///Users/ktietz/demo/mc3/conda-bld/requests-toolbelt_1629456163440/work
