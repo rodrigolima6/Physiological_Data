@@ -162,7 +162,7 @@ tornado @ file:///C:/ci/tornado_1662476985533/work
 tqdm @ file:///C:/ci/tqdm_1650618044857/work
 traitlets @ file:///C:/b/abs_e5m_xjjl94/croot/traitlets_1671143896266/work
 twine==5.1.0
-typing_extensions==4.11.0
+typing_extensions==4.12.0
 urllib3 @ file:///C:/Windows/TEMP/abs_65ynz4fdmi/croots/recipe/urllib3_1659110473919/work
 wcwidth @ file:///Users/ktietz/demo/mc3/conda-bld/wcwidth_1629357192024/work
 webencodings==0.5.1
