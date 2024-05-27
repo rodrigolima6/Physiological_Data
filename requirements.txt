@@ -6,7 +6,7 @@ argon2-cffi-bindings @ file:///C:/ci/argon2-cffi-bindings_1644569876605/work
 asttokens @ file:///opt/conda/conda-bld/asttokens_1646925590279/work
 atomicwrites @ file:///Users/ktietz/demo/mc3/conda-bld/atomicwrites_1630511751522/work
 attrs==23.2.0
-autopep8==2.1.0
+autopep8==2.1.1
 Babel @ file:///tmp/build/80754af9/babel_1620871417480/work
 backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
 beautifulsoup4 @ file:///C:/ci/beautifulsoup4_1650293028159/work
