@@ -168,7 +168,7 @@ wcwidth @ file:///Users/ktietz/demo/mc3/conda-bld/wcwidth_1629357192024/work
 webencodings==0.5.1
 websocket-client @ file:///C:/ci_310/websocket-client_1642093970919/work
 wget==3.2
-widgetsnbextension==4.0.10
+widgetsnbextension==4.0.11
 win-inet-pton @ file:///C:/ci_310/win_inet_pton_1642658466512/work
 wincertstore==0.2
 zope.interface==6.4.post2
