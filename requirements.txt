@@ -109,7 +109,7 @@ pylsl==1.16.2
 pyOpenSSL @ file:///opt/conda/conda-bld/pyopenssl_1643788558760/work
 pyparsing==3.1.2
 PyQt5==5.15.10
-PyQt5-Qt5==5.15.13
+PyQt5-Qt5==5.15.14
 PyQt5-sip==12.13.0
 pyqtgraph @ file:///C:/Windows/TEMP/abs_e3uugnjl26/croots/recipe/pyqtgraph_1659341135432/work
 pyrsistent==0.20.0
