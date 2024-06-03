@@ -46,7 +46,7 @@ imagesize @ file:///C:/Windows/TEMP/abs_3cecd249-3fc4-4bfc-b80b-bb227b0d701en12v
 ipykernel @ file:///C:/b/abs_21ykzkm7y_/croots/recipe/ipykernel_1662361803478/work
 ipython @ file:///C:/b/abs_536xsn7rj0/croot/ipython_1670919360443/work
 ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/work
-ipywidgets==8.1.2
+ipywidgets==8.1.3
 jedi==0.19.1
 Jinja2==3.1.4
 joblib==1.4.2
