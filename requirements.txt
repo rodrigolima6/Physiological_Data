@@ -82,7 +82,7 @@ numba==0.59.1
 numpy @ file:///C:/b/abs_53f_dbvhzc/croot/numpy_and_numpy_base_1665773185489/work
 oauthlib==3.2.2
 opencv-python==4.9.0.80
-packaging==24.0
+packaging==24.1
 pandas==2.2.2
 pandocfilters @ file:///opt/conda/conda-bld/pandocfilters_1643405455980/work
 parso==0.8.4
