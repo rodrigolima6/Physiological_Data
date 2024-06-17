@@ -60,7 +60,7 @@ jupyterlab-pygments==0.3.0
 jupyterlab-widgets==3.0.11
 kiwisolver==1.4.5
 libmagic==1.0
-llvmlite==0.42.0
+llvmlite==0.43.0
 lxml @ file:///C:/ci/lxml_1657527492694/work
 MarkupSafe @ file:///C:/ci/markupsafe_1654508036328/work
 matplotlib==3.9.0
