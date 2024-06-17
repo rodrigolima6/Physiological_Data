@@ -94,7 +94,7 @@ pkginfo @ file:///tmp/build/80754af9/pkginfo_1643162084911/work
 platformdirs @ file:///C:/b/abs_73cc5cz_1u/croots/recipe/platformdirs_1662711386458/work
 plotly==5.22.0
 prometheus-client==0.20.0
-prompt-toolkit==3.0.46
+prompt-toolkit==3.0.47
 psutil==5.9.8
 pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
 py @ file:///opt/conda/conda-bld/py_1644396412707/work
