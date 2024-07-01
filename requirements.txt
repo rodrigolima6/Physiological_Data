@@ -134,7 +134,7 @@ requests-oauthlib==2.0.0
 requests-toolbelt @ file:///Users/ktietz/demo/mc3/conda-bld/requests-toolbelt_1629456163440/work
 rsa @ file:///tmp/build/80754af9/rsa_1596998415516/work
 scikit-learn @ file:///C:/b/abs_eezai1guz5/croot/scikit-learn_1667587552067/work
-scipy==1.13.1
+scipy==1.14.0
 seaborn==0.13.2
 Send2Trash @ file:///tmp/build/80754af9/send2trash_1632406701022/work
 shortuuid==1.0.13
