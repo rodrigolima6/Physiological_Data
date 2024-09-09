@@ -58,7 +58,7 @@ jupyter_client @ file:///C:/b/abs_8fbm7986b_/croots/recipe/jupyter_client_166250
 jupyter_core @ file:///C:/b/abs_bd7elvu3w2/croot/jupyter_core_1676538600510/work
 jupyterlab-pygments==0.3.0
 jupyterlab-widgets==3.0.13
-kiwisolver==1.4.5
+kiwisolver==1.4.7
 libmagic==1.0
 llvmlite==0.43.0
 lxml @ file:///C:/ci/lxml_1657527492694/work
