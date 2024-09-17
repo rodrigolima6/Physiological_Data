@@ -7,12 +7,11 @@ import pyxdf
 
 
 def getEvents(
-    users,
-    openSignals_stream_name: str,
-    markers_stream_name: str,
-    sensors: list,
+        users,
+        openSignals_stream_name: str,
+        markers_stream_name: str,
+        sensors: list,
 ):
-
     data = {}
     for user in users.keys():
         data[user.split(".")[0]] = Load_Data(
@@ -59,10 +58,10 @@ def Run_files(fname):
 
 
 def Load_Data(
-    data,
-    openSignals_stream_name: str,
-    markers_stream_name: str,
-    sensors: list,
+        data,
+        openSignals_stream_name: str,
+        markers_stream_name: str,
+        sensors: list,
 ):
     Signals = pd.DataFrame()
 
@@ -91,7 +90,6 @@ def getDataframe(dataframe, fs, resolution):
 
 
 def Process_ECG(data, fs, resolution):
-
     sensor = ECG(data, fs, resolution)
     ecg = np.array(sensor.data)
     fs = sensor.fs
@@ -143,14 +141,13 @@ def Process_HRV(data, fs, resolution):
 
 
 def Process_RESP(data, fs, resolution):
-
     sensor = RESP(data, fs, resolution)
 
     signals, info = sensor.process_RESP()
 
-    # df = sensor.RESP_RRV(signals)
+    df = sensor.RESP_RRV(signals)
 
-    resp_Dataframe = sensor.getFeatures(signals)  # , df)
+    resp_Dataframe = sensor.getFeatures(signals, df)
 
     columns_to_remove = [
         "RRV_VLF",
@@ -160,6 +157,15 @@ def Process_RESP(data, fs, resolution):
         "RRV_HFn",
         "RRV_SD2",
         "RRV_SD2SD1",
+        "RRV_DFA_alpha2",
+        "RRV_MFDFA_alpha2_Width",
+        "RRV_MFDFA_alpha2_Peak",
+        "RRV_MFDFA_alpha2_Mean",
+        "RRV_MFDFA_alpha2_Max",
+        "RRV_MFDFA_alpha2_Delta",
+        "RRV_MFDFA_alpha2_Asymmetry",
+        "RRV_MFDFA_alpha2_Fluctuation",
+        "RRV_MFDFA_alpha2_Increment",
     ]
 
     for column in columns_to_remove:
@@ -170,7 +176,6 @@ def Process_RESP(data, fs, resolution):
 
 
 def Process_EDA(data, fs, resolution):
-
     sensor = EDA(data, fs, resolution)
 
     (
@@ -230,7 +235,6 @@ def Process_EEG(data, fs, resolution):
     bands_df = pd.DataFrame.from_dict(band_powers, orient="index")
 
     return bands_df
-
 
 # def Process_TEMP(data, fs, resolution):
 #     sensor = TEMP(data, fs, resolution)
