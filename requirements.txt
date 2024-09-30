@@ -37,7 +37,7 @@ docutils @ file:///C:/Windows/Temp/abs_b6cq4adtko/croots/recipe/docutils_1659506
 entrypoints @ file:///C:/ci/entrypoints_1649926676279/work
 executing==2.1.0
 fastjsonschema @ file:///C:/Users/BUILDE~1/AppData/Local/Temp/abs_ebruxzvd08/croots/recipe/python-fastjsonschema_1661376484940/work
-fonttools==4.53.1
+fonttools==4.54.1
 fsspec @ file:///C:/b/abs_07xig1rkra/croot/fsspec_1679418812895/work
 future @ file:///C:/ci_310/future_1642081234309/work
 h5py==3.11.0
