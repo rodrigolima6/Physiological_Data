@@ -157,7 +157,7 @@ threadpoolctl==3.5.0
 tinycss2 @ file:///C:/b/abs_52w5vfuaax/croot/tinycss2_1668168823131/work
 tk==0.1.0
 toml==0.10.2
-tomli==2.0.1
+tomli==2.0.2
 tornado @ file:///C:/ci/tornado_1662476985533/work
 tqdm @ file:///C:/ci/tqdm_1650618044857/work
 traitlets @ file:///C:/b/abs_e5m_xjjl94/croot/traitlets_1671143896266/work
