@@ -29,6 +29,7 @@ def getMarkersIndex(onset, offset, time_Opensignals):
         onset_index.append(np.where(time_Opensignals >= onset[i])[0][0])
         offset_index.append(np.where(time_Opensignals <= offset[i])[0][-1])
 
+
     return onset_index, offset_index
 
 
