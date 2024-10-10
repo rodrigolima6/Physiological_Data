@@ -229,7 +229,7 @@ class ECG(Sensor):
         VCC = 3000
         gain = 1000
         signal_volts = (
-            ((np.array(self.data) / 2 ** self.resolution) - 1 / 2) * VCC / gain
+                ((np.array(self.data) / 2 ** self.resolution) - 1 / 2) * VCC / gain
         )
         signal_mv = signal_volts * 1000
 
@@ -286,11 +286,12 @@ class ECG(Sensor):
         integrated_signal = np.zeros_like(signal)
         cumulative_sum = signal.cumsum()
         integrated_signal[nbr_sampls_int_wind:] = (
-            cumulative_sum[nbr_sampls_int_wind:] - cumulative_sum[:-nbr_sampls_int_wind]
-        ) / nbr_sampls_int_wind
+                                                          cumulative_sum[nbr_sampls_int_wind:] - cumulative_sum[
+                                                                                                 :-nbr_sampls_int_wind]
+                                                  ) / nbr_sampls_int_wind
         integrated_signal[:nbr_sampls_int_wind] = cumulative_sum[
-            :nbr_sampls_int_wind
-        ] / np.arange(1, nbr_sampls_int_wind + 1)
+                                                  :nbr_sampls_int_wind
+                                                  ] / np.arange(1, nbr_sampls_int_wind + 1)
 
         return integrated_signal
 
@@ -579,7 +580,7 @@ class HRV(Sensor):
 
     @staticmethod
     def frequencyAnalysis(
-        rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
+            rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
     ):
         try:
             try:
@@ -750,7 +751,7 @@ class PPG(Sensor):
         super().__init__(data, fs, resolution)
 
     def filterPPG(
-        self, lowpassFreq=5, highpassFreq=0.1, lowpassOrder=2, highpassOrder=2
+            self, lowpassFreq=5, highpassFreq=0.1, lowpassOrder=2, highpassOrder=2
     ):
 
         filteredPPG = bsnb.highpass(
@@ -831,15 +832,15 @@ class PPG(Sensor):
             peak_amplitude = []
             for i in range(2, len(peaksAmp) - 2):
                 if valley_peak_diff[i] > (
-                    0.7
-                    * (
-                        valley_peak_diff[i - 2]
-                        + valley_peak_diff[i - 1]
-                        + valley_peak_diff[i]
-                        + valley_peak_diff[i + 1]
-                        + valley_peak_diff[i + 2]
-                    )
-                    / 5
+                        0.7
+                        * (
+                                valley_peak_diff[i - 2]
+                                + valley_peak_diff[i - 1]
+                                + valley_peak_diff[i]
+                                + valley_peak_diff[i + 1]
+                                + valley_peak_diff[i + 2]
+                        )
+                        / 5
                 ):
                     peak_location.append(peaksIndex[i])
                     peak_amplitude.append(peaksAmp[i])
@@ -1173,8 +1174,9 @@ class RESP(Sensor):
         rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
         rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
 
-        rrv_dataframe = pd.DataFrame.from_dict(rsp_rate_dict)
+        rrv_dataframe = pd.DataFrame.from_dict(rsp_rate_dict)  # comment for full dataframe
 
+        """uncomment following lines to get full dataframe"""
         # try:
         #     rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"])
         # except Exception as e:
@@ -1278,7 +1280,6 @@ class RESP(Sensor):
 
     def zeroCrossing(self, data, fs):
         return bsnb.zero_crossing_rate(data) * len(data) / fs
-
 
 #
 # def getFeatures(self):
