@@ -1,9 +1,8 @@
-import pandas as pd
-
-from lib.sensors import *
-from Load import *
-from Epochs import *
 import pyxdf
+
+from Epochs import *
+from Load import *
+from lib.sensors import *
 
 
 def getEvents(
@@ -145,9 +144,11 @@ def Process_RESP(data, fs, resolution):
 
     signals, info = sensor.process_RESP()
 
-    df = sensor.RESP_RRV(signals)
+    #uncomment line below
+    # df = sensor.RESP_RRV(signals)
 
-    resp_Dataframe = sensor.getFeatures(signals, df)
+    resp_Dataframe = sensor.getFeatures(signals) #, df)
+    # correct form is (signals,df)
 
     columns_to_remove = [
         "RRV_VLF",
