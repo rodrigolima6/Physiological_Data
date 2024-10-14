@@ -67,7 +67,7 @@ matplotlib==3.8.4
 matplotlib-inline==0.1.7
 mistune==3.0.2
 mkl==2024.2.2
-mkl-service==2.4.0
+mkl-service==2.4.1
 mock==5.1.0
 nbclient==0.10.0
 nbconvert==7.16.4
