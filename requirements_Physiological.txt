@@ -102,7 +102,7 @@ python-magic-bin==0.4.14
 pytz==2024.2
 PyWavelets==1.7.0
 pywin32==307
-pywinpty==2.0.13
+pywinpty==2.0.14
 pyxdf==1.16.8
 PyYAML==6.0.2
 pyzmq==26.2.0
