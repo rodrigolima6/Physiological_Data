@@ -107,7 +107,7 @@ Pygments==2.18.0
 PyJWT @ file:///C:/ci/pyjwt_1657529477795/work
 pylsl==1.16.2
 pyOpenSSL @ file:///opt/conda/conda-bld/pyopenssl_1643788558760/work
-pyparsing==3.1.4
+pyparsing==3.2.0
 PyQt5==5.15.11
 PyQt5-Qt5==5.15.15
 PyQt5-sip==12.15.0
