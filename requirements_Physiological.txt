@@ -142,4 +142,4 @@ websocket-client==1.8.0
 wget==3.2
 widgetsnbextension==4.0.13
 wincertstore==0.2
-zope.interface==7.0.3
+zope.interface==7.1.1
