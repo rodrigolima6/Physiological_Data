@@ -106,7 +106,7 @@ pywinpty==2.0.14
 pyxdf==1.16.8
 PyYAML==6.0.2
 pyzmq==26.2.0
-qtconsole==5.6.0
+qtconsole==5.6.1
 QtPy==2.4.1
 referencing==0.35.1
 requests==2.32.3
