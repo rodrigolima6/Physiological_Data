@@ -1,7 +1,5 @@
 import math
 
-import numpy as np
-
 try:
     from lib.biosignals import *
 except (ImportError, ModuleNotFoundError):
@@ -1169,138 +1167,60 @@ class RESP(Sensor):
             )
             return rrv_dataframe
 
-    def getFeatures(self, signals):  # , rrv_dataframe):
+    def getFeatures(self, signals, rrv_dataframe):
 
         rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
         rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
 
-        rrv_dataframe = pd.DataFrame.from_dict(rsp_rate_dict)  # comment for full dataframe
+        # rrv_dataframe = pd.DataFrame.from_dict(rsp_rate_dict)  # comment for full dataframe
 
         """uncomment following lines to get full dataframe"""
-        # try:
-        #     rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "STD_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Mean_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan)
+        try:
+            rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "STD_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan)
 
         return rrv_dataframe
-
-    def maxPeaks(self, peaks):
-        return max(peaks)
-
-    def meanAmpPeaks(self, peaks):
-        return np.mean(peaks)
-
-    def stdAmpPeaks(self, peaks):
-        return np.std(peaks)
-
-    def rmsAmpPeaks(self, peaks):
-        return np.sqrt(np.mean(np.power(peaks, 2))) / len(peaks)
-
-    def energyValue(self, data):
-        return np.mean(np.power(data, 2)) / len(data)
-
-    def meanValue(self, data):
-        return np.mean(data)
-
-    def minValue(self, data):
-        return min(data)
-
-    def maxValue(self, data):
-        return max(data)
-
-    def stdValue(self, data):
-        return np.std(data)
-
-    def rmsValue(self, data):
-        return self.rmsAmpPeaks(data)
-
-    def areaValue(self, data):
-        return integrate.cumtrapz(data)
-
-    def respFreq(self, peaks, fs):
-        return 1 / self.respInterval(peaks, fs)
-
-    def respInterval(self, peaks, fs):
-        return np.mean(np.diff(peaks)) * fs
-
-    def statisticsLastPeaks(self, peaks, fs):
-        if len(peaks) > 10:
-            peaks = peaks[-10:]
-        diff_peaks = np.diff(peaks) * fs
-        return (
-            np.mean(diff_peaks),
-            np.std(diff_peaks),
-            min(diff_peaks),
-            max(diff_peaks),
-            self.rmsValue(diff_peaks),
-        )
-
-    def zeroCrossing(self, data, fs):
-        return bsnb.zero_crossing_rate(data) * len(data) / fs
-
-#
-# def getFeatures(self):
-#     peaks, peaksAmp = peak_detector_Resp(self.data, self.fs)
-#     peaks = peaks[1]
-#     features = []
-#     funcs = {'peaks': [self.maxPeaks, self.meanAmpPeaks, self.stdAmpPeaks, self.rmsAmpPeaks, self.respFreq, self.respInterval, self.statisticsLastPeaks],
-#             'data': [self.energyValue, self.meanValue,  self.minValue, self.maxValue, self.stdValue, self.rmsValue, self.areaValue, self.zeroCrossing]}
-#     # Extract features from peaks
-#     for key in funcs:
-#         aux = self.data
-#         if key == 'peaks':
-#             aux = peaks
-#         for func in funcs[key]:
-#             try:
-#                 value = func(aux)
-#             except TypeError as e:
-#                 value = func(aux, self.fs)
-#
-#             if type(value) == np.float64 or type(value) == int:
-#                 value = [value]
-#             features.append(value)
-#
-#     return np.concatenate(features)

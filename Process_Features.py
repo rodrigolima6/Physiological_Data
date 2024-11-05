@@ -56,27 +56,36 @@ def Run_files(fname):
     return data
 
 
+def change_key(dictionary, key_to_remove, new_key):
+    dictionary[new_key] = dictionary.pop(key_to_remove)
+
+
 def Load_Data(
         data,
         openSignals_stream_name: str,
         markers_stream_name: str,
         sensors: list,
-):
+) -> dict:
     Signals = pd.DataFrame()
 
     marker, timestamps = Load_PsychopyMarkers(data, markers_stream_name)
     opensignals_data, fs = Load_Opensignals(data, openSignals_stream_name)
+
+    change_key(opensignals_data, "time_Opensignals", "Time"), change_key(opensignals_data, "CH1", "ECG"),
+    change_key(opensignals_data, "CH2", "EDA"), change_key(opensignals_data, "CH3", "RESP")
 
     if len(opensignals_data.keys()) > 0:
         Signals = pd.DataFrame(data=opensignals_data)
         sensors.insert(0, "Time")
         Signals.columns = sensors
 
-    return {
+    data = {
         "Signals": Signals,
         "Markers": marker,
         "Markers Timestamps": timestamps,
     }
+
+    return data
 
 
 def getDataframe(dataframe, fs, resolution):
@@ -126,28 +135,15 @@ def Process_HRV(data, fs, resolution):
     return HRV_Dataframe
 
 
-# def Process_fNIRS(data,fs,resolution):
-#
-#     sensor = fNIRS(data,fs,resolution)
-#
-#     sensor.processfNIRS()
-#
-#     fnirs_features = sensor.getFeatures()
-#
-#     fNIRS_Dataframe = pd.DataFrame.from_dict(fnirs_features,orient="columns")
-#
-#     return fNIRS_Dataframe
-
-
 def Process_RESP(data, fs, resolution):
     sensor = RESP(data, fs, resolution)
 
     signals, info = sensor.process_RESP()
 
-    #uncomment line below
-    # df = sensor.RESP_RRV(signals)
+    # uncomment line below
+    df = sensor.RESP_RRV(signals)
 
-    resp_Dataframe = sensor.getFeatures(signals) #, df)
+    resp_Dataframe = sensor.getFeatures(signals, df)
     # correct form is (signals,df)
 
     columns_to_remove = [
@@ -219,23 +215,34 @@ def Process_EDA(data, fs, resolution):
 
     return EDA_Dataframe
 
+# def Process_EEG(data, fs, resolution):
+#     EEG_dict = {}
+#     EEG_filtered = {}
+#     band_powers = {}
+#     freqs = {}
+#     power = {}
+#
+#     for keys in data.keys():
+#         EEG_dict[keys] = EEG(data[keys], fs, resolution)
+#         EEG_filtered[keys], freqs[keys], power[keys], band_powers[keys] = EEG_dict[
+#             keys
+#         ].getFeatures()
+#
+#     bands_df = pd.DataFrame.from_dict(band_powers, orient="index")
+#
+#     return bands_df
 
-def Process_EEG(data, fs, resolution):
-    EEG_dict = {}
-    EEG_filtered = {}
-    band_powers = {}
-    freqs = {}
-    power = {}
-
-    for keys in data.keys():
-        EEG_dict[keys] = EEG(data[keys], fs, resolution)
-        EEG_filtered[keys], freqs[keys], power[keys], band_powers[keys] = EEG_dict[
-            keys
-        ].getFeatures()
-
-    bands_df = pd.DataFrame.from_dict(band_powers, orient="index")
-
-    return bands_df
+# def Process_fNIRS(data,fs,resolution):
+#
+#     sensor = fNIRS(data,fs,resolution)
+#
+#     sensor.processfNIRS()
+#
+#     fnirs_features = sensor.getFeatures()
+#
+#     fNIRS_Dataframe = pd.DataFrame.from_dict(fnirs_features,orient="columns")
+#
+#     return fNIRS_Dataframe
 
 # def Process_TEMP(data, fs, resolution):
 #     sensor = TEMP(data, fs, resolution)
