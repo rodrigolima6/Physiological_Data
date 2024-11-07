@@ -9,13 +9,15 @@ def Load_PsychopyMarkers(data, stream_name: str):
 
 
 def Load_Ratings(data, stream_name: str):
-    arousal_timestamps, valence_timestamps, timeseries, valence, arousal = (
-        list(),
+    arousal_timestamps, valence_timestamps, valence, arousal = (
         list(),
         list(),
         list(),
         list(),
     )
+
+    ratings = {}
+
     for stream in data:
         if stream["info"]["name"][0] == stream_name:
             timeseries = list(stream["time_series"])
@@ -41,11 +43,13 @@ def Load_Ratings(data, stream_name: str):
                     else:
                         arousal.append("High")
 
-    return valence, arousal, valence_timestamps, arousal_timestamps
+        ratings = {"Valence": valence, "Arousal": arousal, "Valence Timestamps": valence_timestamps,
+                   "Arousal Timestamps": arousal_timestamps}
+
+    return ratings
 
 
 def Load_Opensignals(data, stream_name: str):
-
     Opensignals_Data = {}
     fs = int()
 
@@ -60,7 +64,6 @@ def Load_Opensignals(data, stream_name: str):
 
 
 def Load_EEG(data, stream_name: str):
-
     EEG_data = {}
     time_EEG = []
     EEG_fs = int()

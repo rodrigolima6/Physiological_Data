@@ -1,100 +1,4 @@
-import pyxdf
-
-from Epochs import *
-from Load import *
 from lib.sensors import *
-
-
-def getEvents(
-        users,
-        openSignals_stream_name: str,
-        markers_stream_name: str,
-        sensors: list,
-):
-    data = {}
-    for user in users.keys():
-        data[user.split(".")[0]] = Load_Data(
-            users[user],
-            openSignals_stream_name,
-            markers_stream_name,
-            sensors,
-        )
-
-    onset, offset, videos = ({}, {}, {})
-    for user in data.keys():
-        onset[user], offset[user], videos[user] = getMarkers(
-            data[user]["Markers"], data[user]["Markers Timestamps"]
-        )
-
-    onset_index = {}
-    offset_index = {}
-
-    for user in data.keys():
-        onset_index[user], offset_index[user] = getMarkersIndex(
-            onset[user], offset[user], data[user]["Signals"]["Time"]
-        )
-
-    events_diff = {}
-
-    for keys in onset.keys():
-        events_diff[keys] = CalculateEventsDiff(onset[keys], offset[keys])
-
-    return (
-        events_diff,
-        videos,
-        onset,
-        offset,
-        onset_index,
-        offset_index,
-        data,
-    )
-
-
-def Run_files(fname):
-    data, header = pyxdf.load_xdf(fname)
-
-    return data
-
-
-def change_key(dictionary, key_to_remove, new_key):
-    dictionary[new_key] = dictionary.pop(key_to_remove)
-
-
-def Load_Data(
-        data,
-        openSignals_stream_name: str,
-        markers_stream_name: str,
-        sensors: list,
-) -> dict:
-    Signals = pd.DataFrame()
-
-    marker, timestamps = Load_PsychopyMarkers(data, markers_stream_name)
-    opensignals_data, fs = Load_Opensignals(data, openSignals_stream_name)
-
-    change_key(opensignals_data, "time_Opensignals", "Time"), change_key(opensignals_data, "CH1", "ECG"),
-    change_key(opensignals_data, "CH2", "EDA"), change_key(opensignals_data, "CH3", "RESP")
-
-    if len(opensignals_data.keys()) > 0:
-        Signals = pd.DataFrame(data=opensignals_data)
-        sensors.insert(0, "Time")
-        Signals.columns = sensors
-
-    data = {
-        "Signals": Signals,
-        "Markers": marker,
-        "Markers Timestamps": timestamps,
-    }
-
-    return data
-
-
-def getDataframe(dataframe, fs, resolution):
-    HRV_Dataframe = Process_HRV(dataframe["ECG"], fs, resolution)
-    RESP_Dataframe = Process_RESP(dataframe["RESP"], fs, resolution)
-    EDA_Dataframe = Process_EDA(dataframe["EDA"], fs, resolution)
-    Dataframe = (HRV_Dataframe.join(EDA_Dataframe)).join(RESP_Dataframe)
-
-    return Dataframe
 
 
 def Process_ECG(data, fs, resolution):
@@ -118,10 +22,6 @@ def Process_HRV(data, fs, resolution):
         poincare_features,
         frequency_features,
     ) = sensor.getFeatures()
-    # print(heart_rate)
-    # print(time_features)
-    # print(poincare_features)
-    # print(frequency_features)
 
     heart_rate_df = pd.DataFrame.from_dict(heart_rate, orient="columns")
     time_features_df = pd.DataFrame.from_dict(time_features, orient="columns")
@@ -144,11 +44,15 @@ def Process_RESP(data, fs, resolution):
     df = sensor.RESP_RRV(signals)
 
     resp_Dataframe = sensor.getFeatures(signals, df)
+
     # correct form is (signals,df)
 
     columns_to_remove = [
         "RRV_VLF",
         "RRV_LF",
+        "RRV_HF",
+        "RRV_ApEn",
+        "RRV_SampEn",
         "RRV_LFHF",
         "RRV_LFn",
         "RRV_HFn",

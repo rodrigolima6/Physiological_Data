@@ -1146,6 +1146,7 @@ class RESP(Sensor):
 
             return rrv_dataframe
         except Exception as e:
+            print(e)
             rrv_dataframe = pd.DataFrame(
                 columns=[
                     "RRV_RMSSD",
