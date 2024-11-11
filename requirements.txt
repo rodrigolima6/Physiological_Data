@@ -16,7 +16,7 @@ biosppy==2.2.2
 black==24.10.0
 bleach==6.2.0
 blinker==1.8.2
-bokeh==3.6.0
+bokeh==3.6.1
 brotlipy==0.7.0
 cached-property @ file:///tmp/build/80754af9/cached-property_1600785575025/work
 certifi @ file:///C:/b/abs_85o_6fm0se/croot/certifi_1671487778835/work/certifi
