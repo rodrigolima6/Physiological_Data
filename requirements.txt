@@ -29,7 +29,7 @@ configobj==5.0.9
 cryptography @ file:///C:/ci/cryptography_1652101729823/work
 cycler==0.12.1
 DateTime==5.5
-debugpy==1.8.9
+debugpy==1.8.11
 decorator @ file:///opt/conda/conda-bld/decorator_1643638310831/work
 defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
 docopt @ file:///C:/b/abs_d3qvsxazhu/croots/recipe/docopt_1663662414930/work
