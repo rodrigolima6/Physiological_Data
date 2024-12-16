@@ -102,7 +102,7 @@ pyasn1 @ file:///Users/ktietz/demo/mc3/conda-bld/pyasn1_1629708007385/work
 pyasn1-modules==0.4.1
 pycodestyle @ file:///tmp/build/80754af9/pycodestyle_1636635402688/work
 pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
-pycurl==7.45.3
+pycurl==7.45.4
 Pygments==2.18.0
 PyJWT @ file:///C:/ci/pyjwt_1657529477795/work
 pylsl==1.17.6
