@@ -105,7 +105,7 @@ pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
 pycurl==7.45.3
 Pygments==2.18.0
 PyJWT @ file:///C:/ci/pyjwt_1657529477795/work
-pylsl==1.16.2
+pylsl==1.17.6
 pyOpenSSL @ file:///opt/conda/conda-bld/pyopenssl_1643788558760/work
 pyparsing==3.2.0
 PyQt5==5.15.11
