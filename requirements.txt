@@ -22,7 +22,7 @@ cached-property @ file:///tmp/build/80754af9/cached-property_1600785575025/work
 certifi @ file:///C:/b/abs_85o_6fm0se/croot/certifi_1671487778835/work/certifi
 cffi @ file:///C:/Windows/Temp/abs_6808y9x40v/croots/recipe/cffi_1659598653989/work
 charset-normalizer @ file:///tmp/build/80754af9/charset-normalizer_1630003229654/work
-click==8.1.7
+click==8.1.8
 cmarkgfm @ file:///C:/ci_310/cmarkgfm_1642108802684/work
 colorama==0.4.6
 configobj==5.0.9
