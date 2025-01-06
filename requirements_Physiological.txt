@@ -114,7 +114,7 @@ rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
 rpds-py==0.22.3
 scikit-learn==1.6.0
-scipy==1.14.1
+scipy==1.15.0
 seaborn==0.13.2
 Send2Trash==1.8.3
 shortuuid==1.0.13
