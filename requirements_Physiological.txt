@@ -70,7 +70,7 @@ mkl==2025.0.1
 mkl-service==2.4.2
 mock==5.1.0
 nbclient==0.10.2
-nbconvert==7.16.4
+nbconvert==7.16.5
 nbformat==5.10.4
 nest-asyncio==1.6.0
 neurokit2==0.2.10
