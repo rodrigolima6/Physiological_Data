@@ -103,7 +103,7 @@ pytz==2024.2
 PyWavelets==1.8.0
 pywin32==308
 pywinpty==2.0.14
-pyxdf==1.16.8
+pyxdf==1.17.0
 PyYAML==6.0.2
 pyzmq==26.2.0
 qtconsole==5.6.1
