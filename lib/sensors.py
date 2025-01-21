@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 try:
     from lib.biosignals import *
 except (ImportError, ModuleNotFoundError):
@@ -74,6 +76,7 @@ class EDA(Sensor):
 
             return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
         except Exception as e:
+            print("Error on EDA featuresSCR")
             print(e)
             pass
 
@@ -93,8 +96,11 @@ class EDA(Sensor):
             return freqs, power
 
         except Exception as e:
+            print("Error on EDA frequencyAnalysis")
+            freqs = np.nan
+            power = np.nan
             print(e)
-            pass
+            return freqs, power
 
     @staticmethod
     def frequencyFeatures(freq, power):
@@ -217,7 +223,6 @@ class ECG(Sensor):
         super().__init__(data, fs, resolution)
 
     def convertECG(self):
-
         """
         :param signal: Raw ECG signal
         :param resolution: channel resolution from device
@@ -226,15 +231,12 @@ class ECG(Sensor):
 
         VCC = 3000
         gain = 1000
-        signal_volts = (
-                ((np.array(self.data) / 2 ** self.resolution) - 1 / 2) * VCC / gain
-        )
+        signal_volts = ((np.array(self.data) / 2**self.resolution) - 1 / 2) * VCC / gain
         signal_mv = signal_volts * 1000
 
         return signal_mv
 
     def filterECG(self):
-
         """
         :param signal: ECG signal
         :param fs: sampling frequency of the ECG signal
@@ -248,7 +250,6 @@ class ECG(Sensor):
 
     @staticmethod
     def _differentiateECG(signal):
-
         """
         :param signal: Filtered ECG signal
         :return: Derivative of the filtered ECG signal
@@ -260,19 +261,17 @@ class ECG(Sensor):
 
     @staticmethod
     def _squaredECG(signal):
-
         """
         :param signal: Derivative ECG signal
         :return: Squared signal of the ECG derivative
         """
 
-        squared_signal = signal ** 2
+        squared_signal = signal**2
 
         return squared_signal
 
     @staticmethod
     def _integrateECG(signal, fs, window=0.080):
-
         """
         :param signal: Squared ECG signal
         :param fs: sampling frequency of the ECG signal
@@ -284,17 +283,15 @@ class ECG(Sensor):
         integrated_signal = np.zeros_like(signal)
         cumulative_sum = signal.cumsum()
         integrated_signal[nbr_sampls_int_wind:] = (
-                                                          cumulative_sum[nbr_sampls_int_wind:] - cumulative_sum[
-                                                                                                 :-nbr_sampls_int_wind]
-                                                  ) / nbr_sampls_int_wind
+            cumulative_sum[nbr_sampls_int_wind:] - cumulative_sum[:-nbr_sampls_int_wind]
+        ) / nbr_sampls_int_wind
         integrated_signal[:nbr_sampls_int_wind] = cumulative_sum[
-                                                  :nbr_sampls_int_wind
-                                                  ] / np.arange(1, nbr_sampls_int_wind + 1)
+            :nbr_sampls_int_wind
+        ] / np.arange(1, nbr_sampls_int_wind + 1)
 
         return integrated_signal
 
     def _detectRPeaks(self):
-
         """
         :param signal: Non-filtered ECG signal
         :param fs: sampling frequency of the ECG signal
@@ -340,7 +337,6 @@ class HRV(Sensor):
         super().__init__(data, fs, resolution)
 
     def RR_interval(self):
-
         """
         :param signal: ECG signal
         :param fs: sampling frequency of ECG signal
@@ -356,7 +352,6 @@ class HRV(Sensor):
 
     @staticmethod
     def remove_EctopyBeats(rr_interval, rr_interval_time):
-
         """
         :param rr_interval: RR interval series
         :param rr_interval_time: RR interval series time axis
@@ -488,7 +483,6 @@ class HRV(Sensor):
 
     @staticmethod
     def poincareFeatures(rr_interval_NN):
-
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :return: dict with Poincare features - non-linear features
@@ -512,7 +506,7 @@ class HRV(Sensor):
 
         """Length of the longitudinal line in Poincaré plot"""
         try:
-            SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4) * 1000
+            SD2 = round(np.sqrt(2 * STD**2 - 0.5 * SDSD**2), 4) * 1000
         except Exception as e:
             print(e)
             print("Error HRV SD2")
@@ -520,7 +514,7 @@ class HRV(Sensor):
 
         """Length of the transverse line in Poincaré plot"""
         try:
-            SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4) * 1000
+            SD1 = round(np.sqrt(0.5 * SDSD**2), 4) * 1000
         except Exception as e:
             print(e)
             print("Error HRV SD1")
@@ -548,7 +542,6 @@ class HRV(Sensor):
 
     @staticmethod
     def evenlySpaced_RR(rr_interval_NN, time, new_freq):
-
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :param time: time axis
@@ -578,7 +571,7 @@ class HRV(Sensor):
 
     @staticmethod
     def frequencyAnalysis(
-            rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
+        rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
     ):
         try:
             try:
@@ -749,7 +742,7 @@ class PPG(Sensor):
         super().__init__(data, fs, resolution)
 
     def filterPPG(
-            self, lowpassFreq=5, highpassFreq=0.1, lowpassOrder=2, highpassOrder=2
+        self, lowpassFreq=5, highpassFreq=0.1, lowpassOrder=2, highpassOrder=2
     ):
 
         filteredPPG = bsnb.highpass(
@@ -830,15 +823,15 @@ class PPG(Sensor):
             peak_amplitude = []
             for i in range(2, len(peaksAmp) - 2):
                 if valley_peak_diff[i] > (
-                        0.7
-                        * (
-                                valley_peak_diff[i - 2]
-                                + valley_peak_diff[i - 1]
-                                + valley_peak_diff[i]
-                                + valley_peak_diff[i + 1]
-                                + valley_peak_diff[i + 2]
-                        )
-                        / 5
+                    0.7
+                    * (
+                        valley_peak_diff[i - 2]
+                        + valley_peak_diff[i - 1]
+                        + valley_peak_diff[i]
+                        + valley_peak_diff[i + 1]
+                        + valley_peak_diff[i + 2]
+                    )
+                    / 5
                 ):
                     peak_location.append(peaksIndex[i])
                     peak_amplitude.append(peaksAmp[i])
@@ -1146,6 +1139,7 @@ class RESP(Sensor):
 
             return rrv_dataframe
         except Exception as e:
+            print("RESP_RRV")
             print(e)
             rrv_dataframe = pd.DataFrame(
                 columns=[

@@ -51,13 +51,13 @@ def Process_RESP(data, fs, resolution):
         "RRV_VLF",
         "RRV_LF",
         "RRV_HF",
-        # "RRV_ApEn",
+        "RRV_ApEn",
         "RRV_SampEn",
         "RRV_LFHF",
         "RRV_LFn",
         "RRV_HFn",
-        #     "RRV_SD2",
-        #     "RRV_SD2SD1",
+        # "RRV_SD2",
+        # "RRV_SD2SD1",
         "RRV_DFA_alpha2",
         "RRV_MFDFA_alpha2_Width",
         "RRV_MFDFA_alpha2_Peak",
@@ -118,6 +118,7 @@ def Process_EDA(data, fs, resolution):
         EDA_Dataframe = EDA_Dataframe.drop(["LF/HF"], axis=1)
 
     return EDA_Dataframe
+
 
 # def Process_EEG(data, fs, resolution):
 #     EEG_dict = {}
