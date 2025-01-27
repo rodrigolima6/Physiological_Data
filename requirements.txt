@@ -35,7 +35,7 @@ defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
 docopt @ file:///C:/b/abs_d3qvsxazhu/croots/recipe/docopt_1663662414930/work
 docutils @ file:///C:/Windows/Temp/abs_b6cq4adtko/croots/recipe/docutils_1659506292265/work
 entrypoints @ file:///C:/ci/entrypoints_1649926676279/work
-executing==2.1.0
+executing==2.2.0
 fastjsonschema @ file:///C:/Users/BUILDE~1/AppData/Local/Temp/abs_ebruxzvd08/croots/recipe/python-fastjsonschema_1661376484940/work
 fonttools==4.55.6
 fsspec @ file:///C:/b/abs_07xig1rkra/croot/fsspec_1679418812895/work
