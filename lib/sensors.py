@@ -52,33 +52,28 @@ class EDA(Sensor):
         return eda_phasic, eda_tonic
 
     def featuresSCR(self, eda_phasic):
+        info, signals = nk.eda_peaks(eda_phasic, self.fs, method="neurokit")
+
         try:
-            info, signals = nk.eda_peaks(eda_phasic, self.fs, method="neurokit")
-
-            try:
-                SCR_Amplitude = signals["SCR_Amplitude"]
-            except Exception as e:
-                print("Error SCR Amp")
-                print(e)
-                SCR_Amplitude = np.nan
-            try:
-                SCR_RiseTime = signals["SCR_RiseTime"]
-            except Exception as e:
-                print(e)
-                print("Error SCR Rise Time")
-                SCR_RiseTime = np.nan
-            try:
-                SCR_RecoveryTime = signals["SCR_RecoveryTime"]
-            except Exception as e:
-                print(e)
-                print("Error SCR Recovery Time")
-                SCR_RecoveryTime = np.nan
-
-            return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
+            SCR_Amplitude = signals["SCR_Amplitude"]
         except Exception as e:
-            print("Error on EDA featuresSCR")
+            print("Error SCR Amp")
             print(e)
-            pass
+            SCR_Amplitude = np.nan
+        try:
+            SCR_RiseTime = signals["SCR_RiseTime"]
+        except Exception as e:
+            print(e)
+            print("Error SCR Rise Time")
+            SCR_RiseTime = np.nan
+        try:
+            SCR_RecoveryTime = signals["SCR_RecoveryTime"]
+        except Exception as e:
+            print(e)
+            print("Error SCR Recovery Time")
+            SCR_RecoveryTime = np.nan
+
+        return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
 
     @staticmethod
     def frequencyAnalysis(data_filtered):
