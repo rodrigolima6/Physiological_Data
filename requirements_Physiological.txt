@@ -7,7 +7,7 @@ asttokens==3.0.0
 async-lru==2.0.4
 attrs==25.1.0
 babel==2.16.0
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.0
 bidict==0.23.1
 biosignalsnotebooks==0.6.14
 biosppy==2.2.2
