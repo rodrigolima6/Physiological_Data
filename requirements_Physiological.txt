@@ -28,7 +28,7 @@ defusedxml==0.7.1
 exceptiongroup==1.2.2
 executing==2.2.0
 fastjsonschema==2.21.1
-fonttools==4.55.6
+fonttools==4.55.8
 fqdn==1.5.1
 h11==0.14.0
 h5py==3.12.1
