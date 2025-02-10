@@ -121,7 +121,7 @@ python-magic-bin==0.4.14
 pytz @ file:///C:/Windows/TEMP/abs_90eacd4e-8eff-491e-b26e-f707eba2cbe1ujvbhqz1/croots/recipe/pytz_1654762631027/work
 PyWavelets @ file:///C:/b/abs_a8r4b1511a/croot/pywavelets_1670425185881/work
 pywin32==308
-pywinpty==2.0.14
+pywinpty==2.0.15
 pyxdf==1.17.0
 PyYAML==6.0.2
 pyzmq @ file:///C:/ci/pyzmq_1657616000714/work
