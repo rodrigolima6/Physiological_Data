@@ -142,7 +142,7 @@ six @ file:///tmp/build/80754af9/six_1644875935023/work
 sniffio @ file:///C:/ci_310/sniffio_1642092172680/work
 snowballstemmer @ file:///tmp/build/80754af9/snowballstemmer_1637937080595/work
 soupsieve @ file:///C:/b/abs_fasraqxhlv/croot/soupsieve_1666296394662/work
-Sphinx==8.1.3
+Sphinx==8.2.1
 sphinxcontrib-applehelp @ file:///home/ktietz/src/ci/sphinxcontrib-applehelp_1611920841464/work
 sphinxcontrib-devhelp @ file:///home/ktietz/src/ci/sphinxcontrib-devhelp_1611920923094/work
 sphinxcontrib-htmlhelp @ file:///tmp/build/80754af9/sphinxcontrib-htmlhelp_1623945626792/work
