@@ -97,7 +97,7 @@ PyQt5-Qt5==5.15.16
 PyQt5_sip==12.17.0
 pyserial==3.5
 python-dateutil==2.9.0.post0
-python-json-logger==3.2.1
+python-json-logger==3.3.0
 python-magic-bin==0.4.14
 pytz==2025.1
 PyWavelets==1.8.0
