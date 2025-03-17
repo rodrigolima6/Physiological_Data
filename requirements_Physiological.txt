@@ -124,7 +124,7 @@ soupsieve==2.6
 stack-data==0.6.3
 tbb==2022.0.0
 terminado==0.18.1
-threadpoolctl==3.5.0
+threadpoolctl==3.6.0
 tinycss2==1.4.0
 toml==0.10.2
 tomli==2.2.1
