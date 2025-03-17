@@ -74,7 +74,7 @@ nbconvert==7.16.6
 nbformat==5.10.4
 nest-asyncio==1.6.0
 neurokit2==0.2.10
-notebook==7.3.2
+notebook==7.3.3
 notebook_shim==0.2.4
 numpy==2.2.4
 opencv-python==4.11.0.86
