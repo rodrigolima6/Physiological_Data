@@ -68,7 +68,7 @@ matplotlib-inline==0.1.7
 mistune==3.1.2
 mkl==2025.0.1
 mkl-service==2.4.2
-mock==5.1.0
+mock==5.2.0
 nbclient==0.10.2
 nbconvert==7.16.6
 nbformat==5.10.4
