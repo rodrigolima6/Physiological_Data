@@ -14,7 +14,7 @@ biosppy==2.2.3
 bleach==6.2.0
 bokeh==3.6.3
 brotlipy==0.7.0
-certifi==2025.1.31
+certifi==2025.4.26
 cffi==1.17.1
 charset-normalizer==3.4.1
 colorama==0.4.6
