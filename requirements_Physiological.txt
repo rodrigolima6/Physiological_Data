@@ -16,7 +16,7 @@ bokeh==3.6.3
 brotlipy==0.7.0
 certifi==2025.4.26
 cffi==1.17.1
-charset-normalizer==3.4.1
+charset-normalizer==3.4.2
 colorama==0.4.6
 comm==0.2.2
 contourpy==1.3.1
