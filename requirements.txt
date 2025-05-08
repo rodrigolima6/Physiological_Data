@@ -49,7 +49,7 @@ ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/wor
 ipywidgets==8.1.6
 jedi==0.19.2
 Jinja2==3.1.6
-joblib==1.4.2
+joblib==1.5.0
 jsonschema @ file:///C:/b/abs_59eyhnbyej/croots/recipe/jsonschema_1663375476535/work
 jupyter==1.1.1
 jupyter-console==6.6.3
