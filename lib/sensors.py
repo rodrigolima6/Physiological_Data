@@ -52,32 +52,28 @@ class EDA(Sensor):
         return eda_phasic, eda_tonic
 
     def featuresSCR(self, eda_phasic):
+        info, signals = nk.eda_peaks(eda_phasic, self.fs, method="neurokit")
+
         try:
-            info, signals = nk.eda_peaks(eda_phasic, self.fs, method="neurokit")
-
-            try:
-                SCR_Amplitude = signals["SCR_Amplitude"]
-            except Exception as e:
-                print("Error SCR Amp")
-                print(e)
-                SCR_Amplitude = np.nan
-            try:
-                SCR_RiseTime = signals["SCR_RiseTime"]
-            except Exception as e:
-                print(e)
-                print("Error SCR Rise Time")
-                SCR_RiseTime = np.nan
-            try:
-                SCR_RecoveryTime = signals["SCR_RecoveryTime"]
-            except Exception as e:
-                print(e)
-                print("Error SCR Recovery Time")
-                SCR_RecoveryTime = np.nan
-
-            return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
+            SCR_Amplitude = signals["SCR_Amplitude"]
+        except Exception as e:
+            print("Error SCR Amp")
+            print(e)
+            SCR_Amplitude = np.nan
+        try:
+            SCR_RiseTime = signals["SCR_RiseTime"]
         except Exception as e:
             print(e)
-            pass
+            print("Error SCR Rise Time")
+            SCR_RiseTime = np.nan
+        try:
+            SCR_RecoveryTime = signals["SCR_RecoveryTime"]
+        except Exception as e:
+            print(e)
+            print("Error SCR Recovery Time")
+            SCR_RecoveryTime = np.nan
+
+        return SCR_Amplitude, SCR_RiseTime, SCR_RecoveryTime
 
     @staticmethod
     def frequencyAnalysis(data_filtered):
@@ -95,8 +91,11 @@ class EDA(Sensor):
             return freqs, power
 
         except Exception as e:
+            print("Error on EDA frequencyAnalysis")
+            freqs = np.nan
+            power = np.nan
             print(e)
-            pass
+            return freqs, power
 
     @staticmethod
     def frequencyFeatures(freq, power):
@@ -219,7 +218,6 @@ class ECG(Sensor):
         super().__init__(data, fs, resolution)
 
     def convertECG(self):
-
         """
         :param signal: Raw ECG signal
         :param resolution: channel resolution from device
@@ -228,15 +226,12 @@ class ECG(Sensor):
 
         VCC = 3000
         gain = 1000
-        signal_volts = (
-                ((np.array(self.data) / 2 ** self.resolution) - 1 / 2) * VCC / gain
-        )
+        signal_volts = ((np.array(self.data) / 2**self.resolution) - 1 / 2) * VCC / gain
         signal_mv = signal_volts * 1000
 
         return signal_mv
 
     def filterECG(self):
-
         """
         :param signal: ECG signal
         :param fs: sampling frequency of the ECG signal
@@ -250,7 +245,6 @@ class ECG(Sensor):
 
     @staticmethod
     def _differentiateECG(signal):
-
         """
         :param signal: Filtered ECG signal
         :return: Derivative of the filtered ECG signal
@@ -262,19 +256,17 @@ class ECG(Sensor):
 
     @staticmethod
     def _squaredECG(signal):
-
         """
         :param signal: Derivative ECG signal
         :return: Squared signal of the ECG derivative
         """
 
-        squared_signal = signal ** 2
+        squared_signal = signal**2
 
         return squared_signal
 
     @staticmethod
     def _integrateECG(signal, fs, window=0.080):
-
         """
         :param signal: Squared ECG signal
         :param fs: sampling frequency of the ECG signal
@@ -286,17 +278,15 @@ class ECG(Sensor):
         integrated_signal = np.zeros_like(signal)
         cumulative_sum = signal.cumsum()
         integrated_signal[nbr_sampls_int_wind:] = (
-                                                          cumulative_sum[nbr_sampls_int_wind:] - cumulative_sum[
-                                                                                                 :-nbr_sampls_int_wind]
-                                                  ) / nbr_sampls_int_wind
+            cumulative_sum[nbr_sampls_int_wind:] - cumulative_sum[:-nbr_sampls_int_wind]
+        ) / nbr_sampls_int_wind
         integrated_signal[:nbr_sampls_int_wind] = cumulative_sum[
-                                                  :nbr_sampls_int_wind
-                                                  ] / np.arange(1, nbr_sampls_int_wind + 1)
+            :nbr_sampls_int_wind
+        ] / np.arange(1, nbr_sampls_int_wind + 1)
 
         return integrated_signal
 
     def _detectRPeaks(self):
-
         """
         :param signal: Non-filtered ECG signal
         :param fs: sampling frequency of the ECG signal
@@ -342,7 +332,6 @@ class HRV(Sensor):
         super().__init__(data, fs, resolution)
 
     def RR_interval(self):
-
         """
         :param signal: ECG signal
         :param fs: sampling frequency of ECG signal
@@ -358,7 +347,6 @@ class HRV(Sensor):
 
     @staticmethod
     def remove_EctopyBeats(rr_interval, rr_interval_time):
-
         """
         :param rr_interval: RR interval series
         :param rr_interval_time: RR interval series time axis
@@ -490,7 +478,6 @@ class HRV(Sensor):
 
     @staticmethod
     def poincareFeatures(rr_interval_NN):
-
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :return: dict with Poincare features - non-linear features
@@ -514,7 +501,7 @@ class HRV(Sensor):
 
         """Length of the longitudinal line in Poincaré plot"""
         try:
-            SD2 = round(np.sqrt(2 * STD ** 2 - 0.5 * SDSD ** 2), 4) * 1000
+            SD2 = round(np.sqrt(2 * STD**2 - 0.5 * SDSD**2), 4) * 1000
         except Exception as e:
             print(e)
             print("Error HRV SD2")
@@ -522,7 +509,7 @@ class HRV(Sensor):
 
         """Length of the transverse line in Poincaré plot"""
         try:
-            SD1 = round(np.sqrt(0.5 * SDSD ** 2), 4) * 1000
+            SD1 = round(np.sqrt(0.5 * SDSD**2), 4) * 1000
         except Exception as e:
             print(e)
             print("Error HRV SD1")
@@ -550,7 +537,6 @@ class HRV(Sensor):
 
     @staticmethod
     def evenlySpaced_RR(rr_interval_NN, time, new_freq):
-
         """
         :param rr_interval_NN: RR interval series with no ectopic beats
         :param time: time axis
@@ -580,7 +566,7 @@ class HRV(Sensor):
 
     @staticmethod
     def frequencyAnalysis(
-            rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
+        rr_interval_time_NN, rr_interval_NN, window="hann", interpolation_rate=4
     ):
         try:
             try:
@@ -751,7 +737,7 @@ class PPG(Sensor):
         super().__init__(data, fs, resolution)
 
     def filterPPG(
-            self, lowpassFreq=5, highpassFreq=0.1, lowpassOrder=2, highpassOrder=2
+        self, lowpassFreq=5, highpassFreq=0.1, lowpassOrder=2, highpassOrder=2
     ):
 
         filteredPPG = bsnb.highpass(
@@ -832,15 +818,15 @@ class PPG(Sensor):
             peak_amplitude = []
             for i in range(2, len(peaksAmp) - 2):
                 if valley_peak_diff[i] > (
-                        0.7
-                        * (
-                                valley_peak_diff[i - 2]
-                                + valley_peak_diff[i - 1]
-                                + valley_peak_diff[i]
-                                + valley_peak_diff[i + 1]
-                                + valley_peak_diff[i + 2]
-                        )
-                        / 5
+                    0.7
+                    * (
+                        valley_peak_diff[i - 2]
+                        + valley_peak_diff[i - 1]
+                        + valley_peak_diff[i]
+                        + valley_peak_diff[i + 1]
+                        + valley_peak_diff[i + 2]
+                    )
+                    / 5
                 ):
                     peak_location.append(peaksIndex[i])
                     peak_amplitude.append(peaksAmp[i])
@@ -1148,6 +1134,8 @@ class RESP(Sensor):
 
             return rrv_dataframe
         except Exception as e:
+            print("RESP_RRV")
+            print(e)
             rrv_dataframe = pd.DataFrame(
                 columns=[
                     "RRV_RMSSD",
@@ -1169,138 +1157,60 @@ class RESP(Sensor):
             )
             return rrv_dataframe
 
-    def getFeatures(self, signals):  # , rrv_dataframe):
+    def getFeatures(self, signals, rrv_dataframe):
 
         rsp_rate_dict = self.statistical_Features(signals["RSP_Rate"])
         rsp_amp_dict = self.statistical_Features(signals["RSP_Amplitude"])
 
-        rrv_dataframe = pd.DataFrame.from_dict(rsp_rate_dict)  # comment for full dataframe
+        # rrv_dataframe = pd.DataFrame.from_dict(rsp_rate_dict)  # comment for full dataframe
 
         """uncomment following lines to get full dataframe"""
-        # try:
-        #     rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "STD_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Mean_RSP_Amplitude", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan)
-        #
-        # try:
-        #     rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"])
-        # except Exception as e:
-        #     print(e)
-        #     rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan)
+        try:
+            rrv_dataframe.insert(0, "STD_RSP_Amplitude", rsp_amp_dict["STD"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "STD_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", rsp_amp_dict["Maximum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Maximum_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", rsp_amp_dict["Minimum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Minimum_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", rsp_amp_dict["AVG"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Mean_RSP_Amplitude", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "STD_RSP_Rate", rsp_rate_dict["STD"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "STD_RSP_Rate", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", rsp_rate_dict["Maximum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Maximum_RSP_Rate", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", rsp_rate_dict["Minimum"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Minimum_RSP_Rate", np.nan)
+
+        try:
+            rrv_dataframe.insert(0, "Mean_RSP_Rate", rsp_rate_dict["AVG"])
+        except Exception as e:
+            print(e)
+            rrv_dataframe.insert(0, "Mean_RSP_Rate", np.nan)
 
         return rrv_dataframe
-
-    def maxPeaks(self, peaks):
-        return max(peaks)
-
-    def meanAmpPeaks(self, peaks):
-        return np.mean(peaks)
-
-    def stdAmpPeaks(self, peaks):
-        return np.std(peaks)
-
-    def rmsAmpPeaks(self, peaks):
-        return np.sqrt(np.mean(np.power(peaks, 2))) / len(peaks)
-
-    def energyValue(self, data):
-        return np.mean(np.power(data, 2)) / len(data)
-
-    def meanValue(self, data):
-        return np.mean(data)
-
-    def minValue(self, data):
-        return min(data)
-
-    def maxValue(self, data):
-        return max(data)
-
-    def stdValue(self, data):
-        return np.std(data)
-
-    def rmsValue(self, data):
-        return self.rmsAmpPeaks(data)
-
-    def areaValue(self, data):
-        return integrate.cumtrapz(data)
-
-    def respFreq(self, peaks, fs):
-        return 1 / self.respInterval(peaks, fs)
-
-    def respInterval(self, peaks, fs):
-        return np.mean(np.diff(peaks)) * fs
-
-    def statisticsLastPeaks(self, peaks, fs):
-        if len(peaks) > 10:
-            peaks = peaks[-10:]
-        diff_peaks = np.diff(peaks) * fs
-        return (
-            np.mean(diff_peaks),
-            np.std(diff_peaks),
-            min(diff_peaks),
-            max(diff_peaks),
-            self.rmsValue(diff_peaks),
-        )
-
-    def zeroCrossing(self, data, fs):
-        return bsnb.zero_crossing_rate(data) * len(data) / fs
-
-#
-# def getFeatures(self):
-#     peaks, peaksAmp = peak_detector_Resp(self.data, self.fs)
-#     peaks = peaks[1]
-#     features = []
-#     funcs = {'peaks': [self.maxPeaks, self.meanAmpPeaks, self.stdAmpPeaks, self.rmsAmpPeaks, self.respFreq, self.respInterval, self.statisticsLastPeaks],
-#             'data': [self.energyValue, self.meanValue,  self.minValue, self.maxValue, self.stdValue, self.rmsValue, self.areaValue, self.zeroCrossing]}
-#     # Extract features from peaks
-#     for key in funcs:
-#         aux = self.data
-#         if key == 'peaks':
-#             aux = peaks
-#         for func in funcs[key]:
-#             try:
-#                 value = func(aux)
-#             except TypeError as e:
-#                 value = func(aux, self.fs)
-#
-#             if type(value) == np.float64 or type(value) == int:
-#                 value = [value]
-#             features.append(value)
-#
-#     return np.concatenate(features)

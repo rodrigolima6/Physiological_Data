@@ -1,26 +1,35 @@
 import neurokit2 as nk
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def getMarkers(marker, timestamps):
+    category, onset, offset = list(), list(), list()
 
-    videos = list()
-    onset = list()
-    offset = list()
     for timestamp, markers in zip(timestamps, marker):
-        if markers[1] == "1" and "baseline" not in markers:
+        if markers[1] == '1':
             offset.append(timestamp)
-            videos.append(markers[0])
-        elif markers[1] == "1" and "baseline" in markers:
+        elif markers[0] == "end":
             offset.append(timestamp)
-            videos.append(markers[0])
-        elif markers[1] == "0":
+        else:
             onset.append(timestamp)
+            category.append(markers[0])
 
-    return onset, offset, videos
+    return onset, offset, category
 
 
+@staticmethod
+def getRatingsIndex(onset: list, time_opensignals: list) -> list:
+    onset_index = list()
+
+    if len(onset) > 0:
+        for i in range(0, len(onset)):
+            onset_index.append(np.where(time_opensignals >= onset[i])[0][0])
+
+    return onset_index
+
+
+@staticmethod
 def getMarkersIndex(onset, offset, time_Opensignals):
     onset_index = list()
     offset_index = list()
@@ -29,12 +38,10 @@ def getMarkersIndex(onset, offset, time_Opensignals):
         onset_index.append(np.where(time_Opensignals >= onset[i])[0][0])
         offset_index.append(np.where(time_Opensignals <= offset[i])[0][-1])
 
-
     return onset_index, offset_index
 
 
 def CalculateEventsDiff(onset, offset):
-
     events_diff = list()
 
     for i in range(0, len(onset)):
@@ -55,7 +62,6 @@ def getOnset4sec(epochs):
 
 
 def getEpochs4sec(epochs, onset_4s, fs, epoch_duration=4):
-
     data = {}
     for keys in epochs.keys():
         d = {

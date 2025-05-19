@@ -45,6 +45,6 @@ Thumbs.db
 .Trashes
 
 # lib files used for local debugging
-/lib/
+/lib/novainstrumentation
 /html/lib/
 
