@@ -2,7 +2,7 @@ biosignalsnotebooks
 biosppy~=2.2.3
 matplotlib~=3.9.4
 neurokit2~=0.2.12
-numpy~=2.0.2
+numpy~=2.3.4
 pandas~=2.3.3
 scikit-learn~=1.6.1
 scipy~=1.16.2
