@@ -7,6 +7,6 @@ pandas~=2.3.3
 scikit-learn~=1.7.2
 scipy~=1.16.2
 pylsl~=1.17.6
-pyxdf~=1.17.0
+pyxdf~=1.17.1
 colorama~=0.4.6
 tqdm~=4.67.1
