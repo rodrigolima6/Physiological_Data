@@ -1,5 +1,5 @@
 biosignalsnotebooks
-biosppy~=2.2.3
+biosppy~=2.2.4
 matplotlib~=3.10.7
 neurokit2~=0.2.12
 numpy~=2.3.4
