@@ -9,4 +9,4 @@ scipy~=1.17.0
 pylsl~=1.18.1
 pyxdf~=1.17.3
 colorama~=0.4.6
-tqdm~=4.67.2
+tqdm~=4.67.3
